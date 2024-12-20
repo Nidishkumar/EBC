@@ -19,6 +19,8 @@ module top_arb #(
     logic Grp_release;
     logic [ROWS-1:0] row;         // Indicates if there's a request in a row
     logic [COLS-1:0] col;         // Holds column requests for the active row
+    logic [1:0] x_add;
+    logic [1:0] y_add;
 
     // Generate `row` signals to indicate active rows
     always_comb begin
@@ -40,23 +42,25 @@ module top_arb #(
     end
 
     // Instantiate RoundRobin module for column arbitration
-    RoundRobin RRA_Y (
+    roundrobin RRA_Y (
         .clk(clk),
         .reset(reset),
         .enable(enable),
         .req_i(col),        // Column requests of the active row
         .gnt_o(y_gnt_o),    // Column grant outputs
-        .Grp_release(Grp_release)
+        .add_o(x_add),
+        .Grp_release_o(Grp_release)
     );
 
     // Instantiate RoundRobin module for row arbitration
-    RoundRobin RRA_X (
+    roundrobin RRA_X (
         .clk(clk),
         .reset(reset),
         .enable(enable),
         .req_i(row),        // Row requests
         .gnt_o(x_gnt_o),    // Row grant outputs
-        .Grp_release(Grp_release)
+        .add_o(y_add),
+        .Grp_release_o(Grp_release)
     );
 
 endmodule
