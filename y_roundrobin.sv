@@ -4,7 +4,7 @@
 // Date: 
 // Version:
 //------------------------------------------------------------------------------------------------------------------
-module roundrobin (
+module y_roundrobin (
   input clk,
   input reset,
   input enable,
@@ -32,7 +32,7 @@ module roundrobin (
       if (enable)                // Update mask on enable
         mask_q <= nxt_mask;
       else
-        mask_q <= mask_q;        // Retain previous mask
+        mask_q <= 4'b1111;        // Retain previous mask
     end
 
   assign single_cycle_stop = (mask_q == '0) ? 1 : 0; // Stop if mask is zero
@@ -57,13 +57,14 @@ module roundrobin (
   );
 
   // Priority arbiter for raw requests
-  Priority_arb #(4) rawGnt (
-    .req_i(req_i),
-    .gnt_o(raw_gnt)
-  );
+  //Priority_arb #(4) rawGnt (
+  //  .req_i(req_i),
+  //  .gnt_o(raw_gnt)
+  //);
 
-  // Combine masked and raw grants
-  assign gnt_o = (|mask_req ? mask_gnt : raw_gnt);
+  // Flip-flop for mask state
+  assign gnt_o = (|mask_req ? mask_gnt : 4'b0000);
+
 
 endmodule
 
