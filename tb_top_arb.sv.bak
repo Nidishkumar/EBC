@@ -11,9 +11,9 @@ module tb_top_arb;
   parameter COLS = 4;
 
   // Inputs
-  logic clk_i;
-  logic reset_i;
-  logic enable_i;
+  logic clk;
+  logic reset;
+  logic enable;
   logic [ROWS-1:0][COLS-1:0] req_i;
 
   // Outputs
@@ -28,34 +28,34 @@ module tb_top_arb;
     .ROWS(ROWS),
     .COLS(COLS)
   ) dut (
-    .clk_i(clk_i),
-    .reset_i(reset_i),
+    .clk(clk),
+    .reset(reset),
     .req_i(req_i),
-    .enable_i(enable_i),
+    .enable(enable),
     .x_gnt_o(x_gnt_o),
     .y_gnt_o(y_gnt_o)
   );
 
   // Clock Generation
-  initial clk_i = 0;
-  always #5 clk_i = ~clk_i; // 10ns clock period
+  initial clk = 0;
+  always #5 clk = ~clk; // 10ns clock period
 
   // Stimulus
   initial begin
-    reset_i = 1;
-    enable_i = 1;
-    req_i = 16'b0000_0000_1110_1010;
+    reset = 1;
+    enable = 1;
+    req_i = 16'b0000_0000_0000_1010;
     #5;
-    reset_i = 0;
+    reset = 0;
     #10;
 
-    req_i = 16'b0000_0000_0101_0001;
+    req_i = 16'b0000_0000_0101_0000;
     #20;
 
-    req_i = 16'b0000_0011_1000_0000;
+    req_i = 16'b0000_0011_0000_0000;
     #30;
 
-    req_i = 16'b1101_0000_00011_000;
+    req_i = 16'b0101_0000_0000_0000;
     #20;
 
     $stop;

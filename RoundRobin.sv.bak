@@ -5,9 +5,9 @@
 // Version:
 //------------------------------------------------------------------------------------------------------------------
 module roundrobin (
-  input clk_i,
-  input reset_i,
-  input enable_i,
+  input clk,
+  input reset,
+  input enable,
   input [3:0] req_i,             // Request inputs
   output logic [3:0] gnt_o,      // Grant outputs
   output logic Grp_release_o,    // Group release signal
@@ -25,11 +25,11 @@ module roundrobin (
   logic [3:0] raw_gnt;           // Raw grants without masking
 
   // Flip-flop for mask state
-  always_ff @(posedge clk_i or posedge reset_i)
-    if (reset_i)
+  always_ff @(posedge clk or posedge reset)
+    if (reset)
       mask_q <= 4'b1111;         // Reset mask to all ones
     else begin
-      if (enable_i)                // Update mask on enable
+      if (enable)                // Update mask on enable
         mask_q <= nxt_mask;
       else
         mask_q <= mask_q;        // Retain previous mask

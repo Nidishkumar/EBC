@@ -4,10 +4,10 @@
 // Date: 
 // Version:
 //------------------------------------------------------------------------------------------------------------------
-module roundrobin (
-  input clk_i,
-  input reset_i,
-  input enable_i,
+module y_roundrobin (
+  input clk,
+  input reset,
+  input enable,
   input [3:0] req_i,             // Request inputs
   output logic [3:0] gnt_o,      // Grant outputs
   output logic Grp_release_o,    // Group release signal
@@ -25,18 +25,18 @@ module roundrobin (
   logic [3:0] raw_gnt;           // Raw grants without masking
 
   // Flip-flop for mask state
-  always_ff @(posedge clk_i or posedge reset_i)
-    if (reset_i)
+  always_ff @(posedge clk or posedge reset)
+    if (reset)
       mask_q <= 4'b1111;         // Reset mask to all ones
     else begin
-      if (enable_i)                // Update mask on enable
+      if (enable)                // Update mask on enable
         mask_q <= nxt_mask;
       else
-        mask_q <= mask_q;        // Retain previous mask
+        mask_q <= 4'b1111;        // Retain previous mask
     end
 
-  assign single_cycle_stop = (mask_q == '0) ? 1 : 0; // Stop if mask is zero
-  assign Grp_release_o = (nxt_mask > mask_q) ? 1 : 0; // Group release condition
+  assign single_cycle_stop = (mask_q == 4'b0) ? 1'b1 : 1'b0; // Stop if mask is zero
+  assign Grp_release_o = (nxt_mask > mask_q) ? 1'b1 : 1'b0; // Group release condition
 
   // Determine next mask based on current grant
   always_comb begin
@@ -57,13 +57,13 @@ module roundrobin (
   );
 
   // Priority arbiter for raw requests
-  Priority_arb #(4) rawGnt (
-    .req_i(req_i),
-    .gnt_o(raw_gnt)
-  );
+  //Priority_arb #(4) rawGnt (
+  //  .req_i(req_i),
+  //  .gnt_o(raw_gnt)
+  //);
 
-  // Combine masked and raw grants
-  assign gnt_o = (|mask_req ? mask_gnt : raw_gnt);
+  // Flip-flop for mask state
+  assign gnt_o = ~{4{reset}} & (|mask_req ? mask_gnt : 4'b0000);
+
 
 endmodule
-
