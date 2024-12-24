@@ -4,6 +4,8 @@
 // Date: 
 // Version:
 //------------------------------------------------------------------------------------------------------------------
+/*
+
 module y_roundrobin (
   input clk,
   input reset,
@@ -67,6 +69,72 @@ module y_roundrobin (
 
 
 endmodule
+*/
+module y_roundrobin (
+  input logic clk,
+  input logic reset,
+  input logic enable,
+  input logic [3:0] req_i,             // Request inputs
+  output logic [3:0] gnt_o,            // Grant outputs (sequential)
+  output logic Grp_release_o,          // Group release signal
+  output logic [1:0] add_o             // Additional output logic
+);
+
+  logic [3:0] mask_q;                  // Current mask
+  logic [3:0] nxt_mask;                // Next mask
+  logic [3:0] mask_req;                // Masked requests
+  logic [3:0] mask_gnt;                // Masked grants (combinational)
+  logic [3:0] gnt_reg;                 // Registered grant outputs
+
+  // Masked request generation
+  assign mask_req = req_i & mask_q;   // Mask requests with current mask
+
+  // Mask state update logic
+  always_ff @(posedge clk or posedge reset) begin
+    if (reset) begin
+      mask_q <= 4'b1111;              // Reset mask to all ones
+      gnt_o <= 4'b0000;             // Reset registered grant outputs
+    end 
+    else begin
+      if (enable) begin
+        mask_q <= nxt_mask;             // Update mask on enable
+        gnt_o <= gnt_reg;            // Register the combinational grant
+      end
+      else begin
+        mask_q <= 4'b1111;
+        gnt_o <= 4'b0000;
+      end 
+    end
+  end
+
+  // Grant output (registered value)
+  assign gnt_reg = mask_gnt;            // Register the combinational grant
+
+
+  // Group release condition
+  assign Grp_release_o = (nxt_mask > mask_q);
+
+  // Next mask generation based on current grant
+  always_comb begin
+    nxt_mask = mask_q;
+    if (mask_gnt[0]) nxt_mask = 4'b1110;
+    else if (mask_gnt[1]) nxt_mask = 4'b1100;
+    else if (mask_gnt[2]) nxt_mask = 4'b1000;
+    else if (mask_gnt[3]) nxt_mask = 4'b0000;
+
+    // Additional output logic
+    add_o[1] = mask_gnt[3] | mask_gnt[2];
+    add_o[0] = mask_gnt[3] | mask_gnt[1];
+  end
+
+  // Priority arbiter for masked requests
+  Priority_arb #(4) maskedGnt (
+    .req_i(mask_req),
+    .gnt_o(mask_gnt)
+  );
+
+endmodule
+
 
 
 
