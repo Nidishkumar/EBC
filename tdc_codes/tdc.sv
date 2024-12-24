@@ -1,3 +1,9 @@
+// Module name: Testbench for tdc module
+// Module Description: 
+// Author: 
+// Date: 
+// Version: 
+//-----------------------------------------------------------------------------------------------------------------
 module tdc #(
   parameter SIZE = 32 // Parameter to define the size of the counter and timestamp
 )(

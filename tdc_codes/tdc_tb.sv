@@ -1,3 +1,9 @@
+// Module name: Testbench for tdc module
+// Module Description: 
+// Author: 
+// Date: 
+// Version: 
+//-----------------------------------------------------------------------------------------------------------------
 module tdc_tb #(parameter SIZE = 32);
   // Declare testbench variables
   logic clk_i;
