@@ -1,76 +1,108 @@
-// Module name: RR Arbiter Module
+// Module name: Column Arbiter Module
 // Module Description: 
 // Author: 
 // Date: 
 // Version:
 //------------------------------------------------------------------------------------------------------------------
-/*
-
-module y_roundrobin (
-  input clk,
-  input reset,
-  input enable,
-  input [3:0] req_i,             // Request inputs
-  output logic [3:0] gnt_o,      // Grant outputs
-  output logic Grp_release_o,    // Group release signal
-  output logic [1:0] add_o
+module y_roundrobin #(parameter WIDTH = 8) (
+  input logic clk_i,                        // Clock input
+  input logic reset_i,                      // Reset input
+  input logic enable_i,                     // Enable signal to control updates
+  input logic [WIDTH-1:0] req_i,            // Request inputs
+  output logic [WIDTH-1:0] gnt_o,           // Grant outputs (sequential)
+  output logic Grp_release_o,               // Group release signal
+  output logic [2:0] yadd_o                 // Additional output logic (xadd_o equivalent)
 );
 
-  logic [3:0] mask_q;            // Current mask
-  logic [3:0] nxt_mask;          // Next mask
-  logic single_cycle_stop;       // Stop condition for one cycle
+  // Internal signals for mask and grant handling
+  logic [WIDTH-1:0] mask_ff;                // Current mask (active request set)
+  logic [WIDTH-1:0] nxt_mask;               // Next mask based on grants
+  logic [WIDTH-1:0] mask_req;               // Masked requests (AND of req_i and mask_ff)
+  logic [WIDTH-1:0] mask_gnt;               // Masked grants (from priority arbiter)
+  logic [WIDTH-1:0] gnt_temp;               // Temporary grant value before registering
 
-  logic [3:0] mask_req;          // Masked requests
-  assign mask_req = req_i & mask_q;  // Mask requests with current mask
+  // Masked request generation
+  assign mask_req = req_i & mask_ff;        // Mask requests using the current mask
 
-  logic [3:0] mask_gnt;          // Masked grants
-  logic [3:0] raw_gnt;           // Raw grants without masking
-
-  // Flip-flop for mask state
-  always_ff @(posedge clk or posedge reset)
-    if (reset)
-      mask_q <= 4'b1111;         // Reset mask to all ones
+  // Mask and grant state update logic
+  always_ff @(posedge clk_i or posedge reset_i) begin
+    if (reset_i) begin
+      mask_ff <= 8'b11111111;               // Reset mask to all ones (allow all requests)
+      gnt_o  <= 8'b00000000;                // Reset grant output to zero (no grants)
+    end 
     else begin
-      if (enable)                // Update mask on enable
-        mask_q <= nxt_mask;
-      else
-        mask_q <= 4'b1111;        // Retain previous mask
+      if (enable_i) begin
+        mask_ff <= nxt_mask;                // Update mask based on next mask calculation
+        gnt_o <= gnt_temp;                  // Register the combinational grant output
+      end
+      else begin
+        mask_ff <= 8'b11111111;            // Keep the mask enabled (all requests allowed)
+        gnt_o <= 8'b00000000;              // No grants if not enabled
+      end 
     end
-
-  assign single_cycle_stop = (mask_q == 4'b0) ? 1'b1 : 1'b0; // Stop if mask is zero
-  assign Grp_release_o = (nxt_mask > mask_q) ? 1'b1 : 1'b0; // Group release condition
-
-  // Determine next mask based on current grant
-  always_comb begin
-    nxt_mask = mask_q;
-    if (gnt_o[0]) nxt_mask = 4'b1110; // Update mask for grant[0]
-    else if (gnt_o[1]) nxt_mask = 4'b1100; // Update mask for grant[1]
-    else if (gnt_o[2]) nxt_mask = 4'b1000; // Update mask for grant[2]
-    else if (gnt_o[3]) nxt_mask = 4'b0000; // Update mask for grant[3]
-
-    add_o[1] = gnt_o[3] | gnt_o[2];  // Additional logic for x_add[1]
-    add_o[0] = gnt_o[3] | gnt_o[1];  // Additional logic for x_add[0]
   end
 
-  // Priority arbiter for masked requests
-  Priority_arb #(4) maskedGnt (
-    .req_i(mask_req),
-    .gnt_o(mask_gnt)
+  // Grant output is the value from the masked grants
+  assign gnt_temp = mask_gnt;               // Register the combinational grant from masked arbiter
+
+  // Group release condition: High when the next mask is greater than the current mask
+  assign Grp_release_o = (nxt_mask > mask_ff);
+
+  // Next mask generation based on current grant outputs
+  always_comb begin
+    nxt_mask = mask_ff;  // Default to the current mask value
+
+    // Iterate through the grant bits to generate the next mask
+    for (int i = 0; i < 8; i = i + 1) begin
+        if (gnt_temp[i]) begin
+            nxt_mask = (8'b11111111 << (i+1));  // Update mask after the granted bit
+        end
+    end
+  end
+
+  // Compute yadd_o (additional output logic) based on the current grants
+  always_comb begin
+    yadd_o = 3'b000;  // Initialize yadd_o to zero
+
+    // Logic for yadd_o[2] - OR operation for gnt_o[7:4]
+    yadd_o[2] = 1'b0;  // Initialize yadd_o[2] to 0
+    for (int i = 0; i < 8; i = i + 1) begin
+        if (i == 7 || i == 6 || i == 5 || i == 4) begin
+            yadd_o[2] = yadd_o[2] | gnt_o[i];  // OR operation for gnt_o[7:4]
+        end
+    end
+
+    // Logic for yadd_o[1] - OR operation for gnt_o[7,6,3,2]
+    yadd_o[1] = 1'b0;  // Initialize yadd_o[1] to 0
+    for (int i = 0; i < 8; i = i + 1) begin
+        if (i == 7 || i == 6 || i == 3 || i == 2) begin
+            yadd_o[1] = yadd_o[1] | gnt_o[i];  // OR operation for gnt_o[7,6,3,2]
+        end
+    end
+
+    // Logic for yadd_o[0] - OR operation for gnt_o[7,5,3,1]
+    yadd_o[0] = 1'b0;  // Initialize yadd_o[0] to 0
+    for (int i = 0; i < 8; i = i + 1) begin
+        if (i == 7 || i == 5 || i == 3 || i == 1) begin
+            yadd_o[0] = yadd_o[0] | gnt_o[i];  // OR operation for gnt_o[7,5,3,1]
+        end
+    end
+  end
+
+  // Priority arbiter for masked requests (maskedGnt)
+  Priority_arb #(WIDTH) maskedGnt (
+    .req_i(mask_req),   // Input masked requests
+    .gnt_o(mask_gnt)    // Output masked grants
   );
 
-  // Priority arbiter for raw requests
-  //Priority_arb #(4) rawGnt (
-  //  .req_i(req_i),
-  //  .gnt_o(raw_gnt)
-  //);
-
-  // Flip-flop for mask state
-  assign gnt_o = ~{4{reset}} & (|mask_req ? mask_gnt : 4'b0000);
-
-
 endmodule
-*/
-module y_roundrobin (
+
+
+
+
+
+
+/*module y_roundrobin (
   input logic clk,
   input logic reset,
   input logic enable,
@@ -133,89 +165,5 @@ module y_roundrobin (
     .gnt_o(mask_gnt)
   );
 
-endmodule
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Module name: RR Arbiter Module
-// // Module Description: 
-// // Author: 
-// // Date: 
-// // Version:
-// //------------------------------------------------------------------------------------------------------------------
-// module y_roundrobin (
-//   input clk,
-//   input reset,
-//   input enable,
-//   input [3:0] req_i,             // Request inputs
-//   output logic [3:0] gnt_o,      // Grant outputs
-//   output logic Grp_release_o,    // Group release signal
-//   output logic [1:0] add_o
-// );
-
-//   logic [3:0] mask_q;            // Current mask
-//   logic [3:0] nxt_mask;          // Next mask
-//   logic single_cycle_stop;       // Stop condition for one cycle
-
-//   logic [3:0] mask_req;          // Masked requests
-//   assign mask_req = req_i & mask_q;  // Mask requests with current mask
-
-//   logic [3:0] mask_gnt;          // Masked grants
-//   logic [3:0] raw_gnt;           // Raw grants without masking
-
-//   // Flip-flop for mask state
-//   always_ff @(posedge clk or posedge reset)
-//     if (reset)
-//       mask_q <= 4'b1111;         // Reset mask to all ones
-//     else begin
-//       if (enable)                // Update mask on enable
-//         mask_q <= nxt_mask;
-//       else
-//         mask_q <= 4'b1111;        // Retain previous mask
-//     end
-
-//   assign single_cycle_stop = (mask_q == '0) ? 1 : 0; // Stop if mask is zero
-//   assign Grp_release_o = (nxt_mask > mask_q) ? 1 : 0; // Group release condition
-
-//   // Determine next mask based on current grant
-//   always_comb begin
-//     nxt_mask = mask_q;
-//     if (gnt_o[0]) nxt_mask = 4'b1110; // Update mask for grant[0]
-//     else if (gnt_o[1]) nxt_mask = 4'b1100; // Update mask for grant[1]
-//     else if (gnt_o[2]) nxt_mask = 4'b1000; // Update mask for grant[2]
-//     else if (gnt_o[3]) nxt_mask = 4'b0000; // Update mask for grant[3]
-
-//     add_o[1] = gnt_o[3] | gnt_o[2];  // Additional logic for x_add[1]
-//     add_o[0] = gnt_o[3] | gnt_o[1];  // Additional logic for x_add[0]
-//   end
-
-//   // Priority arbiter for masked requests
-//   Priority_arb #(4) maskedGnt (
-//     .req_i(mask_req),
-//     .gnt_o(mask_gnt)
-//   );
-
-//   // Priority arbiter for raw requests
-//   //Priority_arb #(4) rawGnt (
-//   //  .req_i(req_i),
-//   //  .gnt_o(raw_gnt)
-//   //);
-
-//   // Flip-flop for mask state
-//   assign gnt_o = (|mask_req ? mask_gnt : 4'b0000);
-
-
-// endmodule
+endmodule*/
 
