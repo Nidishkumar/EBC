@@ -1,4 +1,4 @@
-// Module name: Testbench for tdc top module
+// Module name: Testbench for tdc tb module
 // Module Description: 
 // Author: 
 // Date: 
