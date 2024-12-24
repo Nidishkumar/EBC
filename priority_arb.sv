@@ -3,8 +3,8 @@
 module Priority_arb #(
   parameter NUM_PORTS = 4        // Number of ports
 )(
-  input wire [NUM_PORTS-1:0] req_i,  // Request inputs
-  output wire [NUM_PORTS-1:0] gnt_o  // One-hot grant signal
+  input logic [NUM_PORTS-1:0] req_i,  // Request inputs
+  output logic [NUM_PORTS-1:0] gnt_o  // One-hot grant signal
 );
 
   // Port[0] has highest priority

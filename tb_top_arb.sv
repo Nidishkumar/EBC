@@ -42,9 +42,8 @@ module tb_top_arb;
   // Tasks
   task initialize;
     begin
-     // reset = 1;
-      enable = 1;
-      req_i= 16'b0000_0000_0000_1001;     
+      enable = 0;
+      req_i= 16'b0000_0000_0000_0000;     
     end
   endtask
 
@@ -72,6 +71,7 @@ module tb_top_arb;
 
     // Reset the DUT
     apply_reset;
+    enable = 0;
 
     // Test 1: Single request active
     apply_request({4'b0000, 4'b0000, 4'b0000, 4'b1101}, 1);
