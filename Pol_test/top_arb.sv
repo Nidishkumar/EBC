@@ -47,7 +47,15 @@ module top_arb #(
     end
 
     // Assign the current column requests from the active row based on row index
-    assign col = req_i[x_add];              // Active row's column requests
+    always_comb 
+    begin
+        col = 8'b0;
+	  for( int i = 0; i < COLS ; i = i + 1 )
+	   begin
+         col[i] = |req_i[x_add][i];          // Active row's column requests
+       end
+	end             
+
     assign pol = req_i[x_add][y_add];       // Column request polarity for the active row
 
     // FSM state transition logic for row and column arbitration
