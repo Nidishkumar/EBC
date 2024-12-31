@@ -4,30 +4,31 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
-
 module top_arb #(
     parameter ROWS = 8,            // Number of rows
     parameter COLS = 8,            // Number of columns
-    parameter POLARITY = 2        // Number of bits for column requests (polarity)
+    parameter POLARITY = 2         // Number of bits for column requests (polarity)
 ) (
     input  logic                  clk_i,                // Clock input
     input  logic                  reset_i,              // Reset input
-    input  logic [COLS-1:0][POLARITY-1:0] req_i[ROWS-1:0], // Request inputs for each row and column
+    input  logic [COLS-1:0][POLARITY-1:0]req_i[ROWS-1:0], // Request inputs for each row and column
     input  logic                  enable_i,             // Enable signal to trigger arbitration
-    output logic [ROWS-1:0]       x_gnt_o,              // Row grant outputs
-    output logic [COLS-1:0]       y_gnt_o,              // Column grant outputs
+    output logic [ROWS-1:0][COLS-1:0] gnt_o ,              // Row grant outputs
     output logic                  polarity_o            // Polarity output (derived from column request)
 );
 
     // Internal signals
     logic Grp_release;             // Group release signal (indicates when the mask has been updated)
     logic [ROWS-1:0] row;          // Indicates which rows have active requests
-    logic [COLS-1:0]col;  // Holds the column requests for the selected active row
+    logic [COLS-1:0]col;           // Holds the column requests for the selected active row
     logic [2:0] x_add;             // Index for selected row in row arbitration logic
-    logic [2:0] y_add;             // Index for selected column in column arbitration logic
+    logic [2:0] y_add;  	        // Index for selected column in column arbitration logic
+
+    logic [COLS-1:0] y_gnt_o;
+    logic [ROWS-1:0] x_gnt_o;
 
     logic x_enable, y_enable;      // Enables for row and column arbitration logic
-    logic [POLARITY-1:0] pol;               // Temporary signal for column request polarity
+    logic [POLARITY-1:0] pol;      // Temporary signal for column request polarity
 
     // State machine for managing arbitration states
     typedef enum logic [1:0] {
@@ -47,15 +48,14 @@ module top_arb #(
     end
 
     // Assign the current column requests from the active row based on row index
-    always_comb 
-    begin
+    always_comb begin
         col = 8'b0;
-	  for( int i = 0; i < COLS ; i = i + 1 )
-	   begin
-         col[i] = |req_i[x_add][i];          // Active row's column requests
-       end
-	end             
+        for (int i = 0; i < COLS; i = i + 1) begin
+            col[i] = |req_i[x_add][i];
+        end
+    end
 
+    // Active row's column requests
     assign pol = req_i[x_add][y_add];       // Column request polarity for the active row
 
     // FSM state transition logic for row and column arbitration
@@ -64,6 +64,20 @@ module top_arb #(
             current_state <= IDLE;  // Reset state to IDLE when reset is triggered
         end else begin
             current_state <= next_state;  // Transition to the next state
+        end
+    end
+
+    always_comb begin
+        // Initialize all grants to 0
+        for (int i = 0; i < ROWS; i++) begin
+            for (int j = 0; j < COLS; j++) begin
+                gnt_o[i][j] = 1'b0;
+            end
+        end
+
+        // Activate the grant for the selected row and column
+        if (x_gnt_o != 0 && y_gnt_o != 0) begin
+            gnt_o[x_add][y_add] = 1'b1; // Grant the intersection of active row and column
         end
     end
 
@@ -137,5 +151,3 @@ module top_arb #(
     );
 
 endmodule
-
-
