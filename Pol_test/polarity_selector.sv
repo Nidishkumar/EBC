@@ -1,3 +1,9 @@
+// Module name:  Polarity Selector Module
+// Module Description: Top-level module for the Round-Robin arbitration of rows and columns
+// Author: [Your Name]
+// Date: [Current Date]
+// Version: [Version Number]
+//------------------------------------------------------------------------------------------------------------------
 module polarity_selector (
     input logic [1:0] req_i,     // 2-bit input request signal (req_i)
     output logic pol_out         // Output signal (polarity_o) representing the selected polarity
