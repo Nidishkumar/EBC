@@ -61,41 +61,24 @@ module y_roundrobin #(parameter WIDTH = 8) (
   end
 
   // Compute yadd_o (additional output logic) based on the current grants
-  always_comb begin
-    yadd_o = 3'b000;  // Initialize yadd_o to zero
-
-    // Logic for yadd_o[2] - OR operation for gnt_o[7:4]
-    yadd_o[2] = 1'b0;  // Initialize yadd_o[2] to 0
-    for (int i = 0; i < 8; i = i + 1) begin
-        if (i == 7 || i == 6 || i == 5 || i == 4) begin
-            yadd_o[2] = yadd_o[2] | gnt_o[i];  // OR operation for gnt_o[7:4]
+   // Compute yadd_o (additional output logic) based on the current grants
+    always_comb begin
+        yadd_o = 3'b0;                        // Initialize yadd_o to 0
+        for (int i = 0; i < WIDTH; i = i + 1) begin
+            if (gnt_o[i]) begin
+                yadd_o = i[2:0];                   // Assign the index of the granted request to yadd_o
+            end
         end
     end
 
-    // Logic for yadd_o[1] - OR operation for gnt_o[7,6,3,2]
-    yadd_o[1] = 1'b0;  // Initialize yadd_o[1] to 0
-    for (int i = 0; i < 8; i = i + 1) begin
-        if (i == 7 || i == 6 || i == 3 || i == 2) begin
-            yadd_o[1] = yadd_o[1] | gnt_o[i];  // OR operation for gnt_o[7,6,3,2]
-        end
-    end
-
-    // Logic for yadd_o[0] - OR operation for gnt_o[7,5,3,1]
-    yadd_o[0] = 1'b0;  // Initialize yadd_o[0] to 0
-    for (int i = 0; i < 8; i = i + 1) begin
-        if (i == 7 || i == 5 || i == 3 || i == 1) begin
-            yadd_o[0] = yadd_o[0] | gnt_o[i];  // OR operation for gnt_o[7,5,3,1]
-        end
-    end
-  end
-
-  // Priority arbiter for masked requests (maskedGnt)
-  Priority_arb #(WIDTH) maskedGnt (
-    .req_i(mask_req),   // Input masked requests
-    .gnt_o(mask_gnt)    // Output masked grants
-  );
+    // Priority arbiter for masked requests (maskedGnt)
+    Priority_arb #(WIDTH) maskedGnt (
+        .req_i(mask_req),                     // Input masked requests
+        .gnt_o(mask_gnt)                      // Output masked grants
+    );
 
 endmodule
+
 
 
 

@@ -56,46 +56,30 @@ module x_roundrobin #(parameter WIDTH = 8) (
 
   // Compute xadd_o (additional outputs) based on the current grants
   always_comb begin
-    xadd_o = 3'b000;  // Initialize xadd_o to 0
-
-    // Logic for xadd_o[2] - OR operation for gnt_o[7:4]
-    xadd_o[2] = 1'b0; 
-    for (int i = 0; i < 8; i = i + 1) begin
-        if (i == 7 || i == 6 || i == 5 || i == 4) begin
-            xadd_o[2] = xadd_o[2] | gnt_o[i];  // OR operation for gnt_o[7:4]
+        xadd_o = 3'b0;                        // Initialize xadd_o to 0
+        for (int i = 0; i < WIDTH ; i = i + 1) begin
+            if (gnt_o[i]) begin
+                xadd_o = i[2:0];                   // Assign the index of the granted bit to xadd_o
+            end
         end
     end
 
-    // Logic for xadd_o[1] - OR operation for gnt_o[7,6,3,2]
-    xadd_o[1] = 1'b0;  
-    for (int i = 0; i < 8; i = i + 1) begin
-        if (i == 7 || i == 6 || i == 3 || i == 2) begin
-            xadd_o[1] = xadd_o[1] | gnt_o[i];  // OR operation for gnt_o[7,6,3,2]
-        end
-    end
+    // Priority arbiter for masked requests (gives grants based on the masked requests)
+    Priority_arb #(WIDTH) maskedGnt (
+        .req_i(mask_req),                     // Input masked requests
+        .gnt_o(mask_gnt)                      // Output masked grants
+    );
 
-    // Logic for xadd_o[0] - OR operation for gnt_o[7,5,3,1]
-    xadd_o[0] = 1'b0;  // Initialize xadd_o[0] to 0
-    for (int i = 0; i < 8; i = i + 1) begin
-        if (i == 7 || i == 5 || i == 3 || i == 1) begin
-            xadd_o[0] = xadd_o[0] | gnt_o[i];  // OR operation for gnt_o[7,5,3,1]
-        end
-    end
-  end
-
-  // Priority arbiter for masked requests (gives grants based on the masked requests)
-  Priority_arb #(WIDTH) maskedGnt (
-    .req_i(mask_req),   // Input masked requests
-    .gnt_o(mask_gnt)    // Output masked grants
-  );
-
-  // Priority arbiter for raw requests (gives grants based on the original requests)
-  Priority_arb #(WIDTH) rawGnt (
-    .req_i(req_i),      // Input raw requests
-    .gnt_o(raw_gnt)     // Output raw grants
-  );
+    // Priority arbiter for raw requests (gives grants based on the original requests)
+    Priority_arb #(WIDTH) rawGnt (
+        .req_i(req_i),                        // Input raw requests
+        .gnt_o(raw_gnt)                       // Output raw grants
+    );
 
 endmodule
+
+
+
 
 
 /*module x_roundrobin (
