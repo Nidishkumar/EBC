@@ -60,7 +60,6 @@ module y_roundrobin #(parameter WIDTH = 8) (
     end
   end
 
-  // Compute yadd_o (additional output logic) based on the current grants
    // Compute yadd_o (additional output logic) based on the current grants
     always_comb begin
         yadd_o = 3'b0;                        // Initialize yadd_o to 0
