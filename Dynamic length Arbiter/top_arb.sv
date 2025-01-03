@@ -142,29 +142,32 @@ module top_arb (
       end
 	 
     // Instantiate RoundRobin module for column arbitration (y-direction)
-    y_roundrobin  RRA_Y (
-        .clk_i(clk_i),                       // Clock input
-        .reset_i(reset_i),                   // Reset input
-        .enable_i(y_enable),                 // Enable signal for column arbitration
-        .req_i(col),                         // Column requests for the active row
-        .gnt_o(y_gnt_o),                     // Column grant outputs
-        .yadd_o(y_add)                       // output for column arbitration (index)
+    y_roundrobin  RRA_Y 
+    (
+        .clk_i     (clk_i)    ,                 // Clock input
+        .reset_i   (reset_i)  ,                 // Reset input
+        .enable_i  (y_enable) ,                 // Enable signal for column arbitration
+        .req_i     (col)      ,                 // Column requests for the active row
+        .gnt_o     (y_gnt_o)  ,                 // Column grant outputs
+        .yadd_o    (y_add)                      // output for column arbitration (index)
     );
 
     // Instantiate RoundRobin module for row arbitration (x-direction)
-    x_roundrobin   RRA_X (
-        .clk_i(clk_i),                       // Clock input
-        .reset_i(reset_i),                   // Reset input
-        .enable_i(x_enable),                 // Enable signal for row arbitration
-        .req_i(row),                         // Row requests (active rows)
-        .gnt_o(x_gnt_o),                     // Row grant outputs
-        .xadd_o(x_add)                       // output for row arbitration (index)
+    x_roundrobin   RRA_X 
+    (
+        .clk_i     (clk_i)    ,                  // Clock input
+        .reset_i   (reset_i)  ,                  // Reset input
+        .enable_i  (x_enable) ,                  // Enable signal for row arbitration
+        .req_i     (row)      ,                  // Row requests (active rows)
+        .gnt_o     (x_gnt_o)  ,                  // Row grant outputs
+        .xadd_o    (x_add)                       // output for row arbitration (index)
     );
 
     // Instantiate polarity selector based on column request polarity
-    polarity_selector polarity_sel (
-        .req_i(polarity),                    // Polarity request input (column request)
-        .pol_out(polarity_o)                 // Output polarity signal
+    polarity_selector polarity_sel
+     (
+        .req_i     (polarity)  ,                  // Polarity request input (column request)
+        .pol_out   (polarity_o)                   // Output polarity signal
     );
 
 endmodule

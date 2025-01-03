@@ -78,15 +78,17 @@ module x_roundrobin
      end
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
-    Priority_arb  maskedGnt (
-        .req_i(mask_req),                     // Input masked requests
-        .gnt_o(mask_gnt)                      // Output masked grants
+    Priority_arb  maskedGnt 
+    (
+        .req_i  (mask_req)  ,                   // Input masked requests
+        .gnt_o  (mask_gnt)                      // Output masked grants
     );
 
     // Priority arbiter for raw requests (gives grants based on the original requests)
-    Priority_arb  rawGnt (
-        .req_i(req_i),                        // Input raw requests
-        .gnt_o(raw_gnt)                       // Output raw grants
+    Priority_arb  rawGnt 
+    (
+        .req_i  (req_i)     ,                   // Input raw requests
+        .gnt_o  (raw_gnt)                       // Output raw grants
     );
 
 endmodule

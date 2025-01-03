@@ -84,8 +84,8 @@ module y_roundrobin
 
     // Priority arbiter for masked requests (maskedGnt)
     Priority_arb  maskedGnt (
-        .req_i(mask_req),                      // Input masked requests
-        .gnt_o(mask_gnt)                       // Output masked grants
+        .req_i  (mask_req)  ,                    // Input masked requests
+        .gnt_o  (mask_gnt)                       // Output masked grants
     );
 
 endmodule
