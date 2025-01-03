@@ -13,13 +13,13 @@ module polarity_selector (
 
     // Always block, sensitivity list includes all signals used in the block
     always_comb 
-	  begin
+	 begin
         case(req_i)
 		    2'b10 : pol_out = 1'b1;
-			 2'b01 : pol_out = 1'b0;
+			2'b01 : pol_out = 1'b0;
 		    default : pol_out = 1'b0;
         endcase
-	  end	 
+	 end	 
 endmodule
 
   

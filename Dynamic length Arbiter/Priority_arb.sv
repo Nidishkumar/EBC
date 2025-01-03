@@ -19,7 +19,7 @@ module Priority_arb (
     for (i = 1; i < NUM_PORTS; i = i + 1) 
 	 begin : loop
       assign gnt_o[i] = req_i[i] & ~(|gnt_o[i-1:0]); // Grant[i] if no higher grant is active
-    end
+     end
   endgenerate
 
 endmodule

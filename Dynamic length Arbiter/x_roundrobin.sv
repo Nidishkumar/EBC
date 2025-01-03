@@ -32,17 +32,17 @@ module x_roundrobin (
     always_ff @(posedge clk_i or posedge reset_i) 
 	  begin
         if (reset_i) 
-		   begin
+		 begin
             mask_ff <= {WIDTH{1'b1}};          // Reset mask to all ones (allow all requests)
             gnt_o   <= {WIDTH{1'b0}};          // Reset grant output to zero (no grants)
 				
          end 
-		  else if (enable_i) 
-			begin
+		else if (enable_i) 
+		 begin
             mask_ff <= nxt_mask;              // Update mask based on next mask calculation
             gnt_o  <= gnt_temp;               // Register the grant output
          end
-    end
+      end
 	 
 
     // Determine the final grant output: either masked grants or raw grants depending on the mask
@@ -55,25 +55,26 @@ module x_roundrobin (
 
         // Iterate through the gnt_temp bits to calculate the next mask
         for (int i = 0; i < WIDTH ; i = i + 1)
-		   begin
+		 begin
             if (gnt_temp[i]) 
-				 begin
+			 begin
                 nxt_mask = ({WIDTH{1'b1}} << (i + 1)); // Next mask update based on current grant 
              end
          end
-    end
+      end
 
     // Compute xadd_o based on the current grants
-    always_comb begin
+    always_comb 
+     begin
         xadd_o = {x_width{1'b0}};              // Initialize xadd_o to 0
         for (int i = 0; i < WIDTH ; i = i + 1) 
-		   begin
+		 begin
             if (gnt_o[i])
-				 begin
+			 begin
                 xadd_o = i[x_width-1:0];       // Assign the index of the granted bit to xadd_o
              end
          end
-    end
+     end
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     Priority_arb  maskedGnt (

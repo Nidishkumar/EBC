@@ -61,14 +61,14 @@ module top_arb (
     always_ff @(posedge clk_i or posedge reset_i) 
 	  begin
         if (reset_i) 
-		   begin
+		 begin
             current_state <= IDLE;  // Reset state to IDLE when reset is triggered
          end 
-		  else 
-		   begin
+		else 
+		 begin
             current_state <= next_state;  // Transition to the next state
          end
-     end
+      end
 
     // FSM next state and output logic based on current state
     always_comb 
@@ -80,23 +80,23 @@ module top_arb (
 
         case (current_state)
             IDLE: 
-				 begin
+			 begin
                 if (enable_i) 
-					  begin
+				 begin
                     x_enable = 1'b1;       // Enable row arbitration if enable_i is high
                     next_state = ROW_GRANT;// Transition to row grant state
                  end 
-					 else 
-					  begin
+				else 
+				 begin
                     next_state = IDLE;     // Stay in IDLE state if enable_i is low
                  end
              end
 
             ROW_GRANT: 
-				 begin
+			 begin
                 x_enable = 1'b1;             // Keep row arbitration enabled during ROW_GRANT state
                 if (x_gnt_o != {ROWS{1'b0}}) 
-					  begin                       // If any row has been granted, move to column grant
+				 begin                       // If any row has been granted, move to column grant
                     y_enable = 1'b1;         // Enable column arbitration once row grant is done
                     x_enable = 1'b0;         // Disable row arbitration
                     next_state = COL_GRANT;  // Transition to column grant state
@@ -104,10 +104,10 @@ module top_arb (
              end
 
             COL_GRANT: 
-				 begin
+			 begin
                 y_enable = 1'b1;             // Enable column arbitration during COL_GRANT state
                 if (y_gnt_o == {COLS{1'b0}}) 
-					  begin                       // If no column grant, transition back to row arbitration
+				 begin                       // If no column grant, transition back to row arbitration
                     x_enable = 1'b1;         // Enable row arbitration once column grant is done
                     y_enable = 1'b0;         // Disable column arbitration
                     next_state = ROW_GRANT;  // Transition back to row grant state
@@ -115,7 +115,7 @@ module top_arb (
              end
 
             default:
-			  	 begin
+			 begin
                 next_state = IDLE;           // Default state transition to IDLE
              end
         endcase
@@ -126,19 +126,19 @@ module top_arb (
 	  begin
         // Initialize all grants to 0
         for (int i = 0; i < ROWS; i++) 
-		   begin
+		 begin
             for (int j = 0; j < COLS; j++) 
-				 begin
+			 begin
                 gnt_o[i][j] = 1'b0;
              end
          end
 
         // Activate the grant for the selected row and column
         if (x_gnt_o != 0 && y_gnt_o != 0) 
-		   begin
+		 begin
             gnt_o[x_add][y_add] = 1'b1; // Grant the intersection of active row and column
          end
-     end
+      end
 	 
     // Instantiate RoundRobin module for column arbitration (y-direction)
     y_roundrobin  RRA_Y (
