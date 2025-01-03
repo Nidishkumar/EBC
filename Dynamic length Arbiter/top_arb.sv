@@ -7,12 +7,12 @@
  import arbiter_pkg::*; 
 
 module top_arb (
-    input  logic                  clk_i,                  // Clock input
-    input  logic                  reset_i,                // Active high Reset input
-    input  logic [COLS-1:0][POLARITY-1:0]req_i[ROWS-1:0], // Request inputs for each row and column
-    input  logic                  enable_i,               // Enable signal to trigger arbitration
-    output logic [ROWS-1:0][COLS-1:0] gnt_o ,             // Row grant outputs
-    output logic                  polarity_o              // Polarity output(derived from column request)
+    input  logic                  clk_i                     ,   // Clock input
+    input  logic                  reset_i                   ,   // Active high Reset input
+    input  logic [COLS-1:0][POLARITY-1:0]req_i[ROWS-1:0]    ,   // Request inputs for each row and column
+    input  logic                  enable_i                  ,   // Enable signal to trigger arbitration
+    output logic [ROWS-1:0][COLS-1:0] gnt_o                 ,   // Row grant outputs
+    output logic                  polarity_o                    // Polarity output(derived from column request)
 );
 
     // Internal signals

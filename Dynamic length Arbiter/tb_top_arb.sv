@@ -19,20 +19,22 @@ import arbiter_pkg::*;
   logic polarity_o;
 
   // Instantiate the Top Module
-  top_arb  dut (
-    .clk_i(clk_i),
-    .reset_i(reset_i),
-    .req_i(req_i),
-    .enable_i(enable_i),
-    .gnt_o(gnt_o),
-	 .polarity_o(polarity_o)
+  top_arb   dut (
+            .clk_i          (clk_i)         ,
+            .reset_i        (reset_i)       ,
+            .req_i          (req_i)         ,
+            .enable_i       (enable_i)      ,
+            .gnt_o          (gnt_o)         ,
+            .polarity_o     (polarity_o)
   );
 
+//--------------------------------------------------Clock generation------------------------------//
   // Clock Generation
   initial begin
-    clk_i = 0;
-    forever #5 clk_i = ~clk_i; //  clock period
+                clk_i = 0       ;
+    forever #5  clk_i = ~clk_i  ; //  clock period
   end
+//--------------------------------------------End of Clock generation----------------------------//
   
  always_ff @(posedge clk_i)
  begin
