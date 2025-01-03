@@ -4,26 +4,27 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
- import arbiter_pkg::*; 
+ import arbiter_pkg::*;                        // Importing arbiter package containing parameter constants
 
-module y_roundrobin  (
-    input  logic clk_i,                        // Clock input
-    input  logic reset_i,                      // Active high Reset input
-    input  logic enable_i,                     // Enable signal to control Column arbiter
-    input  logic [WIDTH-1:0]req_i,             // Request inputs (multi-bit for each request)
-    output logic [WIDTH-1:0] gnt_o,            // Grant outputs (sequential)
+module y_roundrobin 
+ (
+    input  logic clk_i                ,        // Clock input
+    input  logic reset_i              ,        // Active high Reset input
+    input  logic enable_i             ,        // Enable signal to control Column arbiter
+    input  logic [WIDTH-1:0]req_i     ,        // Request inputs (multi-bit for each request)
+    output logic [WIDTH-1:0] gnt_o    ,        // Grant outputs (sequential)
     output logic [y_width-1:0] yadd_o          // Encoded output representing the granted cloumn index
-);
+ );
 
     // Internal signals for mask and grant handling
-    logic [WIDTH-1:0] mask_ff;                 // Current mask 
+    logic [WIDTH-1:0] mask_ff ;                // Current mask 
     logic [WIDTH-1:0] nxt_mask;                // Next mask based on grants
     logic [WIDTH-1:0] mask_req;                // Masked requests (and of req_i and mask_ff)
     logic [WIDTH-1:0] mask_gnt;                // Masked grants (output from priority arbiter)
     logic [WIDTH-1:0] gnt_temp;                // Temporary grant value before registering output
 
-    // Masked request generation (AND the request signals with the current mask)
-    assign mask_req = req_i & mask_ff;         // Mask requests using the current mask
+     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
+    assign mask_req = req_i & mask_ff;        
 
     // Mask and grant state update logic
     always_ff @(posedge clk_i or posedge reset_i) 

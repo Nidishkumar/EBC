@@ -9,17 +9,17 @@
 module top_arb (
     input  logic                  clk_i                     ,   // Clock input
     input  logic                  reset_i                   ,   // Active high Reset input
-    input  logic [COLS-1:0][POLARITY-1:0]req_i[ROWS-1:0]    ,   // Request inputs for each row and column
     input  logic                  enable_i                  ,   // Enable signal to trigger arbitration
-    output logic [ROWS-1:0][COLS-1:0] gnt_o                 ,   // Row grant outputs
-    output logic                  polarity_o                    // Polarity output(derived from column request)
+    input  logic [COLS-1:0][POLARITY-1:0]req_i[ROWS-1:0]    ,   // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
+    output logic [ROWS-1:0][COLS-1:0] gnt_o                 ,   // grant outputs
+    output logic                  polarity_o                    // Polarity output
 );
 
     // Internal signals
     logic [ROWS-1:0] row;          // Indicates which rows have active requests
     logic [COLS-1:0]col;           // Holds the column requests for the selected active row
     logic [x_width-1:0] x_add;     // Index for selected row in row arbitration logic
-    logic [y_width-1:0] y_add;  	  // Index for selected column in column arbitration logic
+    logic [y_width-1:0] y_add;     // Index for selected column in column arbitration logic
 
     logic [COLS-1:0] y_gnt_o;
     logic [ROWS-1:0] x_gnt_o;
@@ -49,9 +49,10 @@ module top_arb (
     // Assign the current column requests from the active row based on row index
     always_comb begin
         col = {COLS{1'b0}};
-        for (int i = 0; i < COLS; i = i + 1) begin
+        for (int i = 0; i < COLS; i = i + 1) 
+         begin
             col[i] = |req_i[x_add][i];
-        end
+         end
     end
 
     // Active row's column requests

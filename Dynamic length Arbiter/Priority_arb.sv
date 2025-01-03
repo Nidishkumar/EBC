@@ -4,11 +4,11 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
-import arbiter_pkg::*; 
+import arbiter_pkg::*;                // Importing arbiter package containing parameter constants
 
 module Priority_arb (
-  input wire [NUM_PORTS-1:0] req_i,  // Request inputs
-  output wire [NUM_PORTS-1:0] gnt_o  // One-hot grant signal
+  input logic [WIDTH-1:0] req_i   ,  // Request inputs
+  output logic [WIDTH-1:0] gnt_o     // One-hot grant signal
 );
 
   // Port[0] has highest priority
@@ -16,9 +16,10 @@ module Priority_arb (
 
   genvar i;
   generate
+    // Grant[i] is asserted if req_i[i] is active and no higher-priority grants are active
     for (i = 1; i < NUM_PORTS; i = i + 1) 
-	 begin : loop
-      assign gnt_o[i] = req_i[i] & ~(|gnt_o[i-1:0]); // Grant[i] if no higher grant is active
+	   begin 
+         assign gnt_o[i] = req_i[i] & ~(|gnt_o[i-1:0]);  
      end
   endgenerate
 

@@ -4,27 +4,28 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
- import arbiter_pkg::*; 
+ import arbiter_pkg::*;                        // Importing arbiter package containing parameter constants
 
-module x_roundrobin (
-    input  logic clk_i,                        // Clock input
-    input  logic reset_i,                      // Active high Reset input
-    input  logic enable_i,                     // Enable signal to control Row arbiter
-    input  logic [WIDTH-1:0] req_i,            // Request inputs
-    output logic [WIDTH-1:0] gnt_o,            // Grant outputs
+module x_roundrobin
+ (
+    input  logic clk_i                 ,       // Clock input
+    input  logic reset_i               ,       // Active high Reset input
+    input  logic enable_i              ,       // Enable signal to control Row arbiter
+    input  logic [WIDTH-1:0] req_i     ,       // Request inputs
+    output logic [WIDTH-1:0] gnt_o     ,       // Grant outputs
     output logic [x_width-1:0] xadd_o          // Encoded output representing the granted row index
-);
+ );
 
     // Internal signals for mask and grant handling
-    logic [WIDTH-1:0] mask_ff;                 // Current mask (the active request set)
+    logic [WIDTH-1:0] mask_ff ;                // Current mask (the active request set)
     logic [WIDTH-1:0] nxt_mask;                // Next mask value after evaluating grants
     logic [WIDTH-1:0] mask_req;                // Masked requests (and of req_i and mask_ff)
     logic [WIDTH-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
-    logic [WIDTH-1:0] raw_gnt;                 // Raw grants (output from raw priority arbiter)
+    logic [WIDTH-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
     logic [WIDTH-1:0] gnt_temp;                // Temporary grant value before updating the output
 	 
 
-    // Mask requests with the current mask
+    // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;
 
 	 
