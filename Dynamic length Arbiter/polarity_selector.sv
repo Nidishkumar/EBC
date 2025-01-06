@@ -12,13 +12,14 @@ module polarity_selector (
 );
 
  // Determine the polarity (pol_out) based on the request input (req_i)     
-	 begin
+	always_comb 
+	  begin
         case(req_i)
-		    2'b10 : pol_out = 1'b1;
-			2'b01 : pol_out = 1'b0;
-		    default : pol_out = 1'b0;
+		     2'b10   :    pol_out = 1'b1;
+			 2'b01   :    pol_out = 1'b0;
+		     default :    pol_out = 1'b0;
         endcase
-	 end	 
+	  end	 	 
 endmodule
 
   

@@ -4,7 +4,7 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
- import arbiter_pkg::*; 
+ import arbiter_pkg::*;                                         // Importing arbiter package containing parameter constants
 
 module top_arb (
     input  logic                  clk_i                     ,   // Clock input
@@ -12,7 +12,8 @@ module top_arb (
     input  logic                  enable_i                  ,   // Enable signal to trigger arbitration
     input  logic [COLS-1:0][POLARITY-1:0]req_i[ROWS-1:0]    ,   // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
     output logic [ROWS-1:0][COLS-1:0] gnt_o                 ,   // grant outputs
-    output logic                  polarity_o                    // Polarity output
+    output logic                  polarity_o                ,   // Polarity output
+    output logic [31:0]           timestamp_o                   //timestamp output
 );
 
     // Internal signals
@@ -163,11 +164,21 @@ module top_arb (
         .xadd_o    (x_add)                       // output for row arbitration (index)
     );
 
-    // Instantiate polarity selector based on column request polarity
+    // Instantiate the tdc module to capture timestamp based on event trigger.
     polarity_selector polarity_sel
      (
         .req_i     (polarity)  ,                  // Polarity request input (column request)
         .pol_out   (polarity_o)                   // Output polarity signal
     );
+
+    // Instantiate the tdc module to capture timestamp based on event trigger.
+    tdc time_stamp 
+	 (
+	     .clk_i     (clk_i)     ,                 // Clock input
+         .reset_i   (reset_i)   ,                 // Reset input
+         .event_i   (y_enable)  ,                 // Connect event signal (y_enable) to trigger timestamp capture in the tdc module.
+		.timestamp_o(timestamp_o)                 // Output the captured timestamp (timestamp_o) from the tdc module.
+		  
+	 );
 
 endmodule

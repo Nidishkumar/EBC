@@ -14,8 +14,9 @@ import arbiter_pkg::*;                             // Importing arbiter package 
   logic [COLS-1:0][POLARITY-1:0] req_i[ROWS-1:0]; // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
   logic [ROWS-1:0][COLS-1:0] gnt_o              ; //grant output
-  //logic [COLS-1:0] y_gnt_o;
   logic polarity_o                              ; // Polarity output
+  logic [31:0] timestamp_o                      ; //timestamp output
+
 
   // Instantiate the Top Module
   top_arb   dut (
@@ -24,7 +25,8 @@ import arbiter_pkg::*;                             // Importing arbiter package 
             .req_i          (req_i)         ,
             .enable_i       (enable_i)      ,
             .gnt_o          (gnt_o)         ,
-            .polarity_o     (polarity_o)
+            .polarity_o     (polarity_o)    ,
+            .timestamp_o    (timestamp_o)
   );
 
 //--------------------------------------------------Clock generation------------------------------//

@@ -17,7 +17,7 @@ module Priority_arb (
   genvar i;
   generate
     // Grant[i] is asserted if req_i[i] is active and no higher-priority grants are active
-    for (i = 1; i < NUM_PORTS; i = i + 1) 
+    for (i = 1; i < WIDTH; i = i + 1) 
 	   begin 
          assign gnt_o[i] = req_i[i] & ~(|gnt_o[i-1:0]);  
      end

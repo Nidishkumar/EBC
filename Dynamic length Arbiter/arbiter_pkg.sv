@@ -13,6 +13,7 @@ package arbiter_pkg;
   parameter y_width = 3  ;   // To identify the granted column index
   parameter x_width = 3  ;   // To identify the granted row index
   parameter WIDTH = ROWS ;   // Alias for the number of rows
+  parameter SIZE  = 32   ;   // To define the width of the timestamp
 
 
 endpackage
