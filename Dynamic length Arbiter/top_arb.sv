@@ -174,9 +174,9 @@ module top_arb (
     // Instantiate the tdc module to capture timestamp based on event trigger.
     tdc time_stamp 
 	 (
-	     .clk_i     (clk_i)     ,                 // Clock input
-         .reset_i   (reset_i)   ,                 // Reset input
-         .event_i   (y_enable)  ,                 // Connect event signal (y_enable) to trigger timestamp capture in the tdc module.
+	    .clk_i     (clk_i)     ,                 // Clock input
+        .reset_i   (reset_i)   ,                 // Reset input
+        .event_i   (y_enable)  ,                 // Connect event signal (y_enable) to trigger timestamp capture in the tdc module.
 		.timestamp_o(timestamp_o)                 // Output the captured timestamp (timestamp_o) from the tdc module.
 		  
 	 );
