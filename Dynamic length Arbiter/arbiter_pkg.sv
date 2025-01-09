@@ -12,8 +12,9 @@ package arbiter_pkg;
   parameter POLARITY = 2 ;   // Represents the each column length of a pixel in the design
   parameter y_width = 3  ;   // To identify the granted column index
   parameter x_width = 3  ;   // To identify the granted row index
-  parameter WIDTH = ROWS ;   // Alias for the number of rows
   parameter SIZE  = 32   ;   // To define the width of the timestamp
+  parameter WIDTH =39    ;   //Width of data_out 
+  
 
 
 endpackage

@@ -14,19 +14,16 @@ import arbiter_pkg::*;                             // Importing arbiter package 
   logic [COLS-1:0][POLARITY-1:0] req_i[ROWS-1:0]; // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
   logic [ROWS-1:0][COLS-1:0] gnt_o              ; //grant output
-  logic polarity_o                              ; // Polarity output
-  logic [31:0] timestamp_o                      ; //timestamp output
-
+  logic [WIDTH-1:0] data_out_o                  ; //event data
 
   // Instantiate the Top Module
   top_arb   dut (
-            .clk_i          (clk_i)         ,
-            .reset_i        (reset_i)       ,
-            .req_i          (req_i)         ,
-            .enable_i       (enable_i)      ,
-            .gnt_o          (gnt_o)         ,
-            .polarity_o     (polarity_o)    ,
-            .timestamp_o    (timestamp_o)
+            .clk_i          (clk_i)         ,     // Clock input
+            .reset_i        (reset_i)       ,     // Active high Reset input
+            .req_i          (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
+            .enable_i       (enable_i)      ,     // Enable signal to trigger arbitration
+            .gnt_o          (gnt_o)         ,     // grant outputs
+            .data_out_o     (data_out_o)          // current event information 
   );
 
 //--------------------------------------------------Clock generation------------------------------//
@@ -61,7 +58,7 @@ end
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00}}; 
+               {2'b00, 2'b00, 2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01}}; 
 
     end
   endtask
@@ -89,10 +86,11 @@ end
 
     // Initialize inputs
     initialize;
-
+    
     // Reset the DUT
     apply_reset;
-    enable_i = 0;
+	 //Applying Enable
+	 enable_i = 1;
 	 
 	 #20;
 
@@ -104,7 +102,7 @@ end
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b10, 2'b01, 2'b00, 2'b01, 2'b00, 2'b10, 2'b10, 2'b01}}, 1);
+               {2'b00, 2'b01, 2'b00, 2'b01, 2'b00, 2'b00, 2'b10, 2'b01}}, 1);
     #30;
 
     // Test 2: First row updated with new request values
@@ -132,23 +130,38 @@ end
                {2'b10, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
     #20;
 	 
-   // Apply reset to deassert the grant signals, setting them to zero
+   // Apply reset to deassert the grant signal
 	 apply_reset;
-	 #40;
+	 #50;
+	// Apply enable low to halt the granting 
+    enable_i = 0;
+	 #20;
+	// Apply enable high to continue the granting where it left
+	 enable_i = 1;
 	 
-	// Test 4: After reset, both arbiters are initialized to the initial row and column
+	// Test 4: Continously give grants to active events of the pixel
 	 apply_request(
 	               {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b01, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b01, 2'b00, 2'b01}, 
                {2'b00, 2'b00, 2'b10, 2'b00, 2'b01, 2'b01, 2'b10, 2'b01}, 
+               {2'b10, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b10, 2'b00, 2'b00}, 
-               {2'b00, 2'b01, 2'b00, 2'b00, 2'b00, 2'b00, 2'b10, 2'b00}}, 0);
-    #100;
-	 
-	 // Test 5: Giving multiple requests in each row exceept third row
+               {2'b00, 2'b01, 2'b00, 2'b00, 2'b00, 2'b00, 2'b10, 2'b00}}, 1);
+    #30;  
+	 // Test 5: Request is updated,based on this updated events will be granted 
+	 apply_request(
+	            {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
+	 #20;
+	 // Test 6: Again Requests updation
      apply_request(
 	               {{2'b10, 2'b10, 2'b00, 2'b10, 2'b00, 2'b01, 2'b00, 2'b00}, 
                {2'b01, 2'b00, 2'b00, 2'b00, 2'b10, 2'b01, 2'b10, 2'b00}, 

@@ -11,18 +11,18 @@ module x_roundrobin
     input  logic clk_i                 ,       // Clock input
     input  logic reset_i               ,       // Active high Reset input
     input  logic enable_i              ,       // Enable signal to control Row arbiter
-    input  logic [WIDTH-1:0] req_i     ,       // Request inputs
-    output logic [WIDTH-1:0] gnt_o     ,       // Grant outputs
+    input  logic [ROWS-1:0] req_i     ,       // Request inputs
+    output logic [ROWS-1:0] gnt_o     ,       // Grant outputs
     output logic [x_width-1:0] xadd_o          // Encoded output representing the granted row index
  );
 
     // Internal signals for mask and grant handling
-    logic [WIDTH-1:0] mask_ff ;                // Current mask (the active request set)
-    logic [WIDTH-1:0] nxt_mask;                // Next mask value after evaluating grants
-    logic [WIDTH-1:0] mask_req;                // Masked requests (and of req_i and mask_ff)
-    logic [WIDTH-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
-    logic [WIDTH-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
-    logic [WIDTH-1:0] gnt_temp;                // Temporary grant value before updating the output
+    logic [ROWS-1:0] mask_ff ;                // Current mask (the active request set)
+    logic [ROWS-1:0] nxt_mask;                // Next mask value after evaluating grants
+    logic [ROWS-1:0] mask_req;                // Masked requests (and of req_i and mask_ff)
+    logic [ROWS-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
+    logic [ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
+    logic [ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
 	 
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
@@ -34,8 +34,8 @@ module x_roundrobin
 	  begin
         if (reset_i) 
 		 begin
-            mask_ff <= {WIDTH{1'b1}};          // Reset mask to all ones (allow all requests)
-            gnt_o   <= {WIDTH{1'b0}};          // Reset grant output to zero (no grants)
+            mask_ff <= {ROWS{1'b1}};          // Reset mask to all ones (allow all requests)
+            gnt_o   <= {ROWS{1'b0}};          // Reset grant output to zero (no grants)
 				
          end 
 		else if (enable_i) 
@@ -55,11 +55,11 @@ module x_roundrobin
         nxt_mask = mask_ff;                   // Default: next mask is the current mask
 
         // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < WIDTH ; i = i + 1)
+        for (int i = 0; i < ROWS ; i = i + 1)
 		 begin
             if (gnt_temp[i]) 
 			 begin
-                nxt_mask = ({WIDTH{1'b1}} << (i + 1)); // Next mask update based on current grant 
+                nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
              end
          end
       end
@@ -68,7 +68,7 @@ module x_roundrobin
     always_comb 
      begin
         xadd_o = {x_width{1'b0}};              // Initialize xadd_o to 0
-        for (int i = 0; i < WIDTH ; i = i + 1) 
+        for (int i = 0; i < ROWS ; i = i + 1) 
 		 begin
             if (gnt_o[i])
 			 begin

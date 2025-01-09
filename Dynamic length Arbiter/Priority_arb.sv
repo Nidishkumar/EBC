@@ -4,7 +4,7 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
-import arbiter_pkg::*;                // Importing arbiter package containing parameter constants
+import arbiter_pkg::*;               // Importing arbiter package containing parameter constants
 
 module Priority_arb (
   input logic [WIDTH-1:0] req_i   ,  // Request inputs
