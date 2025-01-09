@@ -30,26 +30,26 @@ module y_roundrobin
     always_ff @(posedge clk_i or posedge reset_i) 
 	  begin
         if (reset_i) 
-		 begin
+		   begin
             // Reset mask to all ones (allow all requests) and reset grant output to zero
             mask_ff <= {COLS{1'b1}};
             gnt_o   <= {COLS{1'b0}};          // Reset grant output to zero (no grants)
          end 
         else 
-		 begin
+		   begin
             if (enable_i) 
-			 begin
+			    begin
                 mask_ff <= nxt_mask;           // Update mask based on next mask calculation
                 gnt_o   <= gnt_temp;           // Register the combinational grant output
              end
             else
-			 begin
+			    begin
                 // Reset mask to all ones (allow all requests) when not enabled
                 mask_ff <=  {COLS{1'b1}}; 
                 gnt_o   <=  {COLS{1'b0}};     // No grants when not enabled
              end
          end
-      end
+     end
 
     // Grant output is taken from the masked grants
     assign gnt_temp = mask_gnt;                // Register the combinational grant from masked arbiter
@@ -61,26 +61,26 @@ module y_roundrobin
 
         // Iterate through the gnt_temp bits to calculate the next mask
         for (int i = 0; i < COLS ; i = i + 1) 
-		 begin
+		   begin
             if (gnt_temp[i]) 
-			 begin
-                nxt_mask = ({COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-             end
+			      begin
+                   nxt_mask = ({COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+               end
          end
      end
 
     // Compute yadd_o based on the current grants
     always_comb 
-     begin
+      begin
         yadd_o = {y_width{1'b0}};               // Initialize yadd_o to 0
         for (int i = 0; i < COLS; i = i + 1) 
-		 begin
+		   begin
             if (gnt_o[i]) 
-			 begin
-                yadd_o = i[y_width-1:0];        // Assign the index of the granted cloumn index to yadd_o
-             end
+			      begin
+                  yadd_o = i[y_width-1:0];      // Assign the index of the granted cloumn index to yadd_o
+               end
          end
-     end
+      end
 
     // Priority arbiter for masked requests (maskedGnt)
     Priority_arb  maskedGnt (

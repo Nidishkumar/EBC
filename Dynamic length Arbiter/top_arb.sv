@@ -119,51 +119,50 @@ module top_arb (
              end
 
             ROW_GRANT: 
-			 begin
-			      if(enable_i)
-					begin
+			begin
+		    if(enable_i)
+			  begin
                 x_enable = 1'b1;             // Keep row arbitration enabled during ROW_GRANT state
                 if (x_gnt_o != {ROWS{1'b0}}) 
-				     begin                       // If any row has been granted, move to column grant
+				 begin                       // If any row has been granted, move to column grant
                     y_enable = 1'b1;         // Enable column arbitration once row grant is done
                     x_enable = 1'b0;         // Disable row arbitration
                     next_state = COL_GRANT;  // Transition to column grant state
                  end
               end
 
-					 else
-					   begin
-					     x_enable = 1'b0;           // Disable row arbitration 
-                    y_enable = 1'b0;           // Disable column arbitration
-					     next_state = IDLE;	  
-				      end
+			else
+			 begin
+				x_enable = 1'b0;           // Disable row arbitration 
+                y_enable = 1'b0;           // Disable column arbitration
+				next_state = IDLE;	  
+			 end
             end
             COL_GRANT: 
-			 begin
-			       if(enable_i)
-					 begin
-                y_enable = 1'b1;             // Enable column arbitration during COL_GRANT state
-                if (y_gnt_o == {COLS{1'b0}}) 
-				 begin                       // If no column grant, transition back to row arbitration
+			begin
+			    if(enable_i)
+			     begin
+                  y_enable = 1'b1;             // Enable column arbitration during COL_GRANT state
+                 if (y_gnt_o == {COLS{1'b0}}) 
+				  begin                       // If no column grant, transition back to row arbitration
                     x_enable = 1'b1;         // Enable row arbitration once column grant is done
                     y_enable = 1'b0;         // Disable column arbitration
                     next_state = ROW_GRANT;  // Transition back to row grant state
-             end
-               end
-             
-				 else
-				     begin
-					     x_enable = 1'b0;           // Disable row arbitration 
+                  end
+                 end
+				else
+				 begin
+				    x_enable = 1'b0;           // Disable row arbitration 
                     y_enable = 1'b0;           // Disable column arbitration
-					     next_state = IDLE;	  
-				      end
-			  end
+					next_state = IDLE;	  
+				 end
+			end
             default:
 			 begin
                 next_state = IDLE;           // Default state transition to IDLE
              end
         endcase
-    end
+      end
 	 
 	 //Output grant based on active row and column
     always_comb 
@@ -216,18 +215,18 @@ module top_arb (
     // Instantiate the tdc module to capture timestamp based on event trigger.
     tdc time_stamp 
 	 (
-	    .clk_i     (clk_i)     ,                  // Clock input
-        .reset_i   (reset_i)   ,                 // Reset input
+	    .clk_i     (clk_i)      ,                  // Clock input
+        .reset_i   (reset_i)    ,                  // Reset input
 		.timestamp_o(timestamp)                    // Output the captured timestamp (timestamp_o) from the tdc module.
 		  
 	 );
 
 	 address_event AER 
 	 ( 
-	   .x_add_i(x_add),                           //Event Row address                        
-		.y_add_i(y_add),                           //Event Column address  
-		.timestamp_i(timestamp_out),               //captured timestamp data
-		.polarity_i(polarity_out),                 //polarity output
+	   .x_add_i(x_add)               ,             //Event Row address                        
+		.y_add_i(y_add)              ,             //Event Column address  
+		.timestamp_i(timestamp_out)  ,             //captured timestamp data
+		.polarity_i(polarity_out)    ,             //polarity output
 		.data_out_o(data_out)                      //combines event data like row address ,column address,timestamp and polarity
 	 );	 
 endmodule

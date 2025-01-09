@@ -31,15 +31,14 @@ module x_roundrobin
 	 
     // Update mask and grant signals on the clock edge
     always_ff @(posedge clk_i or posedge reset_i) 
-	  begin
+	   begin
         if (reset_i) 
-		 begin
+		   begin
             mask_ff <= {ROWS{1'b1}};          // Reset mask to all ones (allow all requests)
             gnt_o   <= {ROWS{1'b0}};          // Reset grant output to zero (no grants)
-				
-         end 
-		else if (enable_i) 
-		 begin
+			end 
+		  else if (enable_i) 
+		   begin
             mask_ff <= nxt_mask;              // Update mask based on next mask calculation
             gnt_o  <= gnt_temp;               // Register the grant output
          end
@@ -51,31 +50,31 @@ module x_roundrobin
 
     // Generate the next mask based on the current grant outputs
     always_comb 
-	  begin
+	   begin
         nxt_mask = mask_ff;                   // Default: next mask is the current mask
 
         // Iterate through the gnt_temp bits to calculate the next mask
         for (int i = 0; i < ROWS ; i = i + 1)
-		 begin
+		   begin
             if (gnt_temp[i]) 
-			 begin
-                nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-             end
+			      begin
+                 nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+               end
          end
       end
 
     // Compute xadd_o based on the current grants
     always_comb 
-     begin
+      begin
         xadd_o = {x_width{1'b0}};              // Initialize xadd_o to 0
         for (int i = 0; i < ROWS ; i = i + 1) 
-		 begin
+		   begin
             if (gnt_o[i])
-			 begin
-                xadd_o = i[x_width-1:0];       // Assign the index of the granted bit to xadd_o
-             end
+			      begin
+                  xadd_o = i[x_width-1:0];     // Assign the index of the granted bit to xadd_o
+               end
          end
-     end
+      end
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     Priority_arb  maskedGnt 

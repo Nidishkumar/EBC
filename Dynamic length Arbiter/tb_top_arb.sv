@@ -37,7 +37,8 @@ import arbiter_pkg::*;                             // Importing arbiter package 
 // Deassert the request when the corresponding grant is active
  always_ff @(posedge clk_i)
  begin
-  for (int i = 0; i < ROWS; i++) begin
+  for (int i = 0; i < ROWS; i++) 
+   begin
     for (int j = 0; j < COLS; j++) 
      begin
       if (gnt_o[i][j] == 1'b1) 
@@ -45,8 +46,8 @@ import arbiter_pkg::*;                             // Importing arbiter package 
           req_i[i][j] <= 1'b0;     // Deassert request upon grant
        end
      end
-  end
-end 
+   end
+ end 
   // Initialize request input matrix (req_i) to all zeros
   task initialize;
     begin
@@ -59,8 +60,7 @@ end
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01}}; 
-
-    end
+   end
   endtask
 
  // Apply a reset pulse: Assert the reset signal for 10 time units, then deassert it for 10 time units

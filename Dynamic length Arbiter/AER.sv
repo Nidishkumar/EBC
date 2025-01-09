@@ -17,7 +17,6 @@ output logic [WIDTH-1:0] data_out_o                //stores event data
 always_comb
 begin
     data_out_o={timestamp_i,x_add_i,y_add_i,polarity_i};  //combines event data like event row address ,column address,timestamp and polarity
-
 end
 
 endmodule
