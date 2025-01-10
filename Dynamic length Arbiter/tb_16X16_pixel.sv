@@ -1,3 +1,9 @@
+// Module name: tb Module
+// Module Description: Generating events for 16X16 pixel
+// Author: [Your Name]
+// Date: [Current Date]
+// Version: [Version Number]
+//------------------------------------------------------------------------------------------------------------------
 import arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
 
  module tb_16X16_pixel;
