@@ -1,11 +1,11 @@
-// Module name: Testbench for tdc module
-// Module Description: 
+// Module name: Wallclock module
+// Module Description: This Module capture timestamp based on event trigger
 // Author: 
 // Date: 
 // Version: 
 //-----------------------------------------------------------------------------------------------------------------
 import arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
-module tdc (
+module wallclock (
   input  logic               clk_i,         // Clock input
   input  logic               reset_i,       // Reset input (active high)
   output logic [SIZE-1:0]    timestamp_o    // Output to hold the captured timestamp

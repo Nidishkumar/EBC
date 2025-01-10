@@ -212,12 +212,12 @@ module top_arb (
         .polarity_o   (polarity_out)              // Output polarity signal
     );
 
-    // Instantiate the tdc module to capture timestamp based on event trigger.
-    tdc time_stamp 
+    // Instantiate the wallclock module to capture timestamp based on event trigger.
+    wallclock time_stamp 
 	 (
 	    .clk_i     (clk_i)      ,                  // Clock input
         .reset_i   (reset_i)    ,                  // Reset input
-		.timestamp_o(timestamp)                    // Output the captured timestamp (timestamp_o) from the tdc module.
+		.timestamp_o(timestamp)                    // Output the captured timestamp (timestamp_o) from the wallclock module.
 		  
 	 );
 
