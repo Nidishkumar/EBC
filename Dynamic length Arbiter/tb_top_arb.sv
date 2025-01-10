@@ -1,12 +1,12 @@
 // Module name: tb Module
-// Module Description: Round-Robin Arbiter for request prioritization and grant assignment
+// Module Description: Generating Random events for 8*8 pixel
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
-import arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
+import arbiter_pkg::*;                          // Importing arbiter package containing parameter constants
 
- module tb_top_arb;
+ module tb_8x8_pixel;
   // Inputs
   logic clk_i                                   ; // Clock input
   logic reset_i                                 ; // Active high Reset input
@@ -26,19 +26,20 @@ import arbiter_pkg::*;                             // Importing arbiter package 
             .data_out_o     (data_out_o)          // current event information 
   );
 
-//--------------------------------------------------Clock generation------------------------------//
+//--------------------------------------------------Clock generation----------------------------------------------//
   // Clock Generation
   initial begin
                 clk_i = 0       ;
     forever #5  clk_i = ~clk_i  ; //  clock period
   end
-//--------------------------------------------End of Clock generation----------------------------//
+//--------------------------------------------End of Clock generation---------------------------------------------//
   
+ 
+//-------------------------------------------Deasserting request--------------------------------------------------//
 // Deassert the request when the corresponding grant is active
  always_ff @(posedge clk_i)
  begin
-  for (int i = 0; i < ROWS; i++) 
-   begin
+  for (int i = 0; i < ROWS; i++) begin
     for (int j = 0; j < COLS; j++) 
      begin
       if (gnt_o[i][j] == 1'b1) 
@@ -46,23 +47,31 @@ import arbiter_pkg::*;                             // Importing arbiter package 
           req_i[i][j] <= 1'b0;     // Deassert request upon grant
        end
      end
-   end
- end 
+  end
+end 
+//------------------------------------------End of deasserting request-------------------------------------------------//
+
+
+//-------------------------------------------Initializing inputs-------------------------------------------------------//
   // Initialize request input matrix (req_i) to all zeros
   task initialize;
     begin
-      enable_i = 0;
-      req_i = {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+      enable_i = 1;
+      req_i = {
+		         {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01}}; 
+               {2'b00, 2'b00, 2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01} }; 
    end
   endtask
+//-------------------------------------------End of initializing inputs------------------------------------------------//
 
+
+//-------------------------------------------Apply Reset---------------------------------------------------------------//
  // Apply a reset pulse: Assert the reset signal for 10 time units, then deassert it for 10 time units
   task apply_reset;
     begin
@@ -72,7 +81,10 @@ import arbiter_pkg::*;                             // Importing arbiter package 
       #10;
     end
   endtask
+//-------------------------------------------End of apply Reset---------------------------------------------------------//
 
+
+//-------------------------------------------Apply Request-------------------------------------------------------------//
 // Set the enable signal and assign the input request to req_i
   task apply_request(input [COLS-1:0][POLARITY-1:0] request[ROWS-1:0], input logic en);
     begin
@@ -80,7 +92,10 @@ import arbiter_pkg::*;                             // Importing arbiter package 
       req_i = request;
     end
   endtask
+//-------------------------------------------End of Apply Request---------------------------------------------------------//
 
+
+//-------------------------------------------Apply Various Test Cases---------------------------------------------------------//
   // Test procedure
   initial begin
 
@@ -89,23 +104,24 @@ import arbiter_pkg::*;                             // Importing arbiter package 
     
     // Reset the DUT
     apply_reset;
+	 
 	 //Applying Enable
-	 enable_i = 1;
 	 
 	 #20;
 
-    // Test 1: First row selected with specific request values
-    apply_request({{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+    // Test 1: Random Events across pixel
+    apply_request({
+	            {2'b00, 2'b01, 2'b00, 2'b00, 2'b01, 2'b01, 2'b00, 2'b10}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b01, 2'b00, 2'b01, 2'b00, 2'b00, 2'b10, 2'b01}}, 1);
+               {2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b01, 2'b00, 2'b00}, 
+               {2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b01, 2'b00, 2'b10, 2'b00, 2'b00, 2'b10, 2'b01}}, 1);
     #30;
 
-    // Test 2: First row updated with new request values
+    // Test 2: First row updated with new events
 	 
     apply_request(
 	               {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
@@ -116,20 +132,30 @@ import arbiter_pkg::*;                             // Importing arbiter package 
                {2'b00, 2'b01, 2'b00, 2'b10, 2'b00, 2'b10, 2'b00, 2'b01}, 
                {2'b00, 2'b00, 2'b10, 2'b01, 2'b00, 2'b00, 2'b10, 2'b10}, 
                {2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
-    #20;
+    #40;
 	 
-    // Test 3: After completing the first row, it moves to the second row
-    apply_request(
-	               {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+    // Test 3: Active events in 3rd row of pixel
+    apply_request({
+	            {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b10, 2'b01, 2'b10, 2'b10, 2'b10, 2'b10, 2'b01, 2'b10}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
+    #50;
+	  // Test 4: One Active event in each row
+    apply_request({
+	            {2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b01}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b01, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b10, 2'b01}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b01, 2'b00}, 
-               {2'b10, 2'b00, 2'b00, 2'b00, 2'b01, 2'b10, 2'b10, 2'b01}, 
-               {2'b00, 2'b10, 2'b00, 2'b10, 2'b10, 2'b10, 2'b01, 2'b01}, 
-               {2'b00, 2'b00, 2'b01, 2'b01, 2'b00, 2'b10, 2'b00, 2'b01}, 
-               {2'b10, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
-    #20;
-	 
+					{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b01, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00}, 
+               {2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
+	#60;
    // Apply reset to deassert the grant signal
 	 apply_reset;
 	 #50;
@@ -139,40 +165,55 @@ import arbiter_pkg::*;                             // Importing arbiter package 
 	// Apply enable high to continue the granting where it left
 	 enable_i = 1;
 	 
-	// Test 4: Continously give grants to active events of the pixel
-	 apply_request(
-	               {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b01, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b10, 2'b00, 2'b00, 2'b01, 2'b00, 2'b01}, 
-               {2'b00, 2'b00, 2'b10, 2'b00, 2'b01, 2'b01, 2'b10, 2'b01}, 
-               {2'b10, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b01, 2'b00, 2'b00, 2'b00, 2'b00, 2'b10, 2'b00}}, 1);
-    #30;  
-	 // Test 5: Request is updated,based on this updated events will be granted 
-	 apply_request(
-	            {{2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+	// Test 5: Random Events across last four rows 
+	 apply_request({
+	            {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
+					{2'b00, 2'b01, 2'b10, 2'b00, 2'b01, 2'b01, 2'b10, 2'b01}, 
+               {2'b10, 2'b00, 2'b10, 2'b00, 2'b00, 2'b00, 2'b01, 2'b10}, 
+               {2'b00, 2'b01, 2'b00, 2'b10, 2'b00, 2'b10, 2'b00, 2'b01}, 
+               {2'b10, 2'b01, 2'b00, 2'b01, 2'b00, 2'b00, 2'b10, 2'b01}}, 1);
+    #150;  
+	 // Test 6: No active Events
+	 apply_request({
+	            {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}}, 1);
-	 #20;
-	 // Test 6: Again Requests updation
-     apply_request(
-	               {{2'b10, 2'b10, 2'b00, 2'b10, 2'b00, 2'b01, 2'b00, 2'b00}, 
-               {2'b01, 2'b00, 2'b00, 2'b00, 2'b10, 2'b01, 2'b10, 2'b00}, 
-               {2'b01, 2'b10, 2'b10, 2'b00, 2'b01, 2'b00, 2'b10, 2'b10}, 
-               {2'b10, 2'b10, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b10, 2'b00, 2'b00, 2'b10, 2'b01, 2'b10, 2'b01, 2'b01}, 
-               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
-               {2'b10, 2'b00, 2'b00, 2'b01, 2'b00, 2'b00, 2'b10, 2'b10}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}},1);
+	 #40;
+	 // Test 7: Alternate Row has Active Events
+     apply_request({
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
+               {2'b01, 2'b10, 2'b00, 2'b10, 2'b10, 2'b01, 2'b10, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
+               {2'b10, 2'b10, 2'b00, 2'b00, 2'b01, 2'b00, 2'b01, 2'b10}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
+               {2'b01, 2'b00, 2'b10, 2'b00, 2'b01, 2'b00, 2'b10, 2'b10}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
                {2'b00, 2'b00, 2'b00, 2'b00, 2'b01, 2'b10, 2'b10, 2'b01}}, 1);
-    #70;
+					
+    #200;
+	 // Test 8: Last Row of pixel has Active Events
+    apply_request({
+               {2'b10, 2'b10, 2'b01, 2'b00, 2'b10, 2'b01, 2'b01, 2'b10}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00},
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, 
+               {2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}},1);
+					
+    #200;
     $stop;
   end
+//-------------------------------------------End of test Cases---------------------------------------------------------//
+
 
 endmodule 
