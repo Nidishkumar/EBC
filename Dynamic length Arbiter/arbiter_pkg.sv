@@ -13,7 +13,7 @@ package arbiter_pkg;
   parameter y_width = 3  ;   // To identify the granted column index
   parameter x_width = 3  ;   // To identify the granted row index
   parameter SIZE  = 32   ;   // To define the width of the timestamp
-  parameter WIDTH =39    ;   //Width of data_out 
+  parameter WIDTH =39    ;   // Total width combining timestamp (32 bits), row address, column address, and polarity (1 bit)
   
 
 
