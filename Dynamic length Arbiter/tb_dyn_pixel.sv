@@ -63,7 +63,7 @@ for(int i=0;i<ROWS;i++)
    begin
 	 for(int j=0;j<=COLS;j++)
 	  begin
-		   req_i[j][j]=0;
+		   req_i[i][j]=0;
 	  end
 	end end
 endtask
