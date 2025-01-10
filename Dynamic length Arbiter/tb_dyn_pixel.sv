@@ -6,7 +6,7 @@
 
 import arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
 
- module tb_top_arb;
+ module tb_dyn_pixel;
   // Inputs
   logic clk_i                                   ; // Clock input
   logic reset_i                                 ; // Active high Reset input
