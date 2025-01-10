@@ -205,10 +205,10 @@ module top_arb (
         .xadd_o    (x_add)                       // output for row arbitration (index)
     );
 
-    // Instantiate the tdc module to capture timestamp based on event trigger.
+    // Instantiate Polarity Selecter module outputs polarity 
     polarity_selector polarity_sel
      (
-        .req_i     (polarity)  ,                  // Polarity request input (column request)
+        .req_i        (polarity)  ,               // Polarity request input (column request)
         .polarity_o   (polarity_out)              // Output polarity signal
     );
 
@@ -220,7 +220,8 @@ module top_arb (
 		.timestamp_o(timestamp)                    // Output the captured timestamp (timestamp_o) from the wallclock module.
 		  
 	 );
-
+    
+    //Instantiate Address event module for the event data
 	 address_event AER 
 	 ( 
 	   .x_add_i(x_add)               ,             //Event Row address                        

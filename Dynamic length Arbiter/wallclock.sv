@@ -1,5 +1,5 @@
 // Module name: Wallclock module
-// Module Description: This Module capture timestamp based on event trigger
+// Module Description: This Module capture timestamp based on event.
 // Author: 
 // Date: 
 // Version: 
