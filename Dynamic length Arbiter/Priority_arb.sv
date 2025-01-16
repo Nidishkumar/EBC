@@ -7,7 +7,7 @@
 import arbiter_pkg::*;               // Importing arbiter package containing parameter constants
 
 module Priority_arb (
-  input logic [ROWS-1:0] req_i   ,  // Request inputs
+  input logic [ROWS-1:0] req_i   ,  // Request inputs ROW and Column Arbiters
   output logic [ROWS-1:0] gnt_o     // One-hot grant signal
 );
 
@@ -16,7 +16,7 @@ module Priority_arb (
 
   genvar i;
   generate
-    // Grant[i] is asserted if req_i[i] is active and no higher-priority grants are active
+    // Grant[i] is asserted if req_i[i] is active and no higher priority grants are active
     for (i = 1; i < ROWS; i = i + 1) 
 	    begin : loop
          assign gnt_o[i] = req_i[i] & ~(|gnt_o[i-1:0]);  

@@ -6,14 +6,14 @@
 //------------------------------------------------------------------------------------------------------------------
  import arbiter_pkg::*;                        // Importing arbiter package containing parameter constants
 
-module y_roundrobin 
+module Column_arbiter 
  (
     input  logic clk_i                ,        // Clock input
     input  logic reset_i              ,        // Active high Reset input
     input  logic enable_i             ,        // Enable signal to control Column arbiter
     input  logic [COLS-1:0]req_i      ,        // Request inputs (multi-bit for each request)
     output logic [COLS-1:0] gnt_o     ,        // Grant outputs (sequential)
-    output logic [y_width-1:0] yadd_o          // Encoded output representing the granted cloumn index
+    output logic [COL_ADD-1:0] yadd_o          // Encoded output representing the granted cloumn index
  );
 
     // Internal signals for mask and grant handling
@@ -72,12 +72,12 @@ module y_roundrobin
     // Compute yadd_o based on the current grants
     always_comb 
       begin
-        yadd_o = {y_width{1'b0}};               // Initialize yadd_o to 0
+        y_add = {COL_ADD{1'b0}};               // Initialize yadd_o to 0
         for (int i = 0; i < COLS; i = i + 1) 
 		   begin
             if (gnt_o[i]) 
 			      begin
-                  yadd_o = i[y_width-1:0];      // Assign the index of the granted cloumn index to yadd_o
+                  y_add = i[COL_ADD-1:0];      // Assign the index of the granted cloumn index to yadd_o
                end
          end
       end
