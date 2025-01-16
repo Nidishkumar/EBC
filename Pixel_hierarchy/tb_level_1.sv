@@ -12,19 +12,26 @@
   logic reset_i                                 ; // Active high Reset input
   logic [15:0][15:0] req_i; // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
-  logic [3:0][3:0] gnt_o             ; //grant output
+ logic [3:0][3:0] gnt_o             ; //grant output
  logic [1:0] x_add ;      // Index for selected row in row arbitration logic
  logic [1:0] y_add ;
-  // Instantiate the Top Module
+ 
+logic [3:0][3:0]in_gnt_o;
+  logic [1:0]in_x_add;
+   logic [1:0]in_y_add; 
   
-  pixel_level_1
+  top_pixel_hier
   dut (
             .clk         (clk_i)         ,     // Clock input
             .rst_n        (reset_i)       ,     // Active high Reset input
             .set          (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_o          (gnt_o)         ,     // grant outputs
             .x_add     (x_add),
-			.y_add(y_add) 
+				.y_add(y_add) ,
+				
+				.in_gnt_o(in_gnt_o),
+            .in_x_add(in_x_add),       // Index for selected row in row arbitration logic
+            .in_y_add(in_y_add) 
   );
 
  //-------------------------------------------Clock generation-----------------------------------------------//

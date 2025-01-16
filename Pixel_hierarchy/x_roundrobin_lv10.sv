@@ -5,7 +5,7 @@
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
 
-module x_roundrobin #(parameter ROWS=4 ,x_width=2)
+module x_roundrobin_lv10 #(parameter ROWS=4 ,x_width=2)
 
  (
     input  logic clk_i                 ,       // Clock input
@@ -13,7 +13,8 @@ module x_roundrobin #(parameter ROWS=4 ,x_width=2)
     input  logic enable_i              ,       // Enable signal to control Row arbiter
     input  logic [ROWS-1:0] req_i     ,       // Request inputs
     output logic [ROWS-1:0] gnt_o     ,       // Grant outputs
-    output logic [x_width-1:0] xadd_o          // Encoded output representing the granted row index
+    output logic [x_width-1:0] xadd_o ,        // Encoded output representing the granted row index
+	 output logic grp_release 
  );
 
     // Internal signals for mask and grant handling
@@ -22,11 +23,12 @@ module x_roundrobin #(parameter ROWS=4 ,x_width=2)
     logic [ROWS-1:0] mask_req;                // Masked requests (and of req_i and mask_ff)
     logic [ROWS-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
     logic [ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
-  //  logic [ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
+ //   logic [ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
 	 
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;
+	 assign grp_release = ( nxt_mask > mask_ff ? 1:0);
 
 	 
     // Update mask and grant signals on the clock edge
@@ -40,10 +42,11 @@ module x_roundrobin #(parameter ROWS=4 ,x_width=2)
 		  else if (enable_i) 
 		   begin
             mask_ff <= nxt_mask;              // Update mask based on next mask calculation
-           // gnt_o  <= gnt_temp;               // Register the grant output
+          //  gnt_o  <= gnt_temp;               // Register the grant output
          end
-			      end
-		  
+			else if(grp_release)
+			  mask_ff <={ROWS{1'b1}};
+			end
 	 
 
     // Determine the final grant output: either masked grants or raw grants depending on the mask

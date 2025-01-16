@@ -6,7 +6,8 @@ module pixel_level_0 (
     output logic [3:0][3:0] gnt_o,
     output logic [1:0] x_add,       // Index for selected row in row arbitration logic
     output logic [1:0] y_add,       // Index for selected column in column arbitration logic
-    output logic req
+    output logic req ,
+	 output logic grp_release
 );
 
     logic [3:0] row;
@@ -62,22 +63,23 @@ module pixel_level_0 (
         case (current_state)
             IDLE: 
 			    begin
-					if(enable)
-					 begin
-                 x_enable = 1'b1;       // Enable row arbitration if enable_i is high
-                 next_state = ROW_GRANT;// Transition to row grant state
+				     if(enable)
+					   begin
+                  y_enable = 1'b1;       // Enable row arbitration if enable_i is high
+                 next_state = COL_GRANT;// Transition to row grant state
                 end
-					else
+					 
+					 else
 					 begin
 					  x_enable = 1'b0;           // Disable row arbitration by default
-                 y_enable = 1'b0; 
-					  next_state = IDLE;
+                 y_enable = 1'b0;
+					  next_state = IDLE;// Transition to row grant state
 					 end
-				end
+					end
             ROW_GRANT: 
 			      begin
-					 if(enable)
-					 begin
+					  if(enable)
+					   begin
                 x_enable = 1'b1;             // Keep row arbitration enabled during ROW_GRANT state
                 if (x_gnt_o != {4{1'b0}}) 
 				     begin                       // If any row has been granted, move to column grant
@@ -85,18 +87,18 @@ module pixel_level_0 (
                     x_enable = 1'b0;         // Disable row arbitration
                     next_state = COL_GRANT;  // Transition to column grant state
                  end
-					 end
-					else
+					  end
+					 else
 					 begin
-					      x_enable = 1'b0;           // Disable row arbitration by default
-                     y_enable = 1'b0; 
-					      next_state = IDLE;  
-                end
+					  x_enable = 1'b0;           // Disable row arbitration by default
+                 y_enable = 1'b0;
+					  next_state = IDLE;// Transition to row grant state
+					 end
 				end
             COL_GRANT: 
 			       begin
-					 if(enable)
-					 begin
+					   if(enable)
+					   begin
                   y_enable = 1'b1;             // Enable column arbitration during COL_GRANT state
                   if (y_gnt_o == {4{1'b0}}) 
 				       begin                       // If no column grant, transition back to row arbitration
@@ -104,13 +106,13 @@ module pixel_level_0 (
                     y_enable = 1'b0;         // Disable column arbitration
                     next_state = ROW_GRANT;  // Transition back to row grant state
                    end
-						end
+					end
 					 else
-					  begin
-					     x_enable = 1'b0;           // Disable row arbitration by default
-                    y_enable = 1'b0; 
-					     next_state = IDLE;
-                 end
+					 begin
+					  x_enable = 1'b0;           // Disable row arbitration by default
+                 y_enable = 1'b0;
+					  next_state = IDLE;// Transition to row grant state
+					 end
 				end
             default:
 			   begin
@@ -123,14 +125,10 @@ module pixel_level_0 (
 
     always_comb 
  begin
-        row = {4{1'b0}};            // Default: no active requests in any row
-        for (int i = 0; i < 4 ; i++) 
-        begin
-	      for (int j = 0; j < 4; j++) 
-         begin
-            row[i] = |set[i][j];        // OR all bits in each row to detect active row requests
+        row = {4{1'b0}};  
+        for (int i = 0; i < 4; i++) begin
+           row[i] = |(set[i]);  // Directly reduce all columns in the row
          end
-       end
   end
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,7 +142,7 @@ always_comb
          end
        end
 
-//---------------------------------------------------------------------------------------------------------------------
+
    always_comb 
 	  begin
         // Initialize all grants to 0
@@ -165,13 +163,14 @@ always_comb
 
     //----------------------------------------------------------------------------------------------------------
 
-    x_roundrobin RRA_X (
+    x_roundrobin_lv10 RRA_X_lv10 (
         .clk_i(clk),                  // Clock input
         .reset_i(rst_n),            // Reset input
         .enable_i(x_enable),          // Enable signal for row arbitration
         .req_i(row),                  // Row requests (active rows)
         .gnt_o(x_gnt_o),              // Row grant outputs
-        .xadd_o(x_add)                // Output for row arbitration (index)
+        .xadd_o(x_add) ,
+        .grp_release(grp_release)                     		  // Output for row arbitration (index)
     );
 
     y_roundrobin RRA_Y (
