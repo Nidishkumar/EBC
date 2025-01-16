@@ -13,7 +13,7 @@ module Column_arbiter
     input  logic enable_i             ,        // Enable signal to control Column arbiter
     input  logic [COLS-1:0]req_i      ,        // Request inputs (multi-bit for each request)
     output logic [COLS-1:0] gnt_o     ,        // Grant outputs (sequential)
-    output logic [COL_ADD-1:0] yadd_o          // Encoded output representing the granted cloumn index
+    output logic [COL_ADD-1:0] y_add          // Encoded output representing the granted cloumn index
  );
 
     // Internal signals for mask and grant handling

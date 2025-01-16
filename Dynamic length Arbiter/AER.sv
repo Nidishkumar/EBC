@@ -7,8 +7,8 @@
 import arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
 
 module AER (
-input logic [x_width-1:0] x_add,                 //pixel Row address 
-input logic [y_width-1:0] y_add,                 //pixel Column address
+input logic [ROW_ADD-1:0] x_add,                 //pixel Row address 
+input logic [COL_ADD-1:0] y_add,                 //pixel Column address
 input logic [SIZE-1:0] timestamp,                //captured timestamp data
 input logic polarity,                            //polarity output
 output logic [WIDTH-1:0] data_out_o                //stores event data

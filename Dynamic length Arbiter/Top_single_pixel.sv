@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------------------------------------------
 import arbiter_pkg::*;                                         // Importing arbiter package containing parameter constants
 
-module top_arb (
+module Top_single_pixel (
     input  logic                  clk_i                     ,   // Clock input
     input  logic                  reset_i                   ,   // Active high Reset input
     input  logic                  enable_i                  ,   // Enable signal to trigger arbitration
@@ -191,7 +191,7 @@ module top_arb (
         .enable_i  (column_enable) ,                 // Enable signal for column arbitration
         .req_i     (column_req)      ,                 // Column requests for the active row
         .gnt_o     (y_gnt_o)  ,                 // Column grant outputs
-        .yadd      (y_add)                      // Index for selected column  
+        .y_add      (y_add)                      // Index for selected column  
     );
 
     // Instantiate RoundRobin module for row arbitration (x-direction)
@@ -202,7 +202,7 @@ module top_arb (
         .enable_i  (row_enable) ,                  // Enable signal for row arbitration
         .req_i     (row_req)      ,                  // Row requests (active rows)
         .gnt_o     (x_gnt_o)  ,                  // Row grant outputs
-        .xadd      (x_add)                       // Index for selected row 
+        .x_add      (x_add)                       // Index for selected row 
     );
 
     // Instantiate Polarity Selecter module outputs polarity 

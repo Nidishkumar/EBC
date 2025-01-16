@@ -13,7 +13,7 @@ module Row_arbiter
     input  logic enable_i              ,       // Enable signal to control Row arbiter
     input  logic [ROWS-1:0] req_i     ,       // Request inputs
     output logic [ROWS-1:0] gnt_o     ,       // Grant outputs
-    output logic [x_width-1:0] x_add          // Encoded output representing the granted row index
+    output logic [ROW_ADD-1:0] x_add          // Encoded output representing the granted row index
  );
 
     // Internal signals for mask and grant handling
