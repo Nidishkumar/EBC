@@ -6,14 +6,14 @@
 //------------------------------------------------------------------------------------------------------------------
  import arbiter_pkg::*;                        // Importing arbiter package containing parameter constants
 
-module x_roundrobin
+module Row_arbiter
  (
     input  logic clk_i                 ,       // Clock input
     input  logic reset_i               ,       // Active high Reset input
     input  logic enable_i              ,       // Enable signal to control Row arbiter
     input  logic [ROWS-1:0] req_i     ,       // Request inputs
     output logic [ROWS-1:0] gnt_o     ,       // Grant outputs
-    output logic [x_width-1:0] xadd_o          // Encoded output representing the granted row index
+    output logic [ROW_ADD-1:0] x_add          // Encoded output representing the granted row index
  );
 
     // Internal signals for mask and grant handling
@@ -66,12 +66,12 @@ module x_roundrobin
     // Compute xadd_o based on the current grants
     always_comb 
       begin
-        xadd_o = {x_width{1'b0}};              // Initialize xadd_o to 0
+        x_add = {ROW_ADD{1'b0}};              // Initialize xadd_o to 0
         for (int i = 0; i < ROWS ; i = i + 1) 
 		   begin
             if (gnt_o[i])
 			      begin
-                  xadd_o = i[x_width-1:0];     // Assign the index of the granted bit to xadd_o
+                  x_add = i[ROW_ADD-1:0];     // Assign the index of the granted bit to xadd_o
                end
          end
       end

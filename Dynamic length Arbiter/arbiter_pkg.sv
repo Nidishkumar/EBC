@@ -9,9 +9,9 @@ package arbiter_pkg;
   // Define parameters
   parameter ROWS = 8     ;   // Number of rows in the design
   parameter COLS = 8     ;   // Number of columns in the design
-  parameter POLARITY = 2 ;   // Represents the each column length of a pixel in the design
-  parameter y_width = 3  ;   // To identify the granted column index
-  parameter x_width = 3  ;   // To identify the granted row index
+  parameter POLARITY = 2 ;   // Represents the each column length of a pixel 
+  parameter ROW_ADD = 3  ;   // To identify the granted column index
+  parameter COL_ADD = 3  ;   // To identify the granted row index
   parameter SIZE  = 32   ;   // To define the width of the timestamp
   parameter WIDTH =39    ;   // Total width combining timestamp (32 bits), row address, column address, and polarity (1 bit)
   

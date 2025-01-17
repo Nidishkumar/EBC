@@ -20,7 +20,7 @@ module tb_4x4_pixel;
   logic [WIDTH-1:0] data_out_o;
 
   //----------- Instantiate the Top Module --------------------------------------------------------------------------------
-  top_arb dut (
+  Top_single_pixel dut (
     .clk_i(clk_i),
     .reset_i(reset_i),
     .req_i(req_i),

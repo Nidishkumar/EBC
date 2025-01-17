@@ -17,7 +17,7 @@ import arbiter_pkg::*;                             // Importing arbiter package 
   logic [WIDTH-1:0] data_out_o                  ; //event data
 
   // Instantiate the Top Module
-  top_arb   dut (
+  Top_single_pixel   dut (
             .clk_i          (clk_i)         ,     // Clock input
             .reset_i        (reset_i)       ,     // Active high Reset input
             .req_i          (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
