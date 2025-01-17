@@ -7,7 +7,7 @@ module pixel_level_0 (
     output logic [1:0] x_add,       // Index for selected row in row arbitration logic
     output logic [1:0] y_add,       // Index for selected column in column arbitration logic
     output logic req ,
-	 output logic grp_release
+	output logic grp_release
 );
 
     logic [3:0] row;
@@ -16,6 +16,13 @@ module pixel_level_0 (
 
     logic [3:0] y_gnt_o; // Column arbiter grant information
     logic [3:0] x_gnt_o; // Row arbiter grant information
+
+    logic refresh;
+
+    logic grp_release_x;
+    logic grp_release_y;
+
+    assign grp_release = grp_release_x & grp_release_y;
 
     //----------------------------------------------------------------------------------------------------------
 
@@ -59,6 +66,7 @@ module pixel_level_0 (
         next_state = current_state;
         x_enable = 1'b0;           // Disable row arbitration by default
         y_enable = 1'b0;           // Disable column arbitration by default
+        refresh = 1'b0;
 
         case (current_state)
             IDLE: 
@@ -91,7 +99,8 @@ module pixel_level_0 (
 			 begin
 				x_enable = 1'b0;           // Disable row arbitration 
                 y_enable = 1'b0;           // Disable column arbitration
-				next_state = IDLE;	  
+				next_state = IDLE;
+                refresh = 1'b1;		  
 			 end
             end
             COL_GRANT: 
@@ -110,7 +119,8 @@ module pixel_level_0 (
 				 begin
 				    x_enable = 1'b0;           // Disable row arbitration 
                     y_enable = 1'b0;           // Disable column arbitration
-					next_state = IDLE;	  
+					next_state = IDLE;
+                    refresh = 1'b1;	  
 				 end
 			end
             default:
@@ -166,10 +176,11 @@ always_comb
         .clk_i(clk),                  // Clock input
         .reset_i(rst_n),            // Reset input
         .enable_i(x_enable),          // Enable signal for row arbitration
+        .refresh_i(refresh)
         .req_i(row),                  // Row requests (active rows)
         .gnt_o(x_gnt_o),              // Row grant outputs
         .xadd_o(x_add) ,
-        .grp_release(grp_release)                     		  // Output for row arbitration (index)
+        .grp_release(grp_release_x)                     		  // Output for row arbitration (index)
     );
 
     y_roundrobin RRA_Y (
@@ -178,7 +189,8 @@ always_comb
         .enable_i(y_enable),          // Enable signal for column arbitration
         .req_i(col),                  // Column requests for the active row
         .gnt_o(y_gnt_o),              // Column grant outputs
-        .yadd_o(y_add)                // Output for column arbitration (index)
+        .yadd_o(y_add),                // Output for column arbitration (index)
+        .grp_release(grp_release_y)                     		  // Output for row arbitration (index)
     );
 
 endmodule

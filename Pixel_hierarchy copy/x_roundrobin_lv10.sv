@@ -11,10 +11,11 @@ module x_roundrobin_lv10 #(parameter ROWS=4 ,x_width=2)
     input  logic clk_i                ,       // Clock input
     input  logic reset_i              ,       // Active high Reset input
     input  logic enable_i             ,       // Enable signal to control Row arbiter
+    input  logic refresh_i            ,
     input  logic [ROWS-1:0] req_i     ,       // Request inputs
     output logic [ROWS-1:0] gnt_o     ,       // Grant outputs
     output logic [x_width-1:0] xadd_o ,        // Encoded output representing the granted row index
-	 output logic grp_release 
+	  output logic grp_release 
  );
 
     // Internal signals for mask and grant handling
@@ -43,7 +44,7 @@ module x_roundrobin_lv10 #(parameter ROWS=4 ,x_width=2)
             mask_ff <= nxt_mask;              // Update mask based on next mask calculation
             gnt_o  <= gnt_temp;               // Register the grant output
        end
-      else if(grp_release) begin
+      else if(refresh_i) begin
 			      mask_ff <={ROWS{1'b1}};
       end
       end

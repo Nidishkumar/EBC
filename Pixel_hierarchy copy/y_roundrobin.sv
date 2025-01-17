@@ -12,7 +12,8 @@ module y_roundrobin
     input  logic enable_i             ,        // Enable signal to control Column arbiter
     input  logic [COLS-1:0]req_i      ,        // Request inputs (multi-bit for each request)
     output logic [COLS-1:0] gnt_o     ,        // Grant outputs (sequential)
-    output logic [y_width-1:0] yadd_o          // Encoded output representing the granted cloumn index
+    output logic [y_width-1:0] yadd_o ,         // Encoded output representing the granted cloumn index
+    output logic grp_release
  );
 
      // Internal signals for mask and grant handling
@@ -23,7 +24,8 @@ module y_roundrobin
     logic [COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
 
      // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
-    assign mask_req = req_i & mask_ff;        
+    assign mask_req = req_i & mask_ff;   
+    assign grp_release = !gnt_temp     ;
 
     // Mask and grant state update logic
     always_ff @(posedge clk_i or posedge reset_i) 
