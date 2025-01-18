@@ -10,7 +10,7 @@ output logic [1:0]in_y_add,
 output logic [31:0]timestamp_out,
 output logic polarity_out
  );
-logic [15:0][3:0][3:0][1:0] set_group;
+logic [3:0][3:0][1:0] set_group[15:0];
 
 logic [15:0][3:0][3:0] in_gnt_temp; // Array for grant outputs
 logic [15:0][1:0] in_x_add_temp;     // Array for x_add outputs
@@ -39,7 +39,7 @@ end
             .enable(gnt_o[group / 4][group % 4]),
             .set(set_group[group]),
             .req(req[group / 4][group % 4]),
-				.gnt_o(in_gnt_temp[group / 4][group % 4]),
+				.gnt_o(in_gnt_temp[group]),
 				.x_add(in_x_add_temp[group]),
 				.y_add(in_y_add_temp[group]),
 				.timestamp_out(timestamp_temp[group]),
@@ -58,7 +58,7 @@ always_comb begin
 
   for (int group = 0; group < 16; group++) begin
     if (gnt_o[group / 4][group % 4]) begin
-      in_gnt_o = in_gnt_temp[group / 4][group % 4];
+      in_gnt_o = in_gnt_temp[group];
       in_x_add = in_x_add_temp[group];
       in_y_add = in_y_add_temp[group];
       timestamp_out = timestamp_temp[group];
