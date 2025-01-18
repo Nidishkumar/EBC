@@ -1,15 +1,25 @@
 module pixel_level_1
 (
-input logic clk, rst_n,
-input logic [15:0][15:0]set,
+input  logic clk, rst_n,
+input  logic [15:0][15:0]set,
 output logic [3:0][3:0]gnt_o,
-output logic [1:0] x_add ,        // Index for selected row in row arbitration logic
-output logic [1:0] y_add          // Index for selected column in column arbitration logic
+output logic [3:0][3:0]in_gnt_o,
+output logic [3:0] x_add_o ,        // Index for selected row in row arbitration logic
+output logic [3:0] y_add_o ,
+output logic polarity_out,
+output logic [31:0]timestamp_out        // Index for selected column in column arbitration logic
 );       
 
 logic [3:0]row;
 logic [3:0]col;
 logic [15:0]grp_release;
+logic [1:0]x_add;
+logic [1:0]y_add;
+
+logic [1:0]in_x_add;
+logic [1:0]in_y_add;
+
+logic enable;
 
 logic x_enable,y_enable;
 
@@ -19,36 +29,15 @@ logic [3:0][3:0] req;      // Packed array for 4x4 request signals
  logic [3:0] x_gnt_o ;         // row arbiter grant information
  
  logic [15:0][3:0][3:0] set_group;
+ logic grp_release_clk;
+ logic toggle;
 
-assign grp_release_clk = |grp_release;
+assign enable = |req;
+assign x_add_o = {x_add,in_x_add};
+assign y_add_o = {y_add,in_y_add};
 
- always_comb
- begin
-        for (int group = 0; group < 16; group++) begin 
-            for (int row = 0; row < 4; row++) begin 
-                for (int col = 0; col < 4; col++) begin 
-                     set_group[group][row][col] = set[(group / 4) * 4 + row][(group % 4) * 4 + col];
-                end
-            end
-        end
-end
-
-    genvar group;
-	 generate
-    for ( group = 0; group < 16; group++) 
-	 begin : groups
-        pixel_level_0 pixel_level0 (
-            .clk(clk),
-            .rst_n(rst_n),
-            .enable(gnt_o[group / 4][group % 4]),
-            .set(set_group[group]),
-            .req(req[group / 4][group % 4]),
-				.grp_release(grp_release[group])
-        );
-    end
-endgenerate
-	//---------------------------------------------------------------------------------------------
-	
+ 
+//---------------------------------------------------------------------------------------------
 	
 	typedef enum logic [1:0]
  {
@@ -58,7 +47,25 @@ endgenerate
  } state_t;
  
  state_t current_state,next_state;
- 
+
+ 	always_ff @(posedge clk or posedge rst_n) 
+	  begin
+        if (rst_n) 
+		    grp_release_clk <= 1'b0;
+        else if (enable) begin
+            case (current_state) 
+                IDLE: grp_release_clk <= !grp_release_clk; // Toggle the signal
+                ROW_GRANT : grp_release_clk <= !grp_release_clk;
+                default: begin if (toggle)  
+                            grp_release_clk <= !grp_release_clk;
+                         else
+                            grp_release_clk <= |grp_release; 
+                end
+            endcase
+         end
+        else
+            grp_release_clk <= 1'b0;
+      end
  //--------------------------------------------------------------------------------------------------------------
 	always_ff @(posedge grp_release_clk or posedge rst_n) 
 	  begin
@@ -79,13 +86,17 @@ endgenerate
         next_state = current_state;
         x_enable = 1'b0;           // Disable row arbitration by default
         y_enable = 1'b0;           // Disable column arbitration by default
+        toggle = 1'b0;
 
         case (current_state)
-            IDLE: 
-			      begin
-                  y_enable = 1'b1;       // Enable row arbitration if enable_i is high
-                 next_state = COL_GRANT;// Transition to row grant state
+            IDLE:
+            begin 
+            if (enable) begin
+                x_enable = 1'b1;       // Enable row arbitration if enable_i is high
+                next_state = ROW_GRANT;// Transition to row grant state
                end 
+            end
+
             ROW_GRANT: 
 			      begin
                 x_enable = 1'b1;             // Keep row arbitration enabled during ROW_GRANT state
@@ -96,16 +107,18 @@ endgenerate
                     next_state = COL_GRANT;  // Transition to column grant state
                  end
                 end
+            
             COL_GRANT: 
-			       begin
-                  y_enable = 1'b1;             // Enable column arbitration during COL_GRANT state
-                  if (y_gnt_o == {4{1'b0}}) 
-				       begin                       // If no column grant, transition back to row arbitration
-                    x_enable = 1'b1;         // Enable row arbitration once column grant is done
-                    y_enable = 1'b0;         // Disable column arbitration
-                    next_state = ROW_GRANT;  // Transition back to row grant state
+			       begin      
+                        y_enable = 1'b1;             // Enable column arbitration during COL_GRANT state
+                    if (y_gnt_o == {4{1'b0}}) 
+                        begin                       // If no column grant, transition back to row arbitration
+                        x_enable = 1'b1;         // Enable row arbitration once column grant is done
+                        y_enable = 1'b0;         // Disable column arbitration
+                        next_state = ROW_GRANT;  // Transition back to row grant state
+                        toggle = 1'b1;
+                        end
                    end
-                 end
             default:
 			 begin
                 next_state = IDLE;           // Default state transition to IDLE
@@ -118,9 +131,9 @@ always_comb
  begin
         row = {4{1'b0}};            // Default: no active requests in any row
         for (int i = 0; i < 4 ; i++) 
-         begin            
+        begin            
            row[i] = |(req[i]);         
-			end
+		end
  end
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -151,7 +164,8 @@ always_comb
             gnt_o[x_add][y_add] = 1'b1; // Grant the intersection of active row and column
          end
       end
-//------------------------------------------------------------------------------------------------------------
+
+
 
  x_roundrobin   RRA_X 
     (
@@ -174,5 +188,20 @@ always_comb
         .yadd_o    (y_add)                      // output for column arbitration (index)
     );
 
+	  pixel_groups pixel_grp
+	 (
+	    .clk(clk),
+		 .rst_n(rst_n),
+		 .set(set),
+		 .gnt_o(gnt_o),
+		 
+		 .req(req),
+		 .in_gnt_o(in_gnt_o),
+		 .in_x_add(in_x_add),
+		 .in_y_add(in_y_add),
+		 .timestamp_out(timestamp_out),
+		 .polarity_out(polarity_out),
+		 .grp_release( grp_release)
+	 );
 endmodule
 

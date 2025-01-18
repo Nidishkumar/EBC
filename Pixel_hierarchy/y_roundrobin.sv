@@ -12,18 +12,20 @@ module y_roundrobin
     input  logic enable_i             ,        // Enable signal to control Column arbiter
     input  logic [COLS-1:0]req_i      ,        // Request inputs (multi-bit for each request)
     output logic [COLS-1:0] gnt_o     ,        // Grant outputs (sequential)
-    output logic [y_width-1:0] yadd_o          // Encoded output representing the granted cloumn index
+    output logic [y_width-1:0] yadd_o ,         // Encoded output representing the granted cloumn index
+    output logic grp_release
  );
 
-    // Internal signals for mask and grant handling
+     // Internal signals for mask and grant handling
     logic [COLS-1:0] mask_ff     ;              // Current mask 
     logic [COLS-1:0] nxt_mask    ;              // Next mask based on grants
     logic [COLS-1:0] mask_req    ;              // Masked requests (and of req_i and mask_ff)
     logic [COLS-1:0] mask_gnt    ;              // Masked grants (output from priority arbiter)
-    //logic [COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
+    logic [COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
 
      // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
-    assign mask_req = req_i & mask_ff;        
+    assign mask_req = req_i & mask_ff;   
+    assign grp_release = !gnt_temp     ;
 
     // Mask and grant state update logic
     always_ff @(posedge clk_i or posedge reset_i) 
@@ -32,26 +34,26 @@ module y_roundrobin
 		   begin
             // Reset mask to all ones (allow all requests) and reset grant output to zero
             mask_ff <= {COLS{1'b1}};
-         //   gnt_o   <= {COLS{1'b0}};          // Reset grant output to zero (no grants)
+            gnt_o   <= {COLS{1'b0}};          // Reset grant output to zero (no grants)
          end 
         else 
 		   begin
             if (enable_i) 
 			    begin
                 mask_ff <= nxt_mask;           // Update mask based on next mask calculation
-              //  gnt_o   <= gnt_temp;           // Register the combinational grant output
+                gnt_o   <= gnt_temp;           // Register the combinational grant output
              end
             else
 			    begin
                 // Reset mask to all ones (allow all requests) when not enabled
                 mask_ff <=  {COLS{1'b1}}; 
-              //  gnt_o   <=  {COLS{1'b0}};     // No grants when not enabled
+                gnt_o   <=  {COLS{1'b0}};     // No grants when not enabled
              end
          end
      end
 
     // Grant output is taken from the masked grants
-    assign gnt_o = mask_gnt;                // Register the combinational grant from masked arbiter
+    assign gnt_temp = mask_gnt;                // Register the combinational grant from masked arbiter
 
     // Next mask generation based on current grant outputs
     always_comb 
@@ -61,7 +63,7 @@ module y_roundrobin
         // Iterate through the gnt_temp bits to calculate the next mask
         for (int i = 0; i < COLS ; i = i + 1) 
 		   begin
-            if (gnt_o[i]) 
+            if (gnt_temp[i]) 
 			      begin
                    nxt_mask = ({COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
                end

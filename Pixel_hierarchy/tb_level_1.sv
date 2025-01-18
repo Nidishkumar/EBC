@@ -3,22 +3,20 @@
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
-//------------------------------------------------------------------------------------------------------------------
-//import arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
 
  module tb_level_1;
   // Inputs
   logic clk_i                                   ; // Clock input
   logic reset_i                                 ; // Active high Reset input
-  logic [15:0][15:0] req_i; // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
+  logic [15:0][15:0][1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
  logic [3:0][3:0] gnt_o             ; //grant output
- logic [1:0] x_add ;      // Index for selected row in row arbitration logic
- logic [1:0] y_add ;
+ logic [3:0] x_add_o ;      // Index for selected row in row arbitration logic
+ logic [3:0] y_add_o ;
  
-logic [3:0][3:0]in_gnt_o;
-  logic [1:0]in_x_add;
-   logic [1:0]in_y_add; 
+   logic [3:0][3:0]in_gnt_o;
+	logic polarity_out;
+	logic [31:0]timestamp_out;
   
   top_pixel_hier
   dut (
@@ -26,12 +24,12 @@ logic [3:0][3:0]in_gnt_o;
             .rst_n        (reset_i)       ,     // Active high Reset input
             .set          (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_o          (gnt_o)         ,     // grant outputs
-            .x_add     (x_add),
-				.y_add(y_add) ,
+            .x_add_o     (x_add_o),
+				.y_add_o(y_add_o) ,
 				
 				.in_gnt_o(in_gnt_o),
-            .in_x_add(in_x_add),       // Index for selected row in row arbitration logic
-            .in_y_add(in_y_add) 
+				.polarity_out(polarity_out),
+				.timestamp_out(timestamp_out)
   );
 
  //-------------------------------------------Clock generation-----------------------------------------------//
@@ -79,7 +77,7 @@ endtask
    begin
    for(int j=0;j<16;j++)
 	 begin
-	  req_i[i][j]=$urandom %2;
+	  req_i[i][j]=$urandom %3;
 	 end
 	end
 end
@@ -104,4 +102,4 @@ $stop;                //stop simulation
 end
 //-------------------------------------------End of Various Test Cases---------------------------------------------------------//
 
-endmodule
+endmodule 
