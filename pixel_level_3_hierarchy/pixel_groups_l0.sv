@@ -20,7 +20,7 @@ module pixel_groups_l0
     // Temporary outputs for each group
     logic [NUM_GROUPS0-1:0] x_add_temp;
     logic [NUM_GROUPS0-1:0] y_add_temp;
-    logic [NUM_GROUPS0-1:0][1:0][1:0] gnt_temp;
+    logic [NUM_GROUPS0-1:0][l0_GROUP_SIZE-1:0][l0_GROUP_SIZE-1:0] gnt_temp;
     logic [NUM_GROUPS0-1:0] active_temp;
     logic [NUM_GROUPS0-1:0] grp_release_temp;
 	 int base_col;
