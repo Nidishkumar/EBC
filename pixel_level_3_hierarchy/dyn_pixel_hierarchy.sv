@@ -1,17 +1,17 @@
 import lib_arbiter_pkg::*;                                // Importing arbiter package containing parameter constants
 module dyn_pixel_hierarchy (
 input logic clk_i,reset_i,
-input logic [ROWS-1:0][COLS-1:0][POLARITY-1:0]set_i,
-output logic [ROWS-1:0][COLS-1:0]gnt_o,
+input logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]set_i,
+output logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0]gnt_o,
 output logic grp_release_2,
 output logic [WIDTH-1:0] data_out_o
 );       
 
-logic [3:0] x_add;     
-logic [3:0] y_add;
+logic [ROW_ADD-1:0] x_add;     
+logic [COL_ADD-1:0] y_add;
 
-logic [3:0] x_add_ff;     
-logic [3:0] y_add_ff;
+logic [ROW_ADD-1:0] x_add_ff;     
+logic [COL_ADD-1:0] y_add_ff;
 
 logic polarity;
 logic [SIZE-1:0]timestamp;
@@ -28,33 +28,33 @@ logic active;
 
 
 logic req_0;
-logic [7:0][7:0]req_l0;
-logic [3:0][3:0]req_1;
-logic  x_add_1;
-logic  y_add_1;
+logic [Lvl1_PIXELS-1:0][Lvl1_PIXELS-1:0]req_l0;
+logic [Lvl2_PIXELS-1:0][Lvl2_PIXELS-1:0]req_1;
+logic [Lvl1_ADD-1:0]x_add_1;
+logic [Lvl1_ADD-1:0]y_add_1;
 //logic [1:0][1:0]gnt_o_1;
-logic [15:0]grp_release_1;
-logic [1:0][1:0]gnt_0;
-logic [1:0][1:0]gnt_1;
-logic xadd_0;
-logic yadd_0;
-logic grp_release_0;
 //logic [15:0]grp_release_1;
-logic [3:0][3:0]gnt_o_1;
-logic [1:0]x_add_2;
-logic [1:0]y_add_2;
-logic [7:0][7:0]gnt_o_high;
+logic [l0_GROUP_SIZE-1:0][l0_GROUP_SIZE-1:0]gnt_0;
+logic [l1_GROUP_SIZE-1:0][l1_GROUP_SIZE-1:0]gnt_1;
+logic [Lvl0_ADD-1:0]x_add_0;
+logic [Lvl0_ADD-1:0]y_add_0;
+logic grp_release_0;
+logic grp_release_1;
+logic [Lvl2_PIXELS-1:0][Lvl2_PIXELS-1:0]gnt_2;
+logic [Lvl2_ADD-1:0]x_add_2;
+logic [Lvl2_ADD-1:0]y_add_2;
+logic [Lvl1_PIXELS-1:0][Lvl1_PIXELS-1:0]gnt_o_high;
 //logic [3:0][3:0]req_0;
 
 
 assign enable = req_0;
 assign gnt_o = 'b0;
-assign x_add = {x_add_2,x_add_1,xadd_0};
-assign y_add = {y_add_2,y_add_1,yadd_0};
+assign x_add = {x_add_2,x_add_1,x_add_0};
+assign y_add = {y_add_2,y_add_1,y_add_0};
     
 // Active row's column requests
 assign polarity_in = set_i[x_add][y_add]; // Sends active row's column request polarity to the polarity module.
-assign active = active_0 & active_1& active_2;
+assign active = active_0 & active_1 & active_2;
 
     always_ff @(posedge clk_i or posedge reset_i) 
 	  begin
@@ -95,18 +95,18 @@ end
 pixel_top_level 
 #(
     
-    .Lvl_ROWS(4),
-    .Lvl_COLS(4),
-    .Lvl_ROW_ADD(2),
-    .Lvl_COL_ADD(2)
+    .Lvl_ROWS(Lvl2_PIXELS),
+    .Lvl_COLS(Lvl2_PIXELS),
+    .Lvl_ROW_ADD(Lvl2_ADD),
+    .Lvl_COL_ADD(Lvl2_ADD)
 ) 
 level_2 (
     .clk_i(clk_i),
     .reset_i(reset_i),
     .enable_i(enable),
     .req_i(req_1),
-    .grp_release_i(|grp_release_1),
-    .gnt_o(gnt_o_1),
+    .grp_release_i(grp_release_1),
+    .gnt_o(gnt_2),
     .x_add_o(x_add_2),
     .y_add_o(y_add_2),
     .active_o(active_2),
@@ -116,15 +116,11 @@ level_2 (
 
 
 pixel_groups_l1 
-#(
-    .PIXELS(8),       // Size of the pixel array (e.g., 16x16)
-    .GROUP_SIZE(2)
-) 
 pixel_level_1 (
     .clk_i(clk_i),
     .reset_i(reset_i),
-    .gnt_top_i(gnt_o_1),
-	 .grp_release_i(|grp_release_0),
+    .gnt_top_i(gnt_2),
+	 .grp_release_i(grp_release_0),
     .set_i(req_l0),
 	 .gnt_o_high(gnt_o_high),
     .gnt_o(gnt_1),
@@ -136,20 +132,15 @@ pixel_level_1 (
 );
 
 
-pixel_groups_l0 
-#(
-    //.ROWS(16),
-    .PIXELS(16),       // Size of the pixel array (e.g., 16x16)
-    .GROUP_SIZE(2)
-	
-)level_0 (
+pixel_groups_l0 level_0
+ (
     .clk_i(clk_i),
     .reset_i(reset_i),
     .gnt_top_i(gnt_o_high),
     .set_i(set_i),
     .gnt_o(gnt_0),
-    .x_add_o(xadd_0),
-    .y_add_o(yadd_0),
+    .x_add_o(x_add_0),
+    .y_add_o(y_add_0),
     .req_o(req_l0),
     .grp_release_o(grp_release_0),
     .active_o(active_0)

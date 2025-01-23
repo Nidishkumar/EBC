@@ -12,22 +12,22 @@ module pixel_top_level
 (
     input  logic clk_i, reset_i,
     input  logic enable_i,
-    input  logic [3:0][3:0]req_i,
+    input  logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]req_i,
     input  logic grp_release_i,
-    output logic [3:0][3:0]gnt_o,
-    output logic [1:0] x_add_o ,        // Index for selected row in row arbitration logic
-    output logic [1:0] y_add_o ,
+    output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]gnt_o,
+    output logic [Lvl_ROW_ADD-1:0] x_add_o ,        // Index for selected row in row arbitration logic
+    output logic [Lvl_COL_ADD-1:0] y_add_o ,
     output logic active_o,
     output logic req_o,
 	output logic grp_release_o         
 );
 
     // Internal signals
-    logic [3:0] row_req ;             // Indicates which rows have active requests
-    logic [3:0] col_req ;        	   // Holds the column requests for the selected active row
+    logic [Lvl_ROWS-1:0] row_req ;             // Indicates which rows have active requests
+    logic [Lvl_COLS-1:0] col_req ;        	   // Holds the column requests for the selected active row
 	 
-    logic [3:0] y_gnt_o ;         // column arbiter grant information
-    logic [3:0] x_gnt_o ;         // row arbiter grant information
+    logic [Lvl_COLS-1:0] y_gnt_o ;         // column arbiter grant information
+    logic [Lvl_ROWS-1:0] x_gnt_o ;         // row arbiter grant information
 
     logic active_ff;
 
@@ -103,7 +103,7 @@ module pixel_top_level
     
     // Generate row signals: Each bit represents whether there are active requests in that row
     always_comb begin
-        for (int i = 0; i < 3; i++) 
+        for (int i = 0; i < Lvl_ROWS; i++) 
          begin
             row_req[i] = |req_i[i];        // OR all bits in each row to detect active row requests
          end
@@ -125,7 +125,7 @@ module pixel_top_level
 
     // Assign the current column requests from the active row based on row index
     always_comb begin
-        for (int i = 0; i < 3; i = i + 1) 
+        for (int i = 0; i < Lvl_COLS; i = i + 1) 
          begin
             col_req[i] = |req_i[x_add_o][i];
          end
@@ -212,9 +212,9 @@ module pixel_top_level
     always_comb 
 	  begin
         // Initialize all grants to 0
-        for (int i = 0; i < 3; i++) 
+        for (int i = 0; i < Lvl_ROWS; i++) 
 		 begin
-            for (int j = 0; j < 3; j++) 
+            for (int j = 0; j < Lvl_COLS; j++) 
 			 begin
                 gnt_o[i][j] = 1'b0;
              end

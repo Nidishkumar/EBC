@@ -1,36 +1,30 @@
+	import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
 
 
-import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
-
-
-module pixel_groups_l1 #(
-    parameter PIXELS = 16,       // Size of the pixel array (e.g., 16x16)
-    parameter GROUP_SIZE = 2,   // Group size (e.g., 2x2, 4x4, 8x8)
-    parameter CONST = PIXELS / GROUP_SIZE, // Number of groups per row/column
-    parameter NUM_GROUPS = CONST * CONST   // Total number of groups
-)(
+module pixel_groups_l1 
+(
     input logic clk_i,
     input logic reset_i,
-    input logic [PIXELS-1:0][PIXELS-1:0] set_i,
-    input logic [CONST-1:0][CONST-1:0] gnt_top_i,
+    input logic [Lvl1_PIXELS-1:0][Lvl1_PIXELS-1:0] set_i,
+    input logic [CONST1-1:0][CONST1-1:0] gnt_top_i,
 	 input logic  grp_release_i,
-    output logic [CONST-1:0][CONST-1:0] req_o,
-    output logic [NUM_GROUPS-1:0] grp_release_o,
-	 output logic [7:0][7:0] gnt_o_high,
-    output logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0] gnt_o,
+    output logic [CONST1-1:0][CONST1-1:0] req_o,
+    output logic grp_release_o,
+	 output logic [Lvl1_PIXELS-1:0][Lvl1_PIXELS-1:0] gnt_o_high,
+    output logic [l1_GROUP_SIZE-1:0][l1_GROUP_SIZE-1:0] gnt_o,
     output logic  x_add_o,
     output logic  y_add_o,
     output logic  active_o
 );
     // Grouped pixel array
-    logic [NUM_GROUPS-1:0][GROUP_SIZE-1:0][GROUP_SIZE-1:0] set_group;
+    logic [NUM_GROUPS1-1:0][l1_GROUP_SIZE-1:0][l1_GROUP_SIZE-1:0] set_group;
 
     // Temporary outputs for each group
-    logic [NUM_GROUPS-1:0] x_add_temp;
-    logic [NUM_GROUPS-1:0] y_add_temp;
-    logic [NUM_GROUPS-1:0][1:0][1:0] gnt_temp;
-    logic [NUM_GROUPS-1:0] active_temp;
-    logic [NUM_GROUPS-1:0] grp_release_temp;
+    logic [NUM_GROUPS1-1:0] x_add_temp;
+    logic [NUM_GROUPS1-1:0] y_add_temp;
+    logic [NUM_GROUPS1-1:0][l1_GROUP_SIZE-1:0][l1_GROUP_SIZE-1:0] gnt_temp;
+    logic [NUM_GROUPS1-1:0] active_temp;
+    logic [NUM_GROUPS1-1:0] grp_release_temp;
 	 int base_col;
 	 int base_row;
 
@@ -40,13 +34,13 @@ module pixel_groups_l1 #(
     always_comb begin
 	     gnt_o_high = '0;
 
-        for (int group = 0; group < NUM_GROUPS; group++) begin
+        for (int group = 0; group < NUM_GROUPS1; group++) begin
             // Calculate the top-left pixel of the group
-             base_row = (group / CONST) * GROUP_SIZE;
-             base_col = (group % CONST) * GROUP_SIZE;
+             base_row = (group / CONST1) * l1_GROUP_SIZE;
+             base_col = (group % CONST1) * l1_GROUP_SIZE;
 
-            for (int row = 0; row < GROUP_SIZE; row++) begin
-                for (int col = 0; col < GROUP_SIZE; col++) begin
+            for (int row = 0; row < l1_GROUP_SIZE; row++) begin
+                for (int col = 0; col < l1_GROUP_SIZE; col++) begin
                     set_group[group][row][col] = set_i[base_row + row][base_col + col];
 						  gnt_o_high[base_row + row][base_col + col] = gnt_temp[group][row][col];
 
@@ -59,16 +53,17 @@ module pixel_groups_l1 #(
     // Group-level instantiations
     genvar group;
     generate
-        for (group = 0; group < NUM_GROUPS; group++) begin : groups
-            pixel_int_level #(.GROUP_SIZE(GROUP_SIZE),.address(1)) 
+        for (group = 0; group < NUM_GROUPS1; group++) begin : groups
+		  
+            pixel_top_level #(.Lvl_ROWS(l1_GROUP_SIZE),.Lvl_COLS(l1_GROUP_SIZE),.Lvl_ROW_ADD(Lvl1_ADD),.Lvl_COL_ADD(Lvl1_ADD)) 
 				level1
 				(
-                .clk(clk_i),
-                .rst_n(reset_i),
-                .enable(|gnt_top_i[group / CONST][group % CONST]),
-                .set(set_group[group]),
+                .clk_i(clk_i),
+                .reset_i(reset_i),
+                .enable_i(gnt_top_i[group / CONST1][group % CONST1]),
+                .req_i(set_group[group]),
 					 .grp_release_i(grp_release_i),
-                .req(req_o[group / CONST][group % CONST]),
+                .req_o(req_o[group / CONST1][group % CONST1]),
                 .gnt_o(gnt_temp[group]),
                 .x_add_o(x_add_temp[group]),
                 .y_add_o(y_add_temp[group]),
@@ -83,8 +78,8 @@ module pixel_groups_l1 #(
         x_add_o = 0;
         y_add_o = 0;
         grp_release_o = 0;
-        for (int group = 0; group < NUM_GROUPS; group++) begin
-            if (|gnt_top_i[group / CONST][group % CONST]) begin
+        for (int group = 0; group < NUM_GROUPS1; group++) begin
+            if ( gnt_top_i[group / CONST1][group % CONST1]) begin
                 gnt_o = gnt_temp[group];
                 x_add_o = x_add_temp[group];
                 y_add_o = y_add_temp[group];
@@ -92,4 +87,5 @@ module pixel_groups_l1 #(
             end
         end
     end
+	 
 endmodule

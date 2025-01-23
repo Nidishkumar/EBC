@@ -10,9 +10,9 @@ module tb_level;
   // Inputs
   logic clk_i                                   ; // Clock input
   logic reset_i                                 ; // Active high Reset input
-  logic [ROWS-1:0][COLS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
+  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
- logic [ROWS-1:0][COLS-1:0] gnt_o             ; //grant output
+ logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ; //grant output
 
  logic grp_release_o;
 	logic [WIDTH-1:0] data_out_o;
@@ -46,9 +46,9 @@ endtask
 
 always_ff@(posedge clk_i)
  begin
- for(int i=0;i<ROWS;i++)
+ for(int i=0;i<Lvl0_PIXELS;i++)
    begin
-	 for(int j=0;j<ROWS;j++)
+	 for(int j=0;j<Lvl0_PIXELS;j++)
 	  begin
 	    if(gnt_o[i][j]==1'b1)
 		   begin
@@ -58,7 +58,7 @@ always_ff@(posedge clk_i)
 	end 
 end 
 //----------------------------------------------Apply Request-------------------------------------------------------
-task apply_request([ROWS-1:0][COLS-1:0][POLARITY-1:0]req);
+task apply_request([Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req);
 begin
  req_i=req;
 end

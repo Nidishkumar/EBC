@@ -9,9 +9,9 @@ import lib_arbiter_pkg::*;                                      // Importing arb
   // Inputs
   logic clk_i                                   ; // Clock input
   logic reset_i                                 ; // Active high Reset input
-  logic [ROWS-1:0][COLS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
+  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
- logic [ROWS-1:0][COLS-1:0] gnt_o             ; //grant output
+ logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ; //grant output
 
  logic grp_release_o;
  logic [WIDTH-1:0] data_out_o;
@@ -40,9 +40,9 @@ import lib_arbiter_pkg::*;                                      // Importing arb
 task initialize;
  begin
   reset_i=0;
-for(int i=0;i<ROWS;i++)
+for(int i=0;i<Lvl0_PIXELS;i++)
    begin
-	 for(int j=0;j<COLS;j++)
+	 for(int j=0;j<Lvl0_PIXELS;j++)
 	  begin
 		   req_i[i][j]=0;
 	  end
@@ -56,9 +56,9 @@ endtask
 
 always_ff@(posedge clk_i)
  begin
- for(int i=0;i<ROWS;i++)
+ for(int i=0;i<Lvl0_PIXELS;i++)
    begin
-	 for(int j=0;j<COLS;j++)
+	 for(int j=0;j<Lvl0_PIXELS;j++)
 	  begin
 	    if(gnt_o[i][j])
 		   begin
@@ -86,9 +86,9 @@ end
 //Task for random requests 
  task apply_requests;
  begin
-  for(int i=0;i<ROWS;i++)
+  for(int i=0;i<Lvl0_PIXELS;i++)
    begin
-   for(int j=0;j<COLS;j++)
+   for(int j=0;j<Lvl0_PIXELS;j++)
 	 begin
 	  req_i[i][j]=$urandom %3;
 	 end

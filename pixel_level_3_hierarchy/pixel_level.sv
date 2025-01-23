@@ -6,15 +6,15 @@
 //------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
 
-module pixel_level#(parameter GROUP_SIZE = 2,parameter address=1)
+module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 
 (
     input  logic clk_i, reset_i,
     input  logic enable_i,
-    input  logic [1:0][1:0][POLARITY-1:0]req_i,
-    output logic [1:0][1:0]gnt_o,
-    output logic  x_add_o ,        // Index for selected row in row arbitration logic
-    output logic  y_add_o ,
+    input  logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0][POLARITY-1:0]req_i,
+    output logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0]gnt_o,
+    output logic [Lvl_ADD-1:0] x_add_o ,        // Index for selected row in row arbitration logic
+    output logic [Lvl_ADD-1:0]y_add_o ,
     output logic active_o,
     output logic req_o,
 	output logic grp_release_o         
@@ -22,11 +22,11 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter address=1)
 );
 
     // Internal signals
-    logic [1:0] row_req ;             // Indicates which rows have active requests
-    logic [1:0] col_req ;        	   // Holds the column requests for the selected active row
+    logic [GROUP_SIZE-1:0] row_req ;             // Indicates which rows have active requests
+    logic [GROUP_SIZE-1:0] col_req ;        	   // Holds the column requests for the selected active row
 	 
-    logic [1:0] y_gnt_o ;         // column arbiter grant information
-    logic [1:0] x_gnt_o ;         // row arbiter grant information
+    logic [GROUP_SIZE-1:0] y_gnt_o ;         // column arbiter grant information
+    logic [GROUP_SIZE-1:0] x_gnt_o ;         // row arbiter grant information
 
    // logic active_ff;
 
@@ -228,7 +228,7 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter address=1)
       end  */
 	 
     // Instantiate RoundRobin module for column arbitration (y-direction)
-    x_roundrobin  #(.Lvl_ROWS(GROUP_SIZE),.Lvl_ROW_ADD(address))
+    x_roundrobin  #(.Lvl_ROWS(GROUP_SIZE),.Lvl_ROW_ADD(Lvl_ADD))
 	 RRA_X
 	 (
         .clk_i(clk_i),                  // Clock input
@@ -241,7 +241,7 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter address=1)
         .grp_release(grp_release_x)                     		  // Output for row arbitration (index)
     );
 
-    y_roundrobin  #(.Lvl_COLS(GROUP_SIZE),.Lvl_COL_ADD(address))
+    y_roundrobin  #(.Lvl_COLS(GROUP_SIZE),.Lvl_COL_ADD(Lvl_ADD))
 	 RRA_Y
 	 (
         .clk_i(clk_i),                  // Clock input
