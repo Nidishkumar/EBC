@@ -48,7 +48,6 @@ logic [Lvl1_PIXELS-1:0][Lvl1_PIXELS-1:0]gnt_o_high;
 
 
 assign enable = req_0;
-assign gnt_o = 'b0;
 assign x_add = {x_add_2,x_add_1,x_add_0};
 assign y_add = {y_add_2,y_add_1,y_add_0};
     
@@ -70,6 +69,28 @@ assign active = active_0 & active_1 & active_2;
          end 
       end 
 		
+/*always_ff@(posedge clk_i)
+ begin
+    // Initialize 16x16 grant output
+    gnt_o = '0;
+
+    // Iterate through all blocks in gnt_o_1 (higher-level)
+    for (int i = 0; i < Lvl_ROWS; i++) begin
+        for (int j = 0; j < Lvl_COLS; j++) begin
+            if (gnt_o_1[i][j]) 
+				begin
+                // Map the lower-level gnt_o_0 to the corresponding 4x4 region in gnt_o
+                for (int m = 0; m < Lvl_ROWS; m++) begin
+                    for (int n = 0; n < Lvl_COLS; n++) begin
+                        gnt_o[i * CONST + m][j * CONST + n] = gnt_o_0[m][n];
+                    end
+                end
+            end
+        end
+    end
+end
+
+*/
 pixel_top_level 
 #(
     
@@ -116,6 +137,7 @@ pixel_groups_l0 level_0
     .gnt_top_i(gnt_o_high),
     .set_i(set_i),
     .gnt_o(gnt_0),
+	 .gnt_o_0(gnt_o),
     .x_add_o(x_add_0),
     .y_add_o(y_add_0),
     .req_o(req_l0),

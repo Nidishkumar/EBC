@@ -80,7 +80,7 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 
     // Generate row signals: Each bit represents whether there are active requests in that row
     always_comb begin
-        for (int i = 0; i < 2; i++) 
+        for (int i = 0; i < GROUP_SIZE; i++) 
          begin
             row_req[i] = |(req_i[i]);        // OR all bits in each row to detect active row requests
          end
@@ -102,7 +102,7 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 
     // Assign the current column requests from the active row based on row index
     always_comb begin
-        for (int i = 0; i < 2; i = i + 1) 
+        for (int i = 0; i < GROUP_SIZE; i = i + 1) 
          begin
             col_req[i] = |req_i[x_add_o][i];
          end
@@ -185,9 +185,9 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
     always_comb 
 	  begin
         // Initialize all grants to 0
-        for (int i = 0; i < 2; i++) 
+        for (int i = 0; i < GROUP_SIZE; i++) 
 		 begin
-            for (int j = 0; j < 2; j++) 
+            for (int j = 0; j < GROUP_SIZE; j++) 
 			 begin
                 gnt_o[i][j] = 1'b0;
              end
@@ -204,9 +204,9 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 	  begin
         if (reset_i) 
 		   begin
-               for (int i = 0; i < Lvl_ROWS; i++) 
+               for (int i = 0; i < GROUP_SIZE; i++) 
                 begin
-                    for (int j = 0; j < Lvl_COLS; j++) 
+                    for (int j = 0; j < GROUP_SIZE; j++) 
                     begin
                         gnt_o[i][j] <= 1'b0;
                     end
@@ -214,9 +214,9 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
             end 
         else begin
         // Initialize all grants to 0
-        for (int i = 0; i < Lvl_ROWS; i++) 
+        for (int i = 0; i < GROUP_SIZE; i++) 
 		 begin
-            for (int j = 0; j < Lvl_COLS; j++) 
+            for (int j = 0; j < GROUP_SIZE; j++) 
 			 begin
                 if((i == x_add_o) && (j == y_add_o) && (|y_gnt_o == 1'b1))
                     gnt_o[i][j] = 1'b1;

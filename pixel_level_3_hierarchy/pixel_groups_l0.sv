@@ -8,6 +8,7 @@ module pixel_groups_l0
     input logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0] set_i,
     input logic [CONST0-1:0][CONST0-1:0] gnt_top_i,
     output logic [CONST0-1:0][CONST0-1:0] req_o,
+	 output logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o_0,
     output logic grp_release_o,
     output logic [l0_GROUP_SIZE-1:0][l0_GROUP_SIZE-1:0] gnt_o,
     output logic  x_add_o,
@@ -38,6 +39,8 @@ module pixel_groups_l0
             for (int row = 0; row < l0_GROUP_SIZE; row++) begin
                 for (int col = 0; col < l0_GROUP_SIZE; col++) begin
                     set_group[group][row][col] = set_i[base_row + row][base_col + col];
+						  gnt_o_0[base_row + row][base_col + col] = gnt_temp[group][row][col];
+
                 end
             end
         end
