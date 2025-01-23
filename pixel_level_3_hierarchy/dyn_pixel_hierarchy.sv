@@ -35,7 +35,7 @@ logic  y_add_1;
 //logic [1:0][1:0]gnt_o_1;
 logic [15:0]grp_release_1;
 logic [1:0][1:0]gnt_0;
-logic [15:0][1:0][1:0]gnt_1;
+logic [1:0][1:0]gnt_1;
 logic xadd_0;
 logic yadd_0;
 logic grp_release_0;
@@ -43,6 +43,7 @@ logic grp_release_0;
 logic [3:0][3:0]gnt_o_1;
 logic [1:0]x_add_2;
 logic [1:0]y_add_2;
+logic [7:0][7:0]gnt_o_high;
 //logic [3:0][3:0]req_0;
 
 
@@ -125,6 +126,7 @@ pixel_level_1 (
     .gnt_top_i(gnt_o_1),
 	 .grp_release_i(|grp_release_0),
     .set_i(req_l0),
+	 .gnt_o_high(gnt_o_high),
     .gnt_o(gnt_1),
     .x_add_o(x_add_1),
     .y_add_o(y_add_1),
@@ -143,7 +145,7 @@ pixel_groups_l0
 )level_0 (
     .clk_i(clk_i),
     .reset_i(reset_i),
-    .gnt_top_i(gnt_1),
+    .gnt_top_i(gnt_o_high),
     .set_i(set_i),
     .gnt_o(gnt_0),
     .x_add_o(xadd_0),

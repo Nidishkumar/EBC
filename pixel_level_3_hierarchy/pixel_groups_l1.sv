@@ -1,4 +1,5 @@
 
+
 import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
 
 
@@ -15,6 +16,7 @@ module pixel_groups_l1 #(
 	 input logic  grp_release_i,
     output logic [CONST-1:0][CONST-1:0] req_o,
     output logic [NUM_GROUPS-1:0] grp_release_o,
+	 output logic [7:0][7:0] gnt_o_high,
     output logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0] gnt_o,
     output logic  x_add_o,
     output logic  y_add_o,
@@ -36,6 +38,8 @@ module pixel_groups_l1 #(
 
     // Dynamic grouping logic
     always_comb begin
+	     gnt_o_high = '0;
+
         for (int group = 0; group < NUM_GROUPS; group++) begin
             // Calculate the top-left pixel of the group
              base_row = (group / CONST) * GROUP_SIZE;
@@ -44,10 +48,13 @@ module pixel_groups_l1 #(
             for (int row = 0; row < GROUP_SIZE; row++) begin
                 for (int col = 0; col < GROUP_SIZE; col++) begin
                     set_group[group][row][col] = set_i[base_row + row][base_col + col];
+						  gnt_o_high[base_row + row][base_col + col] = gnt_temp[group][row][col];
+
                 end
             end
         end
-    end
+    end   
+
 
     // Group-level instantiations
     genvar group;
@@ -58,7 +65,7 @@ module pixel_groups_l1 #(
 				(
                 .clk(clk_i),
                 .rst_n(reset_i),
-                .enable(gnt_top_i[group / CONST][group % CONST]),
+                .enable(|gnt_top_i[group / CONST][group % CONST]),
                 .set(set_group[group]),
 					 .grp_release_i(grp_release_i),
                 .req(req_o[group / CONST][group % CONST]),
@@ -77,8 +84,8 @@ module pixel_groups_l1 #(
         y_add_o = 0;
         grp_release_o = 0;
         for (int group = 0; group < NUM_GROUPS; group++) begin
-            if (gnt_top_i[group / CONST][group % CONST]) begin
-                gnt_o= gnt_temp[group];
+            if (|gnt_top_i[group / CONST][group % CONST]) begin
+                gnt_o = gnt_temp[group];
                 x_add_o = x_add_temp[group];
                 y_add_o = y_add_temp[group];
                 grp_release_o = grp_release_temp[group];
