@@ -1,0 +1,185 @@
+import lib_arbiter_pkg::*;                                // Importing arbiter package containing parameter constants
+module dyn_pixel_hierarchy (
+input logic clk_i,reset_i,
+input logic [ROWS-1:0][COLS-1:0][POLARITY-1:0]set_i,
+output logic [ROWS-1:0][COLS-1:0]gnt_o,
+output logic grp_release_2,
+output logic [WIDTH-1:0] data_out_o
+);       
+
+logic [3:0] x_add;     
+logic [3:0] y_add;
+
+logic [3:0] x_add_ff;     
+logic [3:0] y_add_ff;
+
+logic polarity;
+logic [SIZE-1:0]timestamp;
+
+
+logic active_1;
+logic active_2;
+
+
+logic active_0;
+logic enable;
+logic [POLARITY-1:0] polarity_in;
+logic active;
+
+
+logic req_0;
+logic [7:0][7:0]req_l0;
+logic [3:0][3:0]req_1;
+logic  x_add_1;
+logic  y_add_1;
+//logic [1:0][1:0]gnt_o_1;
+logic [15:0]grp_release_1;
+logic [1:0][1:0]gnt_0;
+logic [15:0][1:0][1:0]gnt_1;
+logic xadd_0;
+logic yadd_0;
+logic grp_release_0;
+//logic [15:0]grp_release_1;
+logic [3:0][3:0]gnt_o_1;
+logic [1:0]x_add_2;
+logic [1:0]y_add_2;
+//logic [3:0][3:0]req_0;
+
+
+assign enable = req_0;
+assign gnt_o = 'b0;
+assign x_add = {x_add_2,x_add_1,xadd_0};
+assign y_add = {y_add_2,y_add_1,yadd_0};
+    
+// Active row's column requests
+assign polarity_in = set_i[x_add][y_add]; // Sends active row's column request polarity to the polarity module.
+assign active = active_0 & active_1& active_2;
+
+    always_ff @(posedge clk_i or posedge reset_i) 
+	  begin
+        if (reset_i) 
+		   begin
+               x_add_ff <= 'b0;          
+               y_add_ff <= 'b0;
+         end 
+        else 
+		   begin
+               x_add_ff <= x_add;          
+               y_add_ff <= y_add;
+         end 
+      end 
+		
+/*always_ff@(posedge clk_i)
+ begin
+    // Initialize 16x16 grant output
+    gnt_o = '0;
+
+    // Iterate through all blocks in gnt_o_1 (higher-level)
+    for (int i = 0; i < Lvl_ROWS; i++) begin
+        for (int j = 0; j < Lvl_COLS; j++) begin
+            if (gnt_o_1[i][j]) 
+				begin
+                // Map the lower-level gnt_o_0 to the corresponding 4x4 region in gnt_o
+                for (int m = 0; m < Lvl_ROWS; m++) begin
+                    for (int n = 0; n < Lvl_COLS; n++) begin
+                        gnt_o[i * CONST + m][j * CONST + n] = gnt_o_0[m][n];
+                    end
+                end
+            end
+        end
+    end
+end
+
+*/
+pixel_top_level 
+#(
+    
+    .Lvl_ROWS(4),
+    .Lvl_COLS(4),
+    .Lvl_ROW_ADD(2),
+    .Lvl_COL_ADD(2)
+) 
+level_2 (
+    .clk_i(clk_i),
+    .reset_i(reset_i),
+    .enable_i(enable),
+    .req_i(req_1),
+    .grp_release_i(|grp_release_1),
+    .gnt_o(gnt_o_1),
+    .x_add_o(x_add_2),
+    .y_add_o(y_add_2),
+    .active_o(active_2),
+    .req_o(req_0),
+    .grp_release_o(grp_release_2)
+);
+
+
+pixel_groups_l1 
+#(
+    .PIXELS(8),       // Size of the pixel array (e.g., 16x16)
+    .GROUP_SIZE(2)
+) 
+pixel_level_1 (
+    .clk_i(clk_i),
+    .reset_i(reset_i),
+    .gnt_top_i(gnt_o_1),
+	 .grp_release_i(|grp_release_0),
+    .set_i(req_l0),
+    .gnt_o(gnt_1),
+    .x_add_o(x_add_1),
+    .y_add_o(y_add_1),
+    .active_o(active_1),
+    .req_o(req_1),
+    .grp_release_o(grp_release_1)
+);
+
+
+pixel_groups_l0 
+#(
+    //.ROWS(16),
+    .PIXELS(16),       // Size of the pixel array (e.g., 16x16)
+    .GROUP_SIZE(2)
+	
+)level_0 (
+    .clk_i(clk_i),
+    .reset_i(reset_i),
+    .gnt_top_i(gnt_1),
+    .set_i(set_i),
+    .gnt_o(gnt_0),
+    .x_add_o(xadd_0),
+    .y_add_o(yadd_0),
+    .req_o(req_l0),
+    .grp_release_o(grp_release_0),
+    .active_o(active_0)
+);
+
+wall_clock time_stamp 
+(
+	.clk_i     (clk_i)      ,                // Clock input
+    .reset_i   (reset_i)    ,                // Reset input
+	.timestamp_o(timestamp)                  // Output the captured timestamp (timestamp_o) from the wallclock module.
+		  
+);
+
+// Instantiate Polarity Selecter module outputs polarity 
+polarity_selector polarity_sel
+(
+    .clk_i         (clk_i)        , 
+    .reset_i       (reset_i)      ,
+    .req_i         (polarity_in)  ,         // Polarity request input (column request)
+    .polarity_out  (polarity)              // Output polarity signal
+);
+
+    //Instantiate Address event module for the event data
+AER address_event
+( 
+    .enable_i   (active)            ,
+    .x_add_i    (x_add_ff)          ,             //Event Row address                        
+	.y_add_i    (y_add_ff)          ,             //Event Column address  
+	.timestamp_i(timestamp)         ,             //captured timestamp data
+	.polarity_i (polarity)          ,             //polarity output
+	.data_out_o (data_out_o)                        //combines event data like row address ,column address,timestamp and polarity
+);	
+
+
+endmodule
