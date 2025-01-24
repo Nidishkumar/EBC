@@ -15,7 +15,7 @@ package lib_arbiter_pkg;
 
   
   parameter Lvl1_PIXELS      = 8  ;   // Number of rows in the design
-  parameter l1_GROUP_SIZE    = 2   ;
+  parameter l1_GROUP_SIZE    = 2  ;
   parameter CONST1 = Lvl1_PIXELS / l1_GROUP_SIZE; 
   parameter NUM_GROUPS1 = CONST1 * CONST1;
   parameter Lvl1_ADD =1;

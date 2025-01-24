@@ -11,16 +11,16 @@ module pixel_groups_l0
 	 output logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o_0,
     output logic grp_release_o,
     output logic [l0_GROUP_SIZE-1:0][l0_GROUP_SIZE-1:0] gnt_o,
-    output logic  x_add_o,
-    output logic  y_add_o,
+    output logic [Lvl0_ADD-1:0]x_add_o,
+    output logic [Lvl0_ADD-1:0] y_add_o,
     output logic active_o
 );
     // Grouped pixel array
     logic [NUM_GROUPS0-1:0][l0_GROUP_SIZE-1:0][l0_GROUP_SIZE-1:0][POLARITY-1:0] set_group;
 
     // Temporary outputs for each group
-    logic [NUM_GROUPS0-1:0] x_add_temp;
-    logic [NUM_GROUPS0-1:0] y_add_temp;
+    logic [NUM_GROUPS0-1:0] [Lvl0_ADD-1:0]x_add_temp;
+    logic [NUM_GROUPS0-1:0] [Lvl0_ADD-1:0]y_add_temp;
     logic [NUM_GROUPS0-1:0][l0_GROUP_SIZE-1:0][l0_GROUP_SIZE-1:0] gnt_temp;
     logic [NUM_GROUPS0-1:0] active_temp;
     logic [NUM_GROUPS0-1:0] grp_release_temp;

@@ -104,7 +104,6 @@ initialize;           //initializing inputs
 #10;
 apply_reset;          //apply reset
 #10;
-;         //apply enable as high
 apply_requests;       //applying random requests for dynamic pixel sizes
 #200;       //Disable enabl
 apply_requests;       //applying random requests for dynamic pixel sizes
