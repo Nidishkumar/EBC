@@ -38,14 +38,13 @@ module pixel_groups_l0
             for (int row = 0; row < Lvl0_GROUP_SIZE; row++) begin
                 for (int col = 0; col < Lvl0_GROUP_SIZE; col++) begin
                     set_group[group][row][col] = set_i[base_row + row][base_col + col];  // Mapping pixels to the group
-						  gnt_o_0[base_row + row][base_col + col] = gnt_temp[group][row][col]; // Mapping lower group grants to grant matrix 
+					gnt_o_0[base_row + row][base_col + col] = gnt_temp[group][row][col]; // Mapping lower group grants to grant matrix 
                 end
             end
         end
     end
 
-    // Group-level instantiations
-    genvar group;                                         // Generate variable for instantiating groups
+    genvar group;                                        
     generate
         for (group = 0; group < NUM_GROUPS0; group++) 
 		  begin : groups

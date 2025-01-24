@@ -31,7 +31,7 @@ module pixel_top_level
 
     assign req_o =  |req_i;                                     // Aggregate request signal from all pixels
 
-    // Group release signal logic
+
     always_ff @(posedge grp_release_clk or posedge reset_i) 
     begin
         if (reset_i) 

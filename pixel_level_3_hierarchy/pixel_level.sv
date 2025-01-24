@@ -134,7 +134,7 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 			     begin
                     x_enable = 1'b1;                     // Keep row arbitration enabled during ROW_GRANT state
                     if (x_gnt_o != 'b0) 
-				     begin                                   // If any row has been granted, move to column grant
+				     begin                               // If any row has been granted, move to column grant
                         y_enable = 1'b1;                 // Enable column arbitration once row grant is done
                         x_enable = 1'b0;                 // Disable row arbitration
                         next_state = COL_GRANT;          // Transition to column grant state
@@ -142,10 +142,10 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
                   end
 		        else
 			     begin
-				    x_enable = 1'b0;                       // Disable row arbitration
-                    y_enable = 1'b0;                   // Disable column arbitration
-				    next_state = IDLE;                     // Transition to IDLE
-                    refresh = 1'b1;                    // Refresh the state
+				    x_enable = 1'b0;                     // Disable row arbitration
+                    y_enable = 1'b0;                     // Disable column arbitration
+				    next_state = IDLE;                   // Transition to IDLE
+                    refresh = 1'b1;                      // Refresh the state
 			     end
             end
             
@@ -155,7 +155,7 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 			     begin
                     y_enable = 1'b1;                  // Enable column arbitration during COL_GRANT state
                     if (y_gnt_o == 'b0) 
-				     begin                                // If no column grant, transition back to row arbitration
+				     begin                            // If no column grant, transition back to row arbitration
                         x_enable = 1'b1;              // Enable row arbitration once column grant is done
                         y_enable = 1'b0;              // Disable column arbitration
                         next_state = ROW_GRANT;       // Transition back to row grant state
@@ -163,10 +163,10 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
                   end
 				else
 				 begin
-				    x_enable = 1'b0;                      // Disable row arbitration
-                    y_enable = 1'b0;                  // Disable column arbitration
-					next_state = IDLE;                     // Transition to IDLE
-                    refresh = 1'b1;                   // Refresh the state
+				    x_enable = 1'b0;                   // Disable row arbitration
+                    y_enable = 1'b0;                   // Disable column arbitration
+					next_state = IDLE;                 // Transition to IDLE
+                    refresh = 1'b1;                    // Refresh the state
 				 end    
 			end
             default:
