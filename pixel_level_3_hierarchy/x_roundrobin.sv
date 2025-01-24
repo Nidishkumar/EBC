@@ -8,12 +8,12 @@ import lib_arbiter_pkg::*;                                      // Importing arb
 module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
 
  (
-    input  logic clk_i                ,       // Clock input
-    input  logic reset_i              ,       // Active high Reset input
-    input  logic enable_i             ,       // Enable signal to control Row arbiter
-    input  logic refresh_i            ,
-    input  logic [Lvl_ROWS-1:0] req_i     ,       // Request inputs
-    output logic [Lvl_ROWS-1:0] gnt_o     ,       // Grant outputs
+    input  logic clk_i                    ,       // Clock input
+    input  logic reset_i                  ,        // Active high Reset input
+    input  logic enable_i                 ,        // Enable signal to control Row arbiter
+    input  logic refresh_i                ,
+    input  logic [Lvl_ROWS-1:0] req_i     ,        // Request inputs
+    output logic [Lvl_ROWS-1:0] gnt_o     ,        // Grant outputs
     output logic [Lvl_ROW_ADD-1:0] xadd_o ,        // Encoded output representing the granted row index
 	  output logic grp_release 
  );

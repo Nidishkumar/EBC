@@ -12,7 +12,7 @@ module tb_level;
   logic reset_i                                 ; // Active high Reset input
   logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
   // Outputs
- logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ; //grant output
+ logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ;        //grant output
 
  logic grp_release_o;
 	logic [WIDTH-1:0] data_out_o;

@@ -16,14 +16,14 @@ import lib_arbiter_pkg::*;                                      // Importing arb
  logic grp_release_o;
  logic [WIDTH-1:0] data_out_o;
   
-  dyn_pixel_hierarchy
+  pixel_hierarchy
   dut (
             .clk_i        (clk_i)         ,     // Clock input
             .reset_i      (reset_i)       ,     // Active high Reset input
             .set_i        (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_o          (gnt_o)         ,     // grant outputs
-				.grp_release_2(grp_release_o),
-        .data_out_o(data_out_o)
+			    	.grp_release_2(grp_release_o),
+            .data_out_o(data_out_o)
 
   );
 
@@ -109,7 +109,7 @@ apply_requests;       //applying random requests for dynamic pixel sizes
 apply_requests;       //applying random requests for dynamic pixel sizes
 #100;
 apply_requests;       //applying random requests for dynamic pixel sizes
-#100
+#100 
 $stop;                //stop simulation
 end
 //-------------------------------------------End of Various Test Cases---------------------------------------------------------//
