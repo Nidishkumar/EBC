@@ -1,3 +1,9 @@
+// Module name: pixel groups level0
+// Module Description: This module perform lower level grouping arbiteration to the lower level groups
+// Author: [Your Name]
+// Date: [Current Date]
+// Version: [Version Number]
+//------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
 
 module pixel_groups_l0 

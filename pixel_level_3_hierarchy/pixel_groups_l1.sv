@@ -1,3 +1,9 @@
+// Module name: pixel groups level1
+// Module Description: This module perform intermediate grouping arbiteration to the intermediate level groups
+// Author: [Your Name]
+// Date: [Current Date]
+// Version: [Version Number]
+//------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
 
 module pixel_groups_l1 

@@ -1,5 +1,5 @@
 // Module name: tb Module
-// Module Description: Generating events for 16X16 pixel
+// Module Description: Generating events for  pixel array
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]

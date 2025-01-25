@@ -1,5 +1,5 @@
-// Module name: TopModule
-// Module Description: Top module controls both row and column arbiters
+// Module name: Lower level arbitration
+// Module Description: This module perform arbiteration to the lower level groups
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]

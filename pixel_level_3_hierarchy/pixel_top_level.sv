@@ -1,3 +1,9 @@
+// Module name: pixel top level
+// Module Description: This module perform arbiteration to the intermediate level groups and higher level
+// Author: [Your Name]
+// Date: [Current Date]
+// Version: [Version Number]
+//------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
 
 module pixel_top_level 
