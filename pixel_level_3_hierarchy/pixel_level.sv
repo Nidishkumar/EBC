@@ -11,13 +11,13 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 (
     input  logic clk_i, reset_i,                               // Clock and Reset inputs
     input  logic enable_i,                                     // Enable signal to activate arbitration
-    input  logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0][POLARITY-1:0]req_i, // Input request 
+    input  logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0][POLARITY-1:0]req_i, // Input request with polarity
     output logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0]gnt_o,        // Grant for the corresponding requests
     output logic [Lvl_ADD-1:0] x_add_o ,                       // Selected row index from row arbitration
     output logic [Lvl_ADD-1:0] y_add_o ,                       // Selected column index from column arbitration
     output logic active_o,                                     // Indicates if any column grant is active
     output logic req_o,                                        // Indicates if there are any active requests in req_i
-	output logic grp_release_o                                  // Indicates group release (all operations done)
+	output logic grp_release_o                                 // Indicates group release (all operations done)
 );
 
     // Internal signals

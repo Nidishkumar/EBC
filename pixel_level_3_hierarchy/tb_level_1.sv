@@ -1,28 +1,28 @@
 // Module name: tb Module
-// Module Description: Generating events for 16X16 pixel
+// Module Description: Generating events for pixel hierarchy
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
-import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
+import lib_arbiter_pkg::*;                                     // Importing arbiter package containing parameter constants
 
  module tb_level_1;
   // Inputs
-  logic clk_i                                   ; // Clock input
-  logic reset_i                                 ; // Active high Reset input
-  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
+  logic clk_i                                   ;              // Clock input
+  logic reset_i                                 ;              // Active high Reset input
+  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i; // Request signals for each row and column, with POLARITY bits 
   // Outputs
- logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ; //grant output
+ logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ;  //grant output
 
  logic grp_release_o;
  logic [WIDTH-1:0] data_out_o;
   
-  pixel_hierarchy
+  dyn_pixel_hierarchy
   dut (
             .clk_i        (clk_i)         ,     // Clock input
             .reset_i      (reset_i)       ,     // Active high Reset input
             .set_i        (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
-            .gnt_o          (gnt_o)         ,     // grant outputs
-			    	.grp_release_2(grp_release_o),
+            .gnt_o        (gnt_o)         ,     // grant outputs
+			    	.grp_release_out(grp_release_o),
             .data_out_o(data_out_o)
 
   );

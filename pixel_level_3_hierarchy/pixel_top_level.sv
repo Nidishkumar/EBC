@@ -4,11 +4,11 @@ module pixel_top_level
 #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ROW_ADD=1,parameter Lvl_COL_ADD=1)
 
 (
-    input  logic clk_i, reset_i,                                 // Clock and reset signals
+    input  logic clk_i, reset_i,                                // Clock and reset signals
     input  logic enable_i,                                      // Enable signal for the module
-    input  logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]req_i,             // Request matrix indicating pixel requests
-    input  logic grp_release_i,                                 // Group release input signal
-    output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]gnt_o,             // Grant matrix indicating active grants
+    input  logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]req_i,             // pixel group requests from level1 and level2
+    input  logic grp_release_i,                                 // Group release input signal from lower levels
+    output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]gnt_o,             // Grant indicating for level groups
     output logic [Lvl_ROW_ADD-1:0] x_add_o ,                    // Selected row index from row arbitration
     output logic [Lvl_COL_ADD-1:0] y_add_o ,                    // Selected column index from column arbitration
     output logic active_o,                                      // Indicates if arbitration is active
@@ -21,7 +21,7 @@ module pixel_top_level
     logic [Lvl_COLS-1:0] col_req;                               // Column requests for the active row
     logic [Lvl_COLS-1:0] y_gnt_o;                               // Column arbitration grant signals
     logic [Lvl_ROWS-1:0] x_gnt_o;                               // Row arbitration grant signals
-  //  logic active_ff;                                            // Flip-flop for active state
+
     logic x_enable, y_enable;                                   // Enable signals for row and column arbitration
     logic refresh;                                              // Refresh signal for row arbitration
     logic grp_release_x;                                        // Group release signal for row arbitration
@@ -29,7 +29,7 @@ module pixel_top_level
     logic grp_release_clk;                                      // Clock signal for group release
     logic toggle;                                               // Toggle signal for FSM transitions
 
-    assign req_o =  |req_i;                                     // Aggregate request signal from all pixels
+    assign req_o =  |req_i;                                     // Indicates lower group as active if any has any active requests
 
 
     always_ff @(posedge grp_release_clk or posedge reset_i) 
