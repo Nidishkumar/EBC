@@ -1,5 +1,5 @@
 // Module name: pixel groups level1
-// Module Description: This module perform intermediate grouping arbiteration to the intermediate level groups
+// Module Description: This module perform intermediate level grouping and arbiteration to the intermediate level groups
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
