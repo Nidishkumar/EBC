@@ -9,30 +9,29 @@ import lib_arbiter_pkg::*;                                      // Importing arb
 module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 
 (
-    input  logic clk_i, reset_i,                               // Clock and Reset inputs
-    input  logic enable_i,                                     // Enable signal to activate arbitration
-    input  logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0][POLARITY-1:0]req_i, // Input request with polarity
-    output logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0]gnt_o,        // Grant for the corresponding requests
-    output logic [Lvl_ADD-1:0] x_add_o ,                       // Selected row index from row arbitration
-    output logic [Lvl_ADD-1:0] y_add_o ,                       // Selected column index from column arbitration
-    output logic active_o,                                     // Indicates if any column grant is active
-    output logic req_o,                                        // Indicates if there are any active requests in req_i
-	output logic grp_release_o                                 // Indicates group release (all operations done)
+    input  logic clk_i, reset_i                                     ,  // Clock and Reset inputs
+    input  logic enable_i                                           ,  // Enable signal to activate arbitration
+    input  logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0][POLARITY-1:0]req_i,  // Input request with polarity
+    output logic [GROUP_SIZE-1:0][GROUP_SIZE-1:0]gnt_o              ,  // Grant for the corresponding requests
+    output logic [Lvl_ADD-1:0] x_add_o                              ,  // Selected row index from row arbitration
+    output logic [Lvl_ADD-1:0] y_add_o                              ,  // Selected column index from column arbitration
+    output logic active_o                                           ,  // Indicates if any column grant is active
+    output logic req_o                                              ,  // Indicates if there are any active requests in req_i
+	 output logic grp_release_o                                         // Indicates group release (all operations done)
 );
 
     // Internal signals
-    logic [GROUP_SIZE-1:0] row_req;                            // Row-wise request signals 
-    logic [GROUP_SIZE-1:0] col_req;                            // Column-wise requests for the selected active row
-	 
-    logic [GROUP_SIZE-1:0] y_gnt_o;                            // Column arbiter grant signals
-    logic [GROUP_SIZE-1:0] x_gnt_o;                            // Row arbiter grant signals
+    logic [GROUP_SIZE-1:0] row_req     ;                            // Row-wise request signals 
+    logic [GROUP_SIZE-1:0] col_req     ;                            // Column-wise requests for the selected active row
+	
+    logic [GROUP_SIZE-1:0] y_gnt_o     ;                            // Column arbiter grant signals
+    logic [GROUP_SIZE-1:0] x_gnt_o     ;                            // Row arbiter grant signals
 
-    logic x_enable, y_enable;                                  // Enables for row and column arbitration
+    logic x_enable, y_enable  ;                                     // Enables for row and column arbitration
 	 
-    logic refresh;                                             // Refresh signal for arbitration reset
-
-    logic grp_release_x;                                       // Group release signal for row
-    logic grp_release_y;                                       // Group release signal for column
+    logic refresh       ;                                           // Refresh signal for arbitration reset
+    logic grp_release_x ;                                           // Group release signal for row
+    logic grp_release_y ;                                           // Group release signal for column
 
     assign req_o =  |req_i;                                    // Logical OR of all input requests to detect active requests
 
@@ -41,14 +40,14 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
 	  begin
         if (reset_i) 
 		 begin
-            grp_release_o <= 1'b0;                             // Reset group release to 0 when reset is triggered
+            grp_release_o <= 1'b0;                               // Reset group release to 0 when reset is triggered
          end 
 		else 
 		 begin
             if (enable_i)
-                grp_release_o <= grp_release_x & grp_release_y; // Assert group release if both row and column release are high
+                grp_release_o <= grp_release_x & grp_release_y; // Assert group release if both row and column reaches to final active request
             else
-                grp_release_o <= 1'b0;                         // Default: group release is 0
+                grp_release_o <= 1'b0;                          // Default: group release is 0
         end
     end
     
@@ -226,29 +225,28 @@ module pixel_level#(parameter GROUP_SIZE = 2,parameter Lvl_ADD=1)
     x_roundrobin  #(.Lvl_ROWS(GROUP_SIZE),.Lvl_ROW_ADD(Lvl_ADD))
 	 RRA_X
 	 (
-        .clk_i(clk_i),                  // Clock input
-        .reset_i(reset_i),              // Reset input
-        .enable_i(x_enable),            // Enable signal for row arbitration
-        .refresh_i(refresh),            // Refresh signal
-        .req_i(row_req),                // Row requests (active rows)
-        .gnt_o(x_gnt_o),                // Row grant outputs
-        .xadd_o(x_add_o),               // Selected row index
-        .grp_release(grp_release_x)     // Group release signal for row
+        .clk_i       (clk_i)   ,               // Clock input
+        .reset_i     (reset_i) ,               // Reset input
+        .enable_i    (x_enable),               // Enable signal for row arbitration
+        .refresh_i   (refresh) ,               // Refresh signal
+        .req_i       (row_req) ,               // Row requests (active rows)
+        .gnt_o       (x_gnt_o) ,               // Row grant outputs
+        .xadd_o      (x_add_o) ,               // Selected row index
+        .grp_release (grp_release_x)           // Group release signal for row
     );
 
     y_roundrobin  #(.Lvl_COLS(GROUP_SIZE),.Lvl_COL_ADD(Lvl_ADD))
 	 RRA_Y
 	 (
-        .clk_i(clk_i),                  // Clock input
-        .reset_i(reset_i),              // Reset input
-        .enable_i(y_enable),            // Enable signal for column arbitration
-        .req_i(col_req),                // Column requests for the active row
-        .gnt_o(y_gnt_o),                // Column grant outputs
-        .yadd_o(y_add_o),               // Selected column index
-        .grp_release(grp_release_y)     // Group release signal for column
+        .clk_i       (clk_i)   ,                // Clock input
+        .reset_i     (reset_i) ,                // Reset input
+        .enable_i    (y_enable),                // Enable signal for column arbitration
+        .req_i       (col_req) ,                // Column requests for the active row
+        .gnt_o       (y_gnt_o) ,                // Column grant outputs
+        .yadd_o      (y_add_o) ,                // Selected column index
+        .grp_release (grp_release_y)            // Group release signal for column
     );
 
 endmodule
-// --------------------------------------------------------------------------------------------------------------
 
 

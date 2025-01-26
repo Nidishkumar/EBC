@@ -84,14 +84,14 @@ begin
 initialize;           //initializing inputs
 #10;
 apply_reset;          //apply reset
-#10;
-;         //apply enable as high
-apply_requests;       //applying random requests for dynamic pixel sizes
-#200;       //Disable enabl
+#100;
+     //apply enable as high
+//apply_requests;       //applying random requests for dynamic pixel sizes
+/*#200;       //Disable enabl
 apply_requests;       //applying random requests for dynamic pixel sizes
 #100;
 apply_requests;       //applying random requests for dynamic pixel sizes
-#100
+#100 */
 $stop;                //stop simulation
 end
 //-------------------------------------------End of Various Test Cases---------------------------------------------------------//

@@ -181,8 +181,34 @@ module Top_single_pixel (
 		 begin
             gnt_o[x_add][y_add] = 1'b1; // Grant active row and column
          end
+      end 
+		/*always_ff @(posedge clk_i or posedge reset_i) 
+	  begin
+        if (reset_i) 
+		   begin
+               for (int i = 0; i < ROWS; i++) 
+                begin
+                    for (int j = 0; j < COLS; j++) 
+                    begin
+                        gnt_o[i][j] <= 1'b0;
+                    end
+                end
+            end 
+        else begin
+        // Initialize all grants to 0
+        for (int i = 0; i < ROWS; i++) 
+		 begin
+            for (int j = 0; j < COLS; j++) 
+			 begin
+                if((i == x_add) && (j == y_add) && (|y_gnt_o == 1'b1))
+                    gnt_o[i][j] = 1'b1;
+                else
+                    gnt_o[i][j] = 1'b0;
+             end
+         end
       end
-	 
+      end 
+	 */
     // Instantiate RoundRobin module for column arbitration (y-direction)
     Column_arbiter  RRA_Y 
     (

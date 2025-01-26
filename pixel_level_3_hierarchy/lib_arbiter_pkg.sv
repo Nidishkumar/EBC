@@ -8,33 +8,38 @@
 
 package lib_arbiter_pkg;
 
-  // Parameters for Level 0 of the hierarchy
-  parameter Lvl0_PIXELS       = 32; // Total number of pixels in Level 0 
+  // Parameters for Final of the hierarchy
+  parameter Lvl0_PIXELS       = 16; // Total number of pixels in Level 0 
   parameter Lvl0_GROUP_SIZE   = 2;  // Group size for subgroups in Level 0
-  parameter CONST0            = Lvl0_PIXELS / Lvl0_GROUP_SIZE; // pixel array per group size  in Level 0 for grouping pixels
-  parameter NUM_GROUPS0       = CONST0 * CONST0; // Total number of groups in Level 0
-  parameter Lvl0_ADD          = 1;  // Address size for Level 0 groups 
+  parameter CONST0            = Lvl0_PIXELS / Lvl0_GROUP_SIZE;   // pixel array per group size  in Level 0 for grouping pixels
+  parameter NUM_GROUPS0       = CONST0 * CONST0;                 // Total number of groups in Final Level
+  parameter Lvl0_ADD          = 1;  // Address size for Final level groups 
+  
 
-  // Parameters for Level 1 of the hierarchy
-  parameter Lvl1_PIXELS       = 16;  // Total number of pixels in Level 1 
+  // Parameters for Intermediate Level of the hierarchy
+  parameter Lvl1_PIXELS       = 8;  // Total number of pixels in Level 1 
   parameter Lvl1_GROUP_SIZE   = 2;  // Group size for subgroups in Level 1
-  parameter CONST1            = Lvl1_PIXELS / Lvl1_GROUP_SIZE; // pixel array per group size  in Level 0 for grouping pixels
-  parameter NUM_GROUPS1       = CONST1 * CONST1; // Total number of groups in Level 1
-  parameter Lvl1_ADD          = 1;  // Address size for Level 1 groups 
+  parameter CONST1            = Lvl1_PIXELS / Lvl1_GROUP_SIZE;   // pixel array per group size  in Level 0 for grouping pixels
+  parameter NUM_GROUPS1       = CONST1 * CONST1;                 // Total number of groups in Intermediate level 
+  parameter Lvl1_ADD          = 1;  // Address size for Intermediate Level groups 
 
-  // Parameters for Level 2 of the hierarchy
-  parameter Lvl2_PIXELS       = 8;  // Total number of pixels in Level 2 
-  parameter Lvl2_ADD          = 3;  // Address size for Level 2 groups 
+  
+  // Parameters for Higher Level of the hierarchy
+  parameter Lvl2_PIXELS       = 4;      // Total number of pixels in Higher Level
+  parameter Lvl2_ADD          = 2;      // Address size for Higher Level groups 
 
+  
   // Parameters for polarity handling
-  parameter POLARITY          = 2;  // Polarity signal width 
+  parameter POLARITY          = 2;      // Polarity signal width 
 
+  
   // Parameters for address width calculation
-  parameter COL_ADD           = Lvl2_ADD + Lvl1_ADD + Lvl0_ADD; // Total column address width (sum of all levels)
-  parameter ROW_ADD           = Lvl2_ADD + Lvl1_ADD + Lvl0_ADD; // Total row address width (sum of all levels)
+  parameter COL_ADD           = Lvl2_ADD + Lvl1_ADD + Lvl0_ADD;   // Total column address width (sum of all levels)
+  parameter ROW_ADD           = Lvl2_ADD + Lvl1_ADD + Lvl0_ADD;   // Total row address width (sum of all levels)
 
+  
   // Parameters for timestamp and data width
-  parameter SIZE              = 32; // Width of the timestamp 
+  parameter SIZE              = 32;     // Width of the timestamp 
   parameter WIDTH             = SIZE + COL_ADD + ROW_ADD + 1; // Total width combining timestamp, row address, column address, and polarity
 
 endpackage

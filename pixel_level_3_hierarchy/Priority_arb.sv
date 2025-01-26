@@ -4,6 +4,7 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
+
 import lib_arbiter_pkg::*;               // Importing arbiter package containing parameter constants
 
 module Priority_arb  #(parameter Lvl_ROWS=2) 
@@ -13,7 +14,7 @@ module Priority_arb  #(parameter Lvl_ROWS=2)
 );
 
   // Port[0] has highest priority
-  assign gnt_o[0] = req_i[0];        // Grant[0] if request[0] is active
+  assign gnt_o[0] = req_i[0];          // Grant[0] if request[0] is active
 
   genvar i;
   generate

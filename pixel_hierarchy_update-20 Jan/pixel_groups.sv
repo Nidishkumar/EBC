@@ -36,7 +36,7 @@ genvar group;
         pixel_level i_pixel_level (
             .clk_i(clk_i),
             .reset_i(reset_i),
-            .enable_i(gnt_top_i[group / 4][group % 4]),
+            .enable_i(gnt_top_i[group]),
             .req_i(set_group[group]),
             .req_o(req_o[group / 4][group % 4]),
 				    .gnt_o(gnt_temp[group]),
@@ -53,7 +53,7 @@ always_comb begin
   x_add_o = 0;
   y_add_o = 0;
   for (int group = 0; group < 16; group++) begin
-    if (gnt_top_i[group / 4][group % 4]) begin
+    if (gnt_top_i[group]) begin
       gnt_o = gnt_temp[group];
       x_add_o = x_add_temp[group];
       y_add_o = y_add_temp[group];

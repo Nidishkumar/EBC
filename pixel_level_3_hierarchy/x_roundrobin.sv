@@ -3,19 +3,21 @@
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
+//-----------------------------------------------------------------------------------------------------------------
+
 import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
 
 module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
 
  (
-    input  logic clk_i                    ,       // Clock input
+    input  logic clk_i                    ,        // Clock input for Synchronization
     input  logic reset_i                  ,        // Active high Reset input
     input  logic enable_i                 ,        // Enable signal to control Row arbiter
-    input  logic refresh_i                ,
-    input  logic [Lvl_ROWS-1:0] req_i     ,        // Request inputs
+    input  logic refresh_i                ,        // Initializes the Arbiter
+    input  logic [Lvl_ROWS-1:0] req_i     ,        // Request for active row inputs
     output logic [Lvl_ROWS-1:0] gnt_o     ,        // Grant outputs
     output logic [Lvl_ROW_ADD-1:0] xadd_o ,        // Encoded output representing the granted row index
-	  output logic grp_release 
+	 output logic grp_release                       // Grp_release will high after completion all active requests
  );
 
     // Internal signals for mask and grant handling
@@ -29,7 +31,8 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;
-    //assign grp_release = ( nxt_mask > mask_ff ? 1'b1 : 1'b0);
+	 
+    //assign grp_release will high after completion all active requests
     assign grp_release = !mask_req;
 
     // Update mask and grant signals on the clock edge
@@ -42,16 +45,17 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
 			 end 
 		  else if (enable_i) 
 		   begin
-            mask_ff <= nxt_mask;              // Update mask based on next mask calculation
-            gnt_o  <= gnt_temp;               // Register the grant output
+            mask_ff <= nxt_mask;                  // Update mask based on next mask calculation
+            gnt_o  <= gnt_temp;                   // Register the grant output
        end
-      else if(refresh_i) begin
-			      mask_ff <= {Lvl_ROWS{1'b1}};
-      end
+      else if(refresh_i)
+		 begin
+			      mask_ff <= {Lvl_ROWS{1'b1}};       // Initialize mask to all ones (allow all requests)
+       end
       end
 	 
 
-    // Determine the final grant output: either masked grants or raw grants depending on the mask
+    // Determine the final grant output: either masked grants or raw grants depending on the mask_req
     assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt); 
 
     // Generate the next mask based on the current grant outputs

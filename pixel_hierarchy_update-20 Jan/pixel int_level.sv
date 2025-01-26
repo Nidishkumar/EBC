@@ -15,9 +15,9 @@ import lib_arbiter_pkg::*;                                      // Importing arb
     output logic [3:0][3:0]gnt_o,
     output logic [3:0] x_add_o ,        // Index for selected row in row arbitration logic
     output logic [3:0] y_add_o ,
-    output logic active_o;
+    output logic active_o,
     output logic req,
-	output logic grp_release_o,          
+	output logic grp_release_o          
      
 );
 

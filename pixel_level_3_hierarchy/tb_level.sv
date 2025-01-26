@@ -4,36 +4,45 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
+
 import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
 
 module tb_level;
-  // Inputs
-  logic clk_i                                   ; // Clock input
-  logic reset_i                                 ; // Active high Reset input
-  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i;       // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
-  // Outputs
- logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o             ;        //grant output
 
- logic grp_release_o;
-	logic [WIDTH-1:0] data_out_o;
+  // Inputs
+  logic clk_i                                                 ; // Clock input
+  logic reset_i                                               ; // Active high Reset input
+  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req_i ; // Request signals for each row and column, with POLARITY bits determining the signal's polarity or behavior
+  
+  // Outputs
+  logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o              ; //grant output
+  logic grp_release_o                                         ; //Grouplease output
+  logic [WIDTH-1:0] data_out_o                                ; //dataout of events
   
   dyn_pixel_hierarchy
   dut (
-            .clk_i        (clk_i)         ,     // Clock input
-            .reset_i      (reset_i)       ,     // Active high Reset input
-            .set_i        (req_i)         ,     // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
-            .gnt_o          (gnt_o)         ,     // grant outputs
-				.grp_release_2(grp_release_o),
-        .data_out_o(data_out_o)
-
+            .clk_i           (clk_i)              ,             // Clock input
+            .reset_i         (reset_i)            ,             // Active high Reset input
+            .set_i           (req_i)              ,             // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
+            .gnt_o           (gnt_o)              ,             // grant outputs
+				.grp_release_2   (grp_release_o)      ,             //Grouplease output
+            .data_out_o      (data_out_o)                       //dataout of events
+ 
   );
 
 
-  // Clock generation
-  initial begin
-    clk_i = 0;
-    forever #5 clk_i = ~clk_i; // Clock with a period of 10 time units
+  //-------------------------------------------Clock generation-------------------------------------------------------//
+  
+  // Clock Generation
+  initial 
+  begin
+    clk_i = 0                   ;
+    forever #5  clk_i = ~clk_i  ; //  Clock Generation
   end
+ //-------------------------------------------End of Clock generation------------------------------------------------//
+
+ 
+//--------------------------------------------Apply Reset-------------------------------------------------------------//
 
   // Reset generation
   task apply_reset;
@@ -42,6 +51,10 @@ module tb_level;
     #10 reset_i = 0;
   end
 endtask
+//--------------------------------------------End of Apply Reset-------------------------------------------------------------//
+
+
+//--------------------------------------------Initialzing inputs-----------------------------------------------------//
 
 task initialize;
   begin
@@ -69,7 +82,10 @@ task initialize;
     };
   end
 endtask
-  //-------------------------------------------Deasserting request---------------------------------------------//
+//--------------------------------------------End of initializing inputs---------------------------------------------//
+
+
+//--------------------------------------------Request Deassertion-----------------------------------------------------//
 
 always_ff@(posedge clk_i)
  begin
@@ -84,17 +100,24 @@ always_ff@(posedge clk_i)
 	  end
 	end 
 end 
-//----------------------------------------------Apply Request-------------------------------------------------------
+//-------------------------------------------End of Request Deassertion-----------------------------------------------------//
+
+
+//-------------------------------------------Apply Requests----------------------------------------------------------------
+
 task apply_request([Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0]req);
 begin
- req_i=req;
+   req_i=req;
 end
 endtask
-//-------------------------------------------End of Deasserting request---------------------------------------------//
+//-------------------------------------------End of Deasserting request----------------------------------------------//
 
+
+//-------------------------------------------Apply Requests------------------------------------------------------------
   initial begin
        initialize;
     	 apply_reset;
+		 
 	 //Random Events across pixel
    apply_request({
       {2'b01, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00, 2'b00}, // Row 0 inactive
@@ -246,4 +269,5 @@ endtask
 				$stop;
 	 $finish;
   end
+ //-----------------------------------------------End of Apply requests--------------------------------------------------------------
 endmodule

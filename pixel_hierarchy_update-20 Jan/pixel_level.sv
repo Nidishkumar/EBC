@@ -10,7 +10,7 @@ module pixel_level #(parameter ROWS=4 ,COLS=4 )
 (
     input  logic clk_i, reset_i,
     input  logic enable_i,
-    input  logic [3:0][3:0]req_i,
+    input  logic [3:0][3:0][1:0]req_i,
     output logic [3:0][3:0]gnt_o,
     output logic [1:0] x_add_o ,        // Index for selected row in row arbitration logic
     output logic [1:0] y_add_o ,
