@@ -19,13 +19,13 @@ module tb_level;
   logic grp_release_o                                         ; //Grouplease output
   logic [WIDTH-1:0] data_out_o                                ; //dataout of events
   
-  dyn_pixel_hierarchy
+  top_pixel_hierarchy
   dut (
             .clk_i           (clk_i)              ,             // Clock input
             .reset_i         (reset_i)            ,             // Active high Reset input
             .set_i           (req_i)              ,             // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_o           (gnt_o)              ,             // grant outputs
-				.grp_release_2   (grp_release_o)      ,             //Grouplease output
+			    	.grp_release_2   (grp_release_o)      ,             //Grouplease output
             .data_out_o      (data_out_o)                       //dataout of events
  
   );

@@ -11,9 +11,9 @@ module pixel_groups_l0
     input logic clk_i                                                  ,   // Clock input
     input logic reset_i                                                ,   // Reset signal
     input logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0] set_i ,   // Input pixel data with polarity
-    input logic [CONST0-1:0][CONST0-1:0] gnt_top_i                     ,   // Enable from the higher level hierarchy
+    input logic [CONST0-1:0][CONST0-1:0] gnt_set_1                     ,   // Enable from the higher level hierarchy
     output logic [CONST0-1:0][CONST0-1:0] req_o                        ,   // Request signals from each group to the higher level
-	 output logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o_0           ,   //Overaall grant for the all active requests
+	output logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0] gnt_o_0           ,   //Overaall grant for the all active requests
     output logic grp_release_o                                         ,   // Group release signal indicates completion of lower level groups arbitration
     output logic [Lvl0_GROUP_SIZE-1:0][Lvl0_GROUP_SIZE-1:0] gnt_o      ,   // Grant for lower pixel groups 
     output logic [Lvl0_ADD-1:0] x_add_o                                ,   // Row address of the lower level group

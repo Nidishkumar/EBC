@@ -19,7 +19,7 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
   logic grp_release_o                                        ; //Grouplease output
   logic [WIDTH-1:0] data_out_o                               ; //dataout of events
   
-  dyn_pixel_hierarchy
+  top_pixel_hierarchy
   dut 
   (
             .clk_i        (clk_i)              ,               // Clock input

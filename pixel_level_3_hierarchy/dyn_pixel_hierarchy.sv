@@ -9,7 +9,7 @@
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
 
 
-module dyn_pixel_hierarchy (
+module top_pixel_hierarchy (
     input logic clk_i                                                  ,  // Input clock for Synchronization
 	 input logic reset_i                                                ,  // Reset signal
     input logic [Lvl0_PIXELS-1:0][Lvl0_PIXELS-1:0][POLARITY-1:0] set_i ,  // Pixel requests input with polarity for each pixel
