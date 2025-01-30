@@ -17,7 +17,7 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
     input  logic [Lvl_ROWS-1:0] req_i     ,        // Request for active row inputs
     output logic [Lvl_ROWS-1:0] gnt_o     ,        // Grant outputs
     output logic [Lvl_ROW_ADD-1:0] xadd_o ,        // Encoded output representing the granted row index
-	 output logic grp_release                       // Grp_release will high after completion all active requests
+	 output logic grp_release_o                       // Grp_release will high after completion all active requests
  );
 
     // Internal signals for mask and grant handling
@@ -31,29 +31,28 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;
-	 
-    //assign grp_release will high after completion all active requests
-    assign grp_release = !mask_req;
+    assign grp_release_o = !mask_req;
 
     // Update mask and grant signals on the clock edge
     always_ff @(posedge clk_i or posedge reset_i) 
 	   begin
-        if (reset_i) 
-		   begin
+      if (reset_i) 
+		  begin
             mask_ff <= {Lvl_ROWS{1'b1}};          // Reset mask to all ones (allow all requests)
             gnt_o   <= {Lvl_ROWS{1'b0}};          // Reset grant output to zero (no grants)
-			 end 
-		  else if (enable_i) 
-		   begin
+		 end 
+		else if (enable_i) 
+		 begin
             mask_ff <= nxt_mask;                  // Update mask based on next mask calculation
             gnt_o  <= gnt_temp;                   // Register the grant output
        end
       else if(refresh_i)
 		 begin
-			      mask_ff <= {Lvl_ROWS{1'b1}};       // Initialize mask to all ones (allow all requests)
+			   mask_ff <= {Lvl_ROWS{1'b1}};          // Initialize mask to all ones (allow all requests)
        end
+		
       end
-	 
+	   
 
     // Determine the final grant output: either masked grants or raw grants depending on the mask_req
     assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt); 

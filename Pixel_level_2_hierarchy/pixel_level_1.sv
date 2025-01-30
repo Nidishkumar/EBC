@@ -6,13 +6,13 @@
 //------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;      // Importing arbiter package containing parameter constants
 
-module pixel_top_level 
+module pixel_level_1 
 
 (
     input  logic clk_i, reset_i                    ,             // Clock and reset signals
     input  logic enable_i                          ,             // Enable signal for the higher level
     input  logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]req_i ,             // Input requests from lower level
-    input  logic grp_free_i                        ,             // Group release input signal from lower level acts as clock to higher level
+    input  logic grp_enable_i                      ,             // Group release input signal from lower level acts as clock to higher level
     output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]gnt_o ,             // Grant for higher level
     output logic [Lvl_ADD-1:0] x_add_o             ,             // Selected row index for higher level
     output logic [Lvl_ADD-1:0] y_add_o             ,             // Selected column index for higher level
@@ -34,7 +34,7 @@ module pixel_top_level
     logic toggle                   ;                             // Toggle signal for FSM transitions
 
     assign req_o =  |req_i;                                      // Indicates high if any active requests in req_i
-
+   
 
     always_ff @(posedge grp_release_clk or posedge reset_i) 
     begin
@@ -79,13 +79,15 @@ module pixel_top_level
 					    if (toggle)  
                             grp_release_clk <= !grp_release_clk;
                    else
-                            grp_release_clk <= |grp_free_i;     //grp_free_i getting from lower level indicates the group reaches to final request
+                            grp_release_clk <= |grp_enable_i;     //grp_free_i getting from lower level indicates the group reaches to final request
 					  end
             endcase
         end
         else
             grp_release_clk <= 1'b0;                            // Disable group release clock when not enabled
-    end
+    end 
+	 
+
 
     // FSM state transition logic
     always_ff @(posedge grp_release_clk or posedge reset_i) 
@@ -115,7 +117,7 @@ module pixel_top_level
     always_comb 
 	 begin
         for (int i = 0; i < Lvl_COLS; i++) 
-            col_req[i] = |req_i[x_add_o][i];                    // Extract column requests for the selected row
+            col_req[i] = req_i[x_add_o][i];                    // Extract column requests for the selected row
     end
 
     // FSM next state and control signal generation
@@ -131,35 +133,62 @@ module pixel_top_level
             IDLE: 
             begin
                 if (enable_i) 
-                begin
+                 begin
                     x_enable = 1'b1;                            // Enable row arbitration
                     next_state = ROW_GRANT;                     // Transition to ROW_GRANT state
-                end 
+                 end
+					 else
+					  begin
+					    x_enable = 1'b0;
+						 y_enable = 1'b0;
+						 next_state = IDLE;
+						 refresh=1'b1;
+					  end
             end
 
             ROW_GRANT: 
             begin
-                x_enable = 1'b1;                                // Keep row arbitration enabled
-                if (x_gnt_o != 'b0) 
+				  if (enable_i) 
                 begin
+                 x_enable = 1'b1;                                // Keep row arbitration enabled
+                 if (x_gnt_o != 'b0) 
+                  begin
                     y_enable = 1'b1;                            // Enable column arbitration
                     x_enable = 1'b0;                            // Disable row arbitration
                     next_state = COL_GRANT;                     // Transition to COL_GRANT state
-                end
+                  end
+					 end
+					 else
+					  begin
+					    x_enable = 1'b0;
+						 y_enable = 1'b0;
+						 next_state = IDLE;
+						 refresh=1'b1;
+					  end
             end
             
             COL_GRANT: 
             begin
+				  if (enable_i) 
+                begin
                 y_enable = 1'b1;                                // Enable column arbitration
                 if (y_gnt_o == 'b0)                             // If all columns are granted
-                begin
-                    if(|x_add_o == 1'b1) 
-                        refresh = 1'b1;                             // Refresh row arbitration
+                  begin
                         x_enable = 1'b1;                            // Re-enable row arbitration
                         y_enable = 1'b0;                            // Disable column arbitration
                         toggle = 1'b1;                              // Set toggle for FSM transition
                         next_state = ROW_GRANT;                     // Transition back to ROW_GRANT
-                end
+                  end
+					 end
+					  else
+					  begin
+					    x_enable = 1'b0;
+						 y_enable = 1'b0;
+						 toggle = 1'b0;
+						 next_state = IDLE;
+						 refresh=1'b1;
+					  end
+					 
             end
 
             default:
@@ -194,7 +223,7 @@ module pixel_top_level
         .req_i       (row_req),                                  // Row requests
         .gnt_o       (x_gnt_o),                                  // Row grants
         .xadd_o      (x_add_o),                                  // Row index
-        .grp_release (grp_release_x)                             // Group release signal
+        .grp_release_o (grp_release_x)                             // Group release signal
     );
 
     // Instantiate RoundRobin module for column arbitration
@@ -207,8 +236,8 @@ module pixel_top_level
         .req_i       (col_req),                                   // Column requests
         .gnt_o       (y_gnt_o),                                   // Column grants
         .yadd_o      (y_add_o),                                   // Column index
-        .grp_release (grp_release_y)                              // Group release signal
+        .grp_release_o (grp_release_y)                              // Group release signal
     );
 
-endmodule
+endmodule  
 

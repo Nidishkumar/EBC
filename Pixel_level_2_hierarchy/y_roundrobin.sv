@@ -16,7 +16,7 @@ module y_roundrobin
     input  logic [Lvl_COLS-1:0]req_i      ,         // Request inputs (multi-bit for each request)
     output logic [Lvl_COLS-1:0] gnt_o     ,         // Grant outputs 
     output logic [Lvl_COL_ADD-1:0] yadd_o ,         // Encoded output representing the granted cloumn index
-    output logic grp_release
+    output logic grp_release_o
 );
 
      // Internal signals for mask and grant handling
@@ -31,7 +31,7 @@ module y_roundrobin
     assign mask_req = req_i & mask_ff;   
 	 
 	 //Grp_release will be high if mask_req is zero
-    assign grp_release = !mask_req;
+    assign grp_release_o = !mask_req;
 
 
     always_ff @(posedge clk_i or posedge reset_i) 
@@ -41,6 +41,7 @@ module y_roundrobin
             // Reset mask to all ones (allow all requests) and reset grant output to zero
             mask_ff <= {Lvl_COLS{1'b1}};
             gnt_o   <= {Lvl_COLS{1'b0}};           // Reset grant output to zero (no grants)
+
          end 
         else 
 		   begin
@@ -54,6 +55,7 @@ module y_roundrobin
                 // Reset mask to all ones (allow all requests) when not enabled
                 mask_ff <=  {Lvl_COLS{1'b1}}; 
                 gnt_o   <=  {Lvl_COLS{1'b0}};     // No grants when not enabled
+
              end
          end
      end

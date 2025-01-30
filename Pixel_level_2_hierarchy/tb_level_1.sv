@@ -119,11 +119,21 @@ initialize;           //initializing inputs
 apply_reset;          //apply reset
 #10;
 apply_requests;       //applying random requests for dynamic pixel sizes
-#200;       //Disable enabl
+#20;       
 apply_requests;       //applying random requests for dynamic pixel sizes
-#100;
+#25;
 apply_requests;       //applying random requests for dynamic pixel sizes
-#100 
+#100; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#35; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#55; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#80; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#10; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#45; 
 $stop;                //stop simulation
 end
 //--------------------------------------------End of Various Test Cases---------------------------------------------------------//

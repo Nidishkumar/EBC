@@ -7,7 +7,8 @@
 //------------------------------------------------------------------------------------------------------------------
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
-module top_pixel_hierarchy (
+module top_pixel_hierarchy 
+(
     input logic clk_i                                    ,  // Input clock for Synchronization
 	 input logic reset_i                                  ,  // Reset signal
     input logic [ROWS-1:0][COLS-1:0][POLARITY-1:0] req_i ,  // Pixel requests input with polarity for each pixel
@@ -26,8 +27,8 @@ logic polarity ;                    // Signal for the selected polarity
 logic [POLARITY-1:0] polarity_in;   // Input signal for polarity module
 logic [SIZE-1:0] timestamp;         // Timestamp signal for event 
 
-logic [NO_levels-1:0]active_0;      // Active signals form different pixel levels whether the arbitrations in each level active or not
-logic active;                       // overall arbitration active signal from 2 levels
+logic [NO_levels-1:0]active;        // Active signals form different pixel levels whether the arbitrations in each level active or not
+logic active_in;                    // overall arbitration active signal from 2 levels
 
 logic enable;                       // Enable signal to control the higher level
 logic req_o_1;                      // Request signal from higher level acts as enable to higher level
@@ -41,16 +42,17 @@ logic [Lvl0_ROWS-1:0][Lvl0_COLS-1:0] gnt_o_0; // Grant signals for lower level
 logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] req_o_0;   // Request signal for higher level 
 logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] gnt_o_1;   // Grant signals for higher level 
 
-logic grp_release_0;  // Group release signals for lower levels actss as clock to the higher level
+logic [NO_levels-1:0]grp_release;  // Group release signals for lower levels actss as clock to the higher level
 
 // Signal assignments
-assign enable = req_o_1; // Enable signal for the higher level
+assign enable = req_o_1;            // Enable signal for the higher level
+assign grp_release_out_o=grp_release[1];
 assign x_add = {x_add_1, x_add_0};  // Combine all levels Row addresses 
 assign y_add = {y_add_1, y_add_0};  // Combine all levels column address 
 
 // polarity input for the Polarity Selector module
 assign polarity_in = req_i[x_add][y_add]; // Sends the active row's ,column's request polarity to the polarity module.
-assign active = &active_0; // overall arbitration will active, if all levels arbitration active 
+assign active_in = &active; // overall arbitration will active, if all levels arbitration active 
 
 
 always_ff @(posedge clk_i or posedge reset_i) 
@@ -68,36 +70,36 @@ always_ff @(posedge clk_i or posedge reset_i)
  end 
 
 // Instantiating submodules to handle different pixel levels
-pixel_top_level level_1 
+pixel_level_1 level_1 
 (
     .clk_i          (clk_i)          ,     // Input clock
     .reset_i        (reset_i)        ,     // Input Reset
     .enable_i       (enable)         ,     // Input Enable
-    .req_i          (req_o_0)          ,     // Request input from level 1
-    .grp_free_i     (grp_release_0)  ,     // Group release from level 1
-    .gnt_o          (gnt_o_1)          ,     // Grant output for level 2
-    .x_add_o        (x_add_1)        ,     // row index output from level 2
-    .y_add_o        (y_add_1)        ,     // column index output from level 2
-    .active_o       (active_0[1])       ,     // Active signal from level 2 indicates the higher level arbitration is active or not
-    .req_o          (req_o_1)          ,     // enable input for level 2 
-    .grp_release_o  (grp_release_out_o)      // Group release for level 2,it will high if grants all active requests
+    .req_i          (req_o_0)        ,     // Request input from level 1
+    .grp_enable_i   (grp_release[0]) ,     // Group release from lower level,acts as clock for higher level 
+    .gnt_o          (gnt_o_1)        ,     // Grant output for higher level 
+    .x_add_o        (x_add_1)        ,     // Granted row index output higher level 
+    .y_add_o        (y_add_1)        ,     // Granted column index output higher level 2
+    .active_o       (active[1])      ,     // Active signal from higher level indicates the higher level arbitration is active or not
+    .req_o          (req_o_1)        ,     // Acts as enable for this level,if  has active requests  
+    .grp_release_o  (grp_release[1])       // Group release for higher level,it will high if grants all active requests
 );
 
 
 // Instantiating  for Final Level
-pixel_groups_lvl0 level_0 
+pixel_groups_level_0 level_0 
 (
     .clk_i          (clk_i)          ,    // Input clock 
     .reset_i        (reset_i)        ,    //Input Reset
     .enable_i       (gnt_o_1)        ,    // Grant output from level 1 as enable
     .req_i          (req_i)          ,    // Pixel set input with polarity
     .gnt_o          (gnt_o_0)        ,    // Lower-level grant outputs
-    .gnt_out_o      (gnt_out_o)          ,    // Overall grant for active requests
+    .gnt_out_o      (gnt_out_o)      ,    // Overall grant for active requests
     .x_add_o        (x_add_0)        ,    // row address for level 0
     .y_add_o        (y_add_0)        ,    // column address for level 0
-	 .active_o       (active_0[0])    ,          // Active signal from level0 indication active arbitration in level0  
+	 .active_o       (active[0])      ,    // Active signal from level0 indication active arbitration in level0  
     .req_o          (req_o_0)        ,    // Request input for level 1
-    .grp_release_o  (grp_release_0)      // indication to the higher level as group has granted all active requests
+    .grp_release_o  (grp_release[0])      // indication to the higher level as group has granted all active requests
 );
 
 // Wall clock module to capture the timestamp
@@ -120,7 +122,7 @@ polarity_selector polarity_sel
 // Instantiate the address event generator module to combine event data
 AER address_event 
 (
-    .enable_i     (active)   ,       // Enable signal based on active arbitration in all each level
+    .enable_i     (active_in),       // Enable signal based on active arbitration in all each level
     .x_add_i      (x_add_ff) ,       // Active event's Row address 
     .y_add_i      (y_add_ff) ,       // Active event's Column address 
     .timestamp_i  (timestamp),       // Event's timestamp 

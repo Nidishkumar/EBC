@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
 
-module pixel_groups_lvl0 
+module pixel_groups_level_0 
 (
     input logic clk_i                                    ,   // Clock input
     input logic reset_i                                  ,   // Reset signal
@@ -22,7 +22,7 @@ module pixel_groups_lvl0
 
 );
     // Grouped pixel array
-    logic [NUM_GROUPS0-1:0][Lvl0_ROWS-1:0][Lvl0_COLS-1:0][POLARITY-1:0] set_group; // Pixels grouped dynamically based on size
+    logic [NUM_GROUPS0-1:0][Lvl0_ROWS-1:0][Lvl0_COLS-1:0] set_group; // Pixels grouped dynamically based on size
 
     // Temporary outputs for each group
     logic [NUM_GROUPS0-1:0] [Lvl0_ADD-1:0] x_add_temp   ;    // Temporary row address for each group
@@ -43,9 +43,9 @@ module pixel_groups_lvl0
 				 begin
                     for (int col = 0; col < Lvl0_COLS; col++) 
 					      begin
-                              set_group[group][row][col] = req_i[(group / CONST0) * Lvl0_GROUP_SIZE + row][(group % CONST0) * Lvl0_GROUP_SIZE + col];  // Mapping pixels to the individual groups
+                              set_group[group][row][col] = (|req_i[(group / CONST0) * Lvl0_GROUP_SIZE + row][(group % CONST0) * Lvl0_GROUP_SIZE + col]);  // Mapping pixels to the individual groups
 					          gnt_out_o[(group / CONST0) * Lvl0_GROUP_SIZE + row][(group % CONST0) * Lvl0_GROUP_SIZE + col] = gnt_temp[group][row][col]; // Mapping lower group grants to overall grant  
-                      end 
+                     end 
               end
          end
     end
@@ -55,13 +55,7 @@ module pixel_groups_lvl0
         for (group = 0; group < NUM_GROUPS0; group++) 
 		  begin : groups
             // Instantiate pixel_level module for each group
-            pixel_lvl0 
-				#(
-                .Lvl0_ROWS (Lvl0_ROWS),        					// Parameter for number of lower level pixel group Rows
-					 .Lvl0_COLS (Lvl0_COLS),                     // Parameter for number of lower level pixel group columns
-                .Lvl0_ADD  (Lvl0_ADD)                       // Parameter for lower level pixel group address width
-            ) 
-				Level_0 
+            pixel_level_0 Level_0 
 				(
                 .clk_i                 (clk_i)             ,           // Clock input
                 .reset_i               (reset_i)           ,           // Reset signal
