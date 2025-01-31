@@ -1,5 +1,5 @@
 // Module name: Polarity Selector Module
-// Module Description: This Polarity Selector module outputs a selected polarity based on the request signals' polarity.
+// Module Description: This Polarity Selector module outputs a selected polarity based on the request signal's polarity.
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
@@ -7,7 +7,6 @@
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
 
-// Define the module 'polarity_selector' with the following ports
 module polarity_selector 
 (
     input logic clk_i                 ,       // Input clock signal for Synchronization 

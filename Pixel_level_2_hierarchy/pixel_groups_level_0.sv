@@ -1,5 +1,5 @@
 // Module name: pixel groups level0
-// Module Description: This module perform lower level grouping and arbiteration to the lower level groups
+// Module Description: This module perform lower level grouping and arbiteration to the lower level Pixel groups.
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
@@ -44,7 +44,7 @@ module pixel_groups_level_0
                     for (int col = 0; col < Lvl0_COLS; col++) 
 					      begin
                               set_group[group][row][col] = (|req_i[(group / CONST0) * Lvl0_GROUP_SIZE + row][(group % CONST0) * Lvl0_GROUP_SIZE + col]);  // Mapping pixels to the individual groups
-					          gnt_out_o[(group / CONST0) * Lvl0_GROUP_SIZE + row][(group % CONST0) * Lvl0_GROUP_SIZE + col] = gnt_temp[group][row][col]; // Mapping lower group grants to overall grant  
+					               gnt_out_o[(group / CONST0) * Lvl0_GROUP_SIZE + row][(group % CONST0) * Lvl0_GROUP_SIZE + col] = gnt_temp[group][row][col]; // Mapping lower group grants to overall grant  
                      end 
               end
          end

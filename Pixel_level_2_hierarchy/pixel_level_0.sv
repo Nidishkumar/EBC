@@ -1,5 +1,5 @@
 // Module name: Lower level arbitration
-// Module Description: This module perform arbiteration to the lower level groups
+// Module Description: This module perform arbiteration to the lower level Pixel groups.
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
@@ -11,7 +11,7 @@ module pixel_level_0
 (
     input  logic clk_i, reset_i                                   ,  // Clock and Reset inputs
     input  logic enable_i                                         ,  // Enable signal to activate arbitration
-    input  logic [Lvl0_ROWS-1:0][Lvl0_COLS-1:0]req_i,  // Input request with polarity from lower level groups
+    input  logic [Lvl0_ROWS-1:0][Lvl0_COLS-1:0]req_i              ,  // Input request with polarity from lower level groups
     output logic [Lvl0_ROWS-1:0][Lvl0_COLS-1:0]gnt_o              ,  // Grant for the corresponding loer level group requests
     output logic [Lvl0_ADD-1:0] x_add_o                           ,  // Selected row index for lower level group
     output logic [Lvl0_ADD-1:0] y_add_o                           ,  // Selected column index for lower level group
@@ -163,10 +163,10 @@ module pixel_level_0
                   end
 				else
 				 begin
-				     x_enable = 1'b0;                        // Disable row arbitration,if enable is low
-                     y_enable = 1'b0;                        // Disable column arbitration,if enable is low
+				     x_enable = 1'b0;                       // Disable row arbitration,if enable is low
+                     y_enable = 1'b0;                   // Disable column arbitration,if enable is low
 					 next_state = IDLE;                      // Transition to IDLE,if enable is low
-                     refresh = 1'b1;                         // Refresh the row arbiter,if enable is low
+                     refresh = 1'b1;                    // Refresh the row arbiter,if enable is low
 				 end    
 			end
             default:
@@ -194,25 +194,25 @@ module pixel_level_0
     x_roundrobin  #(.Lvl_ROWS(Lvl0_ROWS),.Lvl_ROW_ADD(Lvl0_ADD))
 	 RRA_X
 	 (
-        .clk_i       (clk_i)   ,               // Clock input
-        .reset_i     (reset_i) ,               // Reset input
-        .enable_i    (x_enable),               // Enable signal for row arbitration
-        .refresh_i   (refresh) ,               // Refresh signal
-        .req_i       (row_req) ,               // Row requests (active rows)
-        .gnt_o       (x_gnt_o) ,               // Row grant outputs
-        .xadd_o      (x_add_o) ,               // Selected row index
+        .clk_i         (clk_i)   ,               // Clock input
+        .reset_i       (reset_i) ,               // Reset input
+        .enable_i      (x_enable),               // Enable signal for row arbitration
+        .refresh_i     (refresh) ,               // Refresh signal
+        .req_i         (row_req) ,               // Row requests (active rows)
+        .gnt_o         (x_gnt_o) ,               // Row grant outputs
+        .xadd_o        (x_add_o) ,               // Selected row index
         .grp_release_o (grp_release_x)           // Group release signal for row
     );
 
     y_roundrobin  #(.Lvl_COLS(Lvl0_COLS),.Lvl_COL_ADD(Lvl0_ADD))
 	 RRA_Y
 	 (
-        .clk_i       (clk_i)   ,                // Clock input
-        .reset_i     (reset_i) ,                // Reset input
-        .enable_i    (y_enable),                // Enable signal for column arbitration
-        .req_i       (col_req) ,                // Column requests for the active row
-        .gnt_o       (y_gnt_o) ,                // Column grant outputs
-        .yadd_o      (y_add_o) ,                // Selected column index
+        .clk_i         (clk_i)   ,                // Clock input
+        .reset_i       (reset_i) ,                // Reset input
+        .enable_i      (y_enable),                // Enable signal for column arbitration
+        .req_i         (col_req) ,                // Column requests for the active row
+        .gnt_o         (y_gnt_o) ,                // Column grant outputs
+        .yadd_o        (y_add_o) ,                // Selected column index
         .grp_release_o (grp_release_y)            // Group release signal for column
     );
 

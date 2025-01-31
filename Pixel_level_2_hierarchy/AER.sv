@@ -1,5 +1,5 @@
 // Module name: AER Module
-// Module Description: This module combines the event data row address,column address,timestamp and polarity
+// Module Description: This module combines the event data row address,column address,timestamp and polarity when event occured
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]

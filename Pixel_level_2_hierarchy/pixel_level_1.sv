@@ -1,5 +1,5 @@
 // Module name: pixel top level
-// Module Description: This module perform arbiteration to the higher level
+// Module Description: This module perform arbiteration for the Primary level Pixel Block.  
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
@@ -39,11 +39,11 @@ module pixel_level_1
     always_ff @(posedge grp_release_clk or posedge reset_i) 
     begin
         if (reset_i) 
-            grp_release_o <= 1'b0;                              // Reset group release signal
+                grp_release_o <= 1'b0;                              // Reset group release signal
         else 
         begin
             if (enable_i)
-                grp_release_o <= grp_release_x & grp_release_y; // Assert group release when both row arbiter and column arbiter grp_releases are asserted
+                grp_release_o <= grp_release_x & grp_release_y;     // Assert group release when both row arbiter and column arbiter grp_releases are asserted
             else
                 grp_release_o <= 1'b0;
         end
@@ -137,13 +137,13 @@ module pixel_level_1
                     x_enable = 1'b1;                            // Enable row arbitration
                     next_state = ROW_GRANT;                     // Transition to ROW_GRANT state
                  end
-					 else
+					 else                                            //If enable is low,
 					  begin
-					    x_enable = 1'b0;
-						 y_enable = 1'b0;
-						 next_state = IDLE;
-						 refresh=1'b1;
-					  end
+					    x_enable = 1'b0;                             //row enable will low  
+						 y_enable = 1'b0;                             //column enable will low  
+						 next_state = IDLE;                           //next_state to IDLE
+						 refresh=1'b1;                                //Initialize the row arbiter
+					  end  
             end
 
             ROW_GRANT: 
@@ -158,21 +158,21 @@ module pixel_level_1
                     next_state = COL_GRANT;                     // Transition to COL_GRANT state
                   end
 					 end
-					 else
+					  else                                            //If enable is low,
 					  begin
-					    x_enable = 1'b0;
-						 y_enable = 1'b0;
-						 next_state = IDLE;
-						 refresh=1'b1;
-					  end
+					    x_enable = 1'b0;                             //row enable will low  
+						 y_enable = 1'b0;                             //column enable will low  
+						 next_state = IDLE;                           //next_state to IDLE
+						 refresh=1'b1;                                //Initialize the row arbiter
+					  end  
             end
             
             COL_GRANT: 
             begin
 				  if (enable_i) 
                 begin
-                y_enable = 1'b1;                                // Enable column arbitration
-                if (y_gnt_o == 'b0)                             // If all columns are granted
+                y_enable = 1'b1;                                    // Enable column arbitration
+                if (y_gnt_o == 'b0)                                 // If all columns are granted
                   begin
                         x_enable = 1'b1;                            // Re-enable row arbitration
                         y_enable = 1'b0;                            // Disable column arbitration
@@ -180,14 +180,13 @@ module pixel_level_1
                         next_state = ROW_GRANT;                     // Transition back to ROW_GRANT
                   end
 					 end
-					  else
-					  begin
-					    x_enable = 1'b0;
-						 y_enable = 1'b0;
-						 toggle = 1'b0;
-						 next_state = IDLE;
-						 refresh=1'b1;
-					  end
+					  else                                               //If enable is low,
+					   begin
+					    x_enable = 1'b0;                                 //row enable will low  
+						 y_enable = 1'b0;                                 //column enable will low  
+						 next_state = IDLE;                               //next_state to IDLE
+						 refresh=1'b1;                                    //Initialize the row arbiter
+					   end  
 					 
             end
 
@@ -216,13 +215,13 @@ module pixel_level_1
     x_roundrobin #(.Lvl_ROWS(Lvl_ROWS),.Lvl_ROW_ADD(Lvl_ADD))
     RRA_X
 	 (
-        .clk_i       (grp_release_clk),                          // Clock input
-        .reset_i     (reset_i),                                  // Reset input
-        .enable_i    (x_enable),                                 // Enable signal
-        .refresh_i   (refresh),                                  // Refresh signal
-        .req_i       (row_req),                                  // Row requests
-        .gnt_o       (x_gnt_o),                                  // Row grants
-        .xadd_o      (x_add_o),                                  // Row index
+        .clk_i         (grp_release_clk),                          // Clock input
+        .reset_i       (reset_i),                                  // Reset input
+        .enable_i      (x_enable),                                 // Enable signal
+        .refresh_i     (refresh),                                  // Refresh signal
+        .req_i         (row_req),                                  // Row requests
+        .gnt_o         (x_gnt_o),                                  // Row grants
+        .xadd_o        (x_add_o),                                  // Row index
         .grp_release_o (grp_release_x)                             // Group release signal
     );
 
@@ -230,12 +229,12 @@ module pixel_level_1
     y_roundrobin #(.Lvl_COLS(Lvl_COLS),.Lvl_COL_ADD(Lvl_ADD))
     RRA_Y 
 	 (
-        .clk_i       (grp_release_clk),                           // Clock input
-        .reset_i     (reset_i),                                   // Reset input
-        .enable_i    (y_enable),                                  // Enable signal
-        .req_i       (col_req),                                   // Column requests
-        .gnt_o       (y_gnt_o),                                   // Column grants
-        .yadd_o      (y_add_o),                                   // Column index
+        .clk_i         (grp_release_clk),                           // Clock input
+        .reset_i       (reset_i),                                   // Reset input
+        .enable_i      (y_enable),                                  // Enable signal
+        .req_i         (col_req),                                   // Column requests
+        .gnt_o         (y_gnt_o),                                   // Column grants
+        .yadd_o        (y_add_o),                                   // Column index
         .grp_release_o (grp_release_y)                              // Group release signal
     );
 

@@ -29,7 +29,7 @@ package lib_arbiter_pkg;
 
   
   // Parameters for polarity handling
-  parameter POLARITY          = 2;      // Polarity signal width 
+  parameter POLARITY          = 2;                    // Polarity signal width 
 
   
   // Parameters for address width calculation
@@ -37,7 +37,7 @@ package lib_arbiter_pkg;
   parameter ROW_ADD           = Lvl_ADD + Lvl0_ADD;   // Total row address width (sum of all levels)
   
   // Parameters for timestamp and data width
-  parameter SIZE              = 32;     // Width of the timestamp 
+  parameter SIZE              = 32;                   // Width of the timestamp 
   parameter WIDTH             = SIZE + COL_ADD + ROW_ADD + 1; // Total width combining timestamp, row address, column address, and polarity
 
 endpackage

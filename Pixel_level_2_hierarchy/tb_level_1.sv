@@ -12,22 +12,19 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
   // Inputs
   logic clk_i                                                ; // Clock input
   logic reset_i                                              ; // Active high Reset input
-  logic [ROWS-1:0][COLS-1:0][POLARITY-1:0]req_i; // Request signals for each row and column, with POLARITY bits 
-  
-  // Outputs
-  logic [ROWS-1:0][COLS-1:0] gnt_out_o             ; //grant output
-  logic grp_release_out_o                                        ; //Grouplease output
+  logic [ROWS-1:0][COLS-1:0][POLARITY-1:0]req_i              ; // Request signals for each row and column, with POLARITY bits 
+  logic [ROWS-1:0][COLS-1:0] gnt_out_o                       ; //grant output
+  logic grp_release_out_o                                    ; //Grouplease output
   logic [WIDTH-1:0] data_out_o                               ; //dataout of events
   
-  top_pixel_hierarchy
-  dut 
+  top_pixel_hierarchy dut 
   (
-            .clk_i        (clk_i)              ,               // Clock input
-            .reset_i      (reset_i)            ,               // Active high Reset input
-            .req_i        (req_i)              ,               // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
-            .gnt_out_o    (gnt_out_o)              ,               // grant outputs
-			   .grp_release_out_o(grp_release_out_o)    ,               //Grouplease output
-            .data_out_o(data_out_o)                            //dataout of events
+            .clk_i             (clk_i)              ,               // Clock input
+            .reset_i           (reset_i)            ,               // Active high Reset input
+            .req_i             (req_i)              ,               // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
+            .gnt_out_o         (gnt_out_o)          ,               // grant outputs
+			   .grp_release_out_o (grp_release_out_o)  ,               //Grouplease output
+            .data_out_o        (data_out_o)                         //dataout of events
 
   );
 

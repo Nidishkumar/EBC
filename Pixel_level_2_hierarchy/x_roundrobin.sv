@@ -7,7 +7,7 @@
 
 import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
 
-module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
+module x_roundrobin #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 
  (
     input  logic clk_i                    ,        // Clock input for Synchronization
@@ -17,7 +17,7 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
     input  logic [Lvl_ROWS-1:0] req_i     ,        // Request for active row inputs
     output logic [Lvl_ROWS-1:0] gnt_o     ,        // Grant outputs
     output logic [Lvl_ROW_ADD-1:0] xadd_o ,        // Encoded output representing the granted row index
-	 output logic grp_release_o                       // Grp_release will high after completion all active requests
+	 output logic grp_release_o                     // Grp_release will high after completion all active requests
  );
 
     // Internal signals for mask and grant handling
@@ -27,6 +27,9 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
     logic [Lvl_ROWS-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
     logic [Lvl_ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
     logic [Lvl_ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
+	 logic [Lvl_ROW_ADD-1:0] xadd_incr;            // Temporary address increament variable
+	 logic add_done;                               // Flag to indicate yadd_o is updated
+	 logic mask_done;                              // Flag to indicate nxt_mask is updated
 	 
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
@@ -61,13 +64,14 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
     always_comb 
 	   begin
         nxt_mask = mask_ff;                   // Default: next mask is the current mask
-
+        mask_done=1'b0;
         // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < Lvl_ROWS ; i = i + 1)
+        for (int i = 0; i < Lvl_ROWS && !mask_done; i = i + 1)
 		   begin
             if (gnt_temp[i]) 
 			      begin
                  nxt_mask = ({Lvl_ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+					  mask_done=1'b1;
                end
          end
       end
@@ -76,12 +80,18 @@ module x_roundrobin #(parameter Lvl_ROWS=4 , parameter Lvl_ROW_ADD=2)
     always_comb 
       begin
         xadd_o = {Lvl_ROW_ADD{1'b0}};              // Initialize xadd_o to 0
-        for (int i = 0; i < Lvl_ROWS ; i = i + 1) 
+		  xadd_incr = {Lvl_ROW_ADD{1'b0}};           // Initialize xadd_incr to 0
+		  add_done=1'b0;                             // Initialize add_done to 0
+        for (int i = 0; i < Lvl_ROWS && !add_done ; i = i + 1) 
 		   begin
+			 
             if (gnt_o[i])
 			      begin
-                  xadd_o = i[Lvl_ROW_ADD-1:0];     // Assign the index of the granted bit to xadd_o
+                  xadd_o = xadd_incr;     // Assign the increamented address to xadd_o
+						add_done=1'b1;          // Assign add_done to 1
                end
+				else
+				   xadd_incr=xadd_incr+1'b1;  //Increament Address add_incr
          end
       end
 

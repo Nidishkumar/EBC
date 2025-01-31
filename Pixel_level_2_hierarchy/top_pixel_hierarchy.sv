@@ -1,4 +1,4 @@
-// Module name: Dynamic Pixel Hierarchy
+// Module name: Top Pixel Hierarchy
 // Module Description: This module handles the pixel hierarchy for processing pixel requests and generating grant signals.
 // It integrates multiple submodules including the polarity selector, timestamp generator, and address event generator.
 // Author: []
@@ -7,6 +7,7 @@
 //------------------------------------------------------------------------------------------------------------------
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
+
 module top_pixel_hierarchy 
 (
     input logic clk_i                                    ,  // Input clock for Synchronization
@@ -42,25 +43,25 @@ logic [Lvl0_ROWS-1:0][Lvl0_COLS-1:0] gnt_o_0; // Grant signals for lower level
 logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] req_o_0;   // Request signal for higher level 
 logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] gnt_o_1;   // Grant signals for higher level 
 
-logic [NO_levels-1:0]grp_release;  // Group release signals for lower levels actss as clock to the higher level
+logic [NO_levels-1:0]grp_release;   // Group release signals for lower levels actss as clock to the higher level
 
 // Signal assignments
 assign enable = req_o_1;            // Enable signal for the higher level
-assign grp_release_out_o=grp_release[1];
+assign grp_release_out_o=grp_release[1];//grp_release as a indication of all active requests are granted
+
 assign x_add = {x_add_1, x_add_0};  // Combine all levels Row addresses 
 assign y_add = {y_add_1, y_add_0};  // Combine all levels column address 
 
-// polarity input for the Polarity Selector module
 assign polarity_in = req_i[x_add][y_add]; // Sends the active row's ,column's request polarity to the polarity module.
-assign active_in = &active; // overall arbitration will active, if all levels arbitration active 
+assign active_in = &active;         // overall arbitration will active, if all levels arbitration active 
 
 
 always_ff @(posedge clk_i or posedge reset_i) 
  begin
     if (reset_i) 
     begin
-        x_add_ff <= 'b0;    // Reset row address
-        y_add_ff <= 'b0;    // Reset column address
+        x_add_ff <= 'b0;      // Reset row address
+        y_add_ff <= 'b0;      // Reset column address
     end 
     else 
     begin
