@@ -61,34 +61,30 @@ pixel_level_1 #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD=1)
     state_t current_state, next_state;                          // FSM state variables
 
 	 
-    always_ff@(posedge clk_i or posedge reset_i) 
-begin
-    if (reset_i) 
-        grp_release_clk <= 1'b0; // Reset the group release clock
-    else if (enable_i) 
-    begin
+always_comb//@(posedge clk_i or posedge reset_i) 
+ begin
+    //grp_release_clk=0;
         case (current_state)
             IDLE: 
-                grp_release_clk <= clk_i; // Follow main clock in IDLE state
+                grp_release_clk = clk_i; // Follow main clock in IDLE state
                 
             ROW_GRANT: 
-                grp_release_clk <= ~grp_release_clk; // Toggle in ROW_GRANT
-                
-            COL_GRANT: 
+                grp_release_clk = clk_i; // Toggle in ROW_GRANT
+            default:   
             begin
+			 if(grp_enable_i)
+	            grp_release_clk = ~grp_release_clk;
+			 else
+				begin
                 if (toggle)  
-                    grp_release_clk <= ~grp_release_clk; // Toggle if all columns granted
+                    grp_release_clk = ~grp_release_clk; // Toggle if all columns granted
                 else
-                    grp_release_clk <= !grp_enable_i;  // Sync with lower-level group release
+                    grp_release_clk = !grp_enable_i;  // Sync with lower-level group release
+				end
             end
-            
-            default: 
-                grp_release_clk <= 1'b0; // Default inactive state
         endcase
-    end
-    else 
-        grp_release_clk <= 1'b0; // When disabled, keep it low
-end
+
+ end
 
     // FSM state transition logic
     always_ff @(posedge grp_release_clk or posedge reset_i) 

@@ -62,7 +62,7 @@ module pixel_groups_level_0 #(parameter Lvl0_ROWS=2,Lvl0_COLS=2,Lvl0_ADD=1)
                 .clk_i                 (clk_i)             ,           // Clock input
                 .reset_i               (reset_i)           ,           // Reset signal
                 .enable_i              (enable_i[group / CONST0][group % CONST0]),  // Enable signal for the lower level group 
-				.grp_enable_i          (|gnt_temp[group]),
+			       .grp_enable_i          (active_temp[group]),
                 .req_i                 (set_group[group])  ,                        //Individual group Input requests 
                 .req_o                 (req_o[group / CONST0][group % CONST0]),     // active groups request for the higher level as request input
                 .gnt_o                 (gnt_temp[group])   ,           // Grant output for the lower level group
