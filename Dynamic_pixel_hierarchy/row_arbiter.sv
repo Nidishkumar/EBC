@@ -58,7 +58,7 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 		  grp_release_o<=0;
 		else
 		 begin
-		 if(!mask_req)
+		 if(!gnt_temp && |req_i )
 		   grp_release_o<=1;
 		 else
 		  grp_release_o<=0;

@@ -37,7 +37,7 @@ pixel_level_1 #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD=1)
     assign req_o =  |req_i;                                      // Indicates high if any active requests in req_i
    
 
-    always_ff@(posedge grp_release_clk or posedge reset_i) 
+    always_comb //@(posedge clk_i or posedge reset_i) 
     begin
         if (reset_i) 
                 grp_release_o = 1'b0;                              // Reset group release signal
@@ -70,18 +70,20 @@ always_comb//@(posedge clk_i or posedge reset_i)
                 
             ROW_GRANT: 
                 grp_release_clk = clk_i; // Toggle in ROW_GRANT
-            default:   
+            COL_GRANT:   
             begin
 			 if(grp_enable_i)
-	            grp_release_clk = ~grp_release_clk;
+	            grp_release_clk = clk_i;
 			 else
 				begin
                 if (toggle)  
-                    grp_release_clk = ~grp_release_clk; // Toggle if all columns granted
+                    grp_release_clk = clk_i; // Toggle if all columns granted
                 else
                     grp_release_clk = !grp_enable_i;  // Sync with lower-level group release
 				end
             end
+			 default:
+			   grp_release_clk = 0;
         endcase
 
  end

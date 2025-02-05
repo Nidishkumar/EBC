@@ -39,7 +39,7 @@ always_ff@(posedge clk_i or posedge reset_i)
 		  grp_release_o=0;
 		else
 		 begin
-		 if(!gnt_temp)
+		 if(!gnt_temp && |req_i)
 		   grp_release_o=1;
 		 else
 		  grp_release_o=0;
