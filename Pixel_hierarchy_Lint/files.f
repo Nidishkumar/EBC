@@ -12,5 +12,5 @@ pixel_groups_level_0.sv
 pixel_level_1.sv
 polarity_selector.sv
 wall_clock.sv
-AER.sv
+event_encoder.sv
 top_pixel_hierarchy.sv
