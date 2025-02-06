@@ -70,9 +70,9 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
         nxt_mask = mask_ff;                    // Default: next mask is the current mask
         mask_done=1'b0;
         // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < Lvl_COLS && !mask_done; i = i + 1) 
+        for (int i = 0; i < Lvl_COLS ; i = i + 1) 
 		   begin
-            if (gnt_temp[i]) 
+            if (gnt_temp[i] && !mask_done) 
 			      begin
                    nxt_mask = ({Lvl_COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
 						 mask_done=1'b1;
@@ -86,9 +86,9 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
         yadd_o = {Lvl_COL_ADD{1'b0}};              // Initialize yadd_o to 0
 		  yadd_incr = {Lvl_COL_ADD{1'b0}};           // Initialize yadd_incr to 0
 		  add_done=0;                                // Initialize add_done to 0
-        for (int i = 0; i < Lvl_COLS &&  !add_done  ; i = i + 1) 
+        for (int i = 0; i < Lvl_COLS   ; i = i + 1) 
 		   begin
-            if (gnt_o[i] )
+            if (gnt_o[i] && !add_done)
 			      begin
                   yadd_o = yadd_incr;              // Assign the increamented address to yadd_o
 						add_done=1;                      // Assign add_done to 1

@@ -66,9 +66,9 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
         nxt_mask = mask_ff;                   // Default: next mask is the current mask
         mask_done=1'b0;
         // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < Lvl_ROWS && !mask_done; i = i + 1)
+        for (int i = 0; i < Lvl_ROWS ; i = i + 1)
 		   begin
-            if (gnt_temp[i]) 
+            if (gnt_temp[i]&& !mask_done) 
 			      begin
                  nxt_mask = ({Lvl_ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
 					  mask_done=1'b1;
@@ -82,10 +82,10 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
         xadd_o = {Lvl_ROW_ADD{1'b0}};              // Initialize xadd_o to 0
 		  xadd_incr = {Lvl_ROW_ADD{1'b0}};           // Initialize xadd_incr to 0
 		  add_done=1'b0;                             // Initialize add_done to 0
-        for (int i = 0; i < Lvl_ROWS && !add_done ; i = i + 1) 
+        for (int i = 0; i < Lvl_ROWS; i = i + 1) 
 		   begin
 			 
-            if (gnt_o[i])
+            if (gnt_o[i] && !add_done)
 			      begin
                   xadd_o = xadd_incr;     // Assign the increamented address to xadd_o
 						add_done=1'b1;          // Assign add_done to 1
