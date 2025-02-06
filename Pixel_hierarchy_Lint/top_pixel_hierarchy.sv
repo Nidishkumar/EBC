@@ -121,7 +121,7 @@ polarity_selector polarity_sel
 );
 
 // Instantiate the address event generator module to combine event data
-AER address_event 
+event_encoder address_event 
 (
     .enable_i     (active_in),       // Enable signal based on active arbitration in all each level
     .x_add_i      (x_add_ff) ,       // Active event's Row address 

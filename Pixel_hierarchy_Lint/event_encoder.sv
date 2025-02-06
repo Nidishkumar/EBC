@@ -7,7 +7,7 @@
 
 import lib_arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
 
-module AER
+module event_encoder
     (
     input logic enable_i              ,
     input logic [ROW_ADD-1:0] x_add_i ,                 //pixel Row address 
