@@ -54,39 +54,64 @@ module row_arbiter
     assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt); 
 
     // Generate the next mask based on the current grant outputs
-    always_comb 
-	   begin
-        nxt_mask = mask_ff;                   // Default: next mask is the current mask
-        next_done = 1'b0;
+//    always_comb 
+//	   begin
+//        nxt_mask = mask_ff;                   // Default: next mask is the current mask
+//        next_done = 1'b0;
+//
+//        // Iterate through the gnt_temp bits to calculate the next mask
+//        for (int i = 0; i < ROWS ; i = i + 1)
+//		   begin
+//            if (gnt_temp[i] && (!next_done)) 
+//			      begin
+//                 nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+//                 next_done = 1'b1;
+//               end
+//         end
+//      end
 
-        // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < ROWS ; i = i + 1)
-		   begin
-            if (gnt_temp[i] && (!next_done)) 
-			      begin
-                 nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-                 next_done = 1'b1;
-               end
-         end
-      end
+   	 assign nxt_mask= ~((gnt_temp << 1)-({{(ROWS-1){1'b0}}, 1'b1})); 
+
 
     // Compute xadd_o based on the current grants
-    always_comb 
+//   always_ff@(posedge clk_i or posedge reset_i)
+//      begin
+//       if(reset_i)
+//		  begin
+//		    x_add_o  <= {ROW_ADD{1'b0}};
+//			 add_incr <= {ROW_ADD{1'b0}};
+//        end
+//		  else
+//		  begin
+//        for (int i = 0; i < ROWS; i = i + 1) 
+//		   begin
+//            if (gnt_temp[i])
+//                  x_add_o <= add_incr;      // Assign the index of the granted cloumn index to yadd_o
+//            else
+//                 add_incr <= add_incr + 1'b1;
+//         end
+//      end
+//     end
+
+  function logic [ROW_ADD-1:0] address (input logic [ROWS-1:0] data);
+      for(int i=0 ;i<ROWS ;i++)
       begin
-        x_add_o = {ROW_ADD{1'b0}};              // Initialize xadd_o to 0
-        add_incr = {ROW_ADD{1'b0}};
-        add_done = 1'b0;
-        for (int i = 0; i < ROWS ; i = i + 1) 
-		   begin
-            if (gnt_o[i] && (!add_done))
-			      begin
-                  x_add_o = add_incr;     // Assign the index of the granted bit to xadd_o
-                  add_done = 1'b1;
-               end
-            else
-               add_incr = add_incr + 1'b1;
-         end
+       if(data[i])
+	      return i[ROW_ADD-1:0];
+	   end
+	      return '0;
+	  endfunction
+
+
+     always_comb
+     begin
+     if (gnt_o !=0)
+      begin
+       x_add_o =address(gnt_o);
       end
+     else
+       x_add_o ='0;
+     end
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     priority_arb  maskedGnt 

@@ -41,16 +41,16 @@ module tb_x_roundrobin;
   initial begin
     // Initialize signals
     clk_i = 0;
-    enable_i = 0;
+    enable_i = 1'b0;
     req_i = 8'b01000111;
 
     // Apply reset
-    reset_i = 1;
+    reset_i = 1'b1;
     #10 reset_i = 0;
 
     // Test case 1
     req_i = 8'b10010011;
-    #10 enable_i = 1;
+    #10 enable_i = 1'b1;
     #20;
 
     // Test case 2
@@ -58,13 +58,13 @@ module tb_x_roundrobin;
     #20;
 
     // Test case 3
-    enable_i = 0;
+    enable_i = 1'b0;
     req_i = 8'b01100000;
     #10;
 
     // Test case 4
     req_i = 8'b11101111;
-    #10 enable_i = 1;
+    #10 enable_i = 1'b1;
     #10 reset_i = 1;
     #10 reset_i = 0;
     req_i = 8'b11110000;
@@ -92,3 +92,4 @@ module tb_x_roundrobin;
     $stop;
   end
 endmodule
+

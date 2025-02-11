@@ -84,7 +84,7 @@ module pixel_level_1
             endcase
         end
         else
-            grp_release_clk <= 1'b0;                            // Disable group release clock when not enabled
+            grp_release_clk <= 0;                            // Disable group release clock when not enabled
     end 
 	 
 

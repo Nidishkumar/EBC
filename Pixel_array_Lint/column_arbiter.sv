@@ -26,7 +26,7 @@ module column_arbiter
 
     logic next_done;
     logic add_done;
-    logic [COL_ADD-1:0] add_incr;
+    //logic [COL_ADD-1:0] add_incr;
 
 
      // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
@@ -60,42 +60,62 @@ module column_arbiter
     // Grant output is taken from the masked grants
     assign gnt_temp = mask_gnt;                // Register the combinational grant from masked arbiter
 
+	assign nxt_mask= ~((gnt_temp << 1)-({{(COLS-1){1'b0}}, 1'b1})); 
+
     // Next mask generation based on current grant outputs
-    always_comb 
-     begin
-        nxt_mask = mask_ff;                    // Default: next mask is the current mask
-        next_done = 1'b0;
+//    always_comb 
+//     begin
+//        nxt_mask = mask_ff;                    // Default: next mask is the current mask
+//        next_done = 1'b0;
+//
+//        // Iterate through the gnt_temp bits to calculate the next mask
+//        for (int i = 0; i < COLS; i = i + 1) 
+//		   begin
+//            if (gnt_temp[i] && (!next_done)) 
+//			      begin
+//                   nxt_mask = ({COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+//                   next_done = 1'b1;
+//               end
+//         end
+//     end
 
-        // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < COLS; i = i + 1) 
-		   begin
-            if (gnt_temp[i] && (!next_done)) 
-			      begin
-                   nxt_mask = ({COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-                   next_done = 1'b1;
-               end
-         end
-     end
-
-    // Compute yadd_o based on the current grants
-    always_comb 
+	  
+	  function logic [COL_ADD-1:0] address (input logic [COLS-1:0] data);
+      for(int i=0 ;i<COLS ;i++)
       begin
-        y_add_o = {COL_ADD{1'b0}};               // Initialize yadd_o to 0
-        add_incr = 1'b0;
-        add_done = 1'b0;
+       if(data[i])
+	      return i[COL_ADD-1:0];
+	   end
+	      return '0;
+	  endfunction
 
-        for (int i = 0; i < COLS; i = i + 1) 
-		   begin
-            if (gnt_o[i] && (!add_done))
-			      begin
-                  y_add_o = add_incr;      // Assign the index of the granted cloumn index to yadd_o
-                  add_done = 1'b1;
-               end
-            else
-               add_incr = add_incr + 1'b1;
-         end
+
+     always_comb
+     begin
+     if (gnt_o !=0)
+      begin
+       y_add_o =address(gnt_o);
       end
-
+     else
+       y_add_o ='0;
+     end
+    // Compute yadd_o based on the current grants
+//    always_ff@(posedge clk_i or posedge reset_i)
+//      begin
+//       if(reset_i)
+//		  begin
+//		    y_add_o  <= {COL_ADD{1'b0}};
+//			// add_incr <= {COL_ADD{1'b0}};
+//        end
+//		  else
+//		  begin
+//        for (int i = 0; i < COLS; i = i + 1) 
+//		   begin
+//            if (gnt_temp[i])
+//                  y_add_o <= (gnt_temp!=0)?($clog2(gnt_temp)):{COL_ADD{1'b0}};      // Assign the index of the granted cloumn index to yadd_o
+//         end
+//      end
+//     end
     // Priority arbiter for masked requests (maskedGnt)
     priority_arb  maskedGnt (
         .req_i  (mask_req)  ,                    // Input masked requests

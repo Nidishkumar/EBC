@@ -20,7 +20,7 @@ module Priority_arb  #(parameter Lvl_ROWS=2)
   generate
     // Grant[i] is asserted if req_i[i] is active and no higher-priority grants are active
     for (i = 1; i < Lvl_ROWS; i = i + 1) 
-	    begin : loop
+	    begin : gen_priority_arb
          assign gnt_o[i] = req_i[i] & ~(|gnt_o[i-1:0]);  
       end
   endgenerate

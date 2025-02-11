@@ -35,14 +35,14 @@ module x_roundrobin #(parameter WIDTH=8, x_width=3)
 		 begin
             mask_ff <= {WIDTH{1'b1}};          // Reset mask to all ones (allow all requests)
             x_gnt_o   <= {WIDTH{1'b0}}; 				// Reset grant output to zero (no grants)
-			xadd_o    <={x_width{1'b0}}; 
+			//xadd_o    <={x_width{1'b0}}; 
 				
          end 
 		else if (enable_i) 
 		 begin
             mask_ff <= nxt_mask;              // Update mask based on next mask calculation
             x_gnt_o  <= gnt_temp; 				// Register the grant output
-			xadd_o    <=x_add;
+			//xadd_o    <=x_add;
          end
       end
 	 
@@ -50,33 +50,82 @@ module x_roundrobin #(parameter WIDTH=8, x_width=3)
     // Determine the final grant output: either masked grants or raw grants depending on the mask
     assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt); 
 
-    // Generate the next mask based on the current grant outputs
-    always_comb 
-	  begin
-        nxt_mask = mask_ff;                   // Default: next mask is the current mask
-
-        // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < WIDTH ; i = i + 1)
-		 begin
-            if (gnt_temp[i]) 
-			 begin
-                nxt_mask = ({WIDTH{1'b1}} << (i + 1)); // Next mask update based on current grant 
-             end
-         end
-      end
-
+        assign nxt_mask= ~((gnt_temp << 1)-({{(WIDTH-1){1'b0}}, 1'b1})); 
+		 
+	  
     // Compute xadd_o based on the current grants
-    always_comb 
+//    always_comb 
+//     begin
+//       // x_add = {x_width{1'b0}};              // Initialize xadd_o to 0
+//        for (int i = 0; i < WIDTH ; i = i + 1) 
+//		 begin
+//            if (gnt_temp[i])
+//			 begin
+//                x_add = i[x_width-1:0];       // Assign the index of the granted bit to xadd_o
+//             end
+//         end
+//     end
+//    always_ff @(posedge clk_i or posedge reset_i) begin
+//    if (reset_i) 
+//	 begin
+//        xadd_o <= '0;  // Reset addr to 0
+//    end 
+//	 else 
+//	 begin
+//        for (int i = 0; i < WIDTH; i = i + 1) 
+//		  begin
+//            if (x_gnt_o[i]) 
+//				begin
+//                xadd_o <= x_add; // Assign tracked value instead of `i`
+//            end
+//                x_add <= x_add + 1'b1; // Increment separately
+//        end
+//    end
+//end
+
+//function automatic logic [x_width-1:0] address(input logic [WIDTH-1:0] data);
+//    for (int i = 0; i < WIDTH; i++) 
+//        if (data[i]) 
+//			return i[x_width-1:0];  			// return x_width'(i);  
+//		else			
+//    		return '0; 							// Default if no bit is set
+//endfunction
+//always_ff@(posedge clk_i or posedge reset_i) 
+//begin
+//	if(reset_i)
+//		xadd_o <= '0;
+//	else 
+//	begin
+//	if (gnt_temp != 0)
+//		xadd_o <= address(gnt_temp) ;
+//	else 
+//		xadd_o<= '0;
+//	end
+//end
+function logic [x_width-1:0] address (input logic [WIDTH-1:0] data);
+  for(int i=0 ;i<WIDTH ;i++)
+   begin
+    if(data[i])
      begin
-        x_add = {x_width{1'b0}};              // Initialize xadd_o to 0
-        for (int i = 0; i < WIDTH ; i = i + 1) 
-		 begin
-            if (gnt_temp[i])
-			 begin
-                x_add = i[x_width-1:0];       // Assign the index of the granted bit to xadd_o
-             end
-         end
-     end
+	   return i[x_width-1:0];
+	 end
+	 end
+	  return '0;
+	  
+endfunction
+
+
+always_comb//@(posedge clk_i or posedge reset_i)
+begin
+
+ if (x_gnt_o !=0)
+begin
+  xadd_o =address(x_gnt_o);
+end
+ else
+  xadd_o ='0;
+ end
+
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     Priority_arb  maskedGnt 

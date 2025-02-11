@@ -28,13 +28,13 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
     logic [Lvl_ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
     logic [Lvl_ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
 	 logic [Lvl_ROW_ADD-1:0] xadd_incr;            // Temporary address increament variable
-	 logic add_done;                               // Flag to indicate yadd_o is updated
-	 logic mask_done;                              // Flag to indicate nxt_mask is updated
+	 //logic add_done;                               // Flag to indicate yadd_o is updated
+	// logic mask_done;                              // Flag to indicate nxt_mask is updated
 	 
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;
-    assign grp_release_o = !mask_req;
+    assign grp_release_o =  ~|mask_req;
 
     // Update mask and grant signals on the clock edge
     always_ff @(posedge clk_i or posedge reset_i) 
@@ -60,8 +60,11 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
     // Determine the final grant output: either masked grants or raw grants depending on the mask_req
     assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt); 
 
-    // Generate the next mask based on the current grant outputs
-    always_comb 
+	 //Next mask updation based on grant
+	 assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); 
+
+    //     // Lint Warning for Multiple Assignmets of next_mask 
+   /* always_comb 
 	   begin
         nxt_mask = mask_ff;                   // Default: next mask is the current mask
         mask_done=1'b0;
@@ -74,10 +77,31 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 					  mask_done=1'b1;
                end
          end
-      end
+      end */
+		
+      //Compute xadd_o based on the current grants
+		function logic [Lvl_ROW_ADD-1:0] address (input logic [Lvl_ROWS-1:0] data);
+      for(int i=0 ;i<Lvl_ROWS ;i++)
+      begin
+       if(data[i])
+	      return i[Lvl_ROW_ADD-1:0];
+	   end
+	      return '0;
+	  endfunction
 
-    // Compute xadd_o based on the current grants
-    always_comb 
+
+always_comb
+begin
+ if (gnt_o !=0)
+   begin
+    xadd_o =address(gnt_o);
+   end
+ else
+    xadd_o ='0;
+ end
+		
+    //  Lint Warning for Multiple Assignmets of yadd_o
+   /* always_comb 
       begin
         xadd_o = {Lvl_ROW_ADD{1'b0}};              // Initialize xadd_o to 0
 		  xadd_incr = {Lvl_ROW_ADD{1'b0}};           // Initialize xadd_incr to 0
@@ -93,7 +117,7 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 				else
 				   xadd_incr=xadd_incr+1'b1;  //Increament Address add_incr
          end
-      end
+      end */
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     Priority_arb #(.Lvl_ROWS(Lvl_ROWS))

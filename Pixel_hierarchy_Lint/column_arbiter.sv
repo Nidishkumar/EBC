@@ -25,14 +25,12 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     logic [Lvl_COLS-1:0] mask_gnt    ;              // Masked grants (output from priority arbiter)
     logic [Lvl_COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
 	 logic [Lvl_COL_ADD-1:0] yadd_incr;              // Temporary address increament variable
-	 logic add_done;                                 // Flag to indicate yadd_o is updated
-	 logic mask_done;                                // Flag to indicate nxt_mask is updated
-
+	
      // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;   
 	 
 	 //Grp_release will be high if mask_req is zero
-    assign grp_release_o = !mask_req;
+    assign grp_release_o =  ~(|mask_req);
 
 
     always_ff @(posedge clk_i or posedge reset_i) 
@@ -64,8 +62,11 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     // Grant output is taken from the masked grants
     assign gnt_temp = mask_gnt;                   // Register the combinational grant from masked arbiter
 
-    // Next mask generation based on current grant outputs
-    always_comb 
+	 //Next mask updation based on grant
+	 assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_COLS-1){1'b0}}, 1'b1})); 
+
+    // Lint Warning for Multiple Assignmets of next_mask 
+    /*always_comb 
      begin
         nxt_mask = mask_ff;                    // Default: next mask is the current mask
         mask_done=1'b0;
@@ -78,10 +79,30 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
 						 mask_done=1'b1;
                end
          end
-     end
+     end */
 
-    // Compute yadd_o based on the current grants
-   always_comb 
+	  function logic [Lvl_COL_ADD-1:0] address (input logic [Lvl_COLS-1:0] data);
+      for(int i=0 ;i<Lvl_COLS ;i++)
+      begin
+       if(data[i])
+	      return i[Lvl_COL_ADD-1:0];
+	   end
+	      return '0;
+	  endfunction
+
+
+     always_comb
+     begin
+     if (gnt_o !=0)
+      begin
+       yadd_o =address(gnt_o);
+      end
+     else
+       yadd_o ='0;
+     end
+	  
+    // Lint Warning for Multiple Assignmets of yadd_o
+  /* always_comb 
       begin
         yadd_o = {Lvl_COL_ADD{1'b0}};              // Initialize yadd_o to 0
 		  yadd_incr = {Lvl_COL_ADD{1'b0}};           // Initialize yadd_incr to 0
@@ -97,7 +118,7 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
 				      yadd_incr=yadd_incr+1'b1;        //Increament add_incr to 1
 
          end
-      end 
+      end  */
 		
 
     // Priority arbiter for masked requests (maskedGnt)
