@@ -4,6 +4,14 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
+`include "lib_arbiter_pkg.sv"                                         // Importing arbiter package containing parameter constants
+`include "column_arbiter.sv"
+`include "row_arbiter.sv"
+`include "polarity_selector.sv"
+`include "priority_arb.sv"
+`include "AER.sv"
+`include "wall_clock.sv"
+
 
 import lib_arbiter_pkg::*;                                         // Importing arbiter package containing parameter constants
 
@@ -58,33 +66,33 @@ module top_single_pixel
          end
     end
 
-    always_ff @(posedge clk_i or posedge reset_i) 
-	  begin
-        if (reset_i) 
-		   begin
-               x_add_ff <= 'b0;          
-               y_add_ff <= 'b0;
-         end 
-        else 
-		   begin
-               x_add_ff <= x_add;          
-               y_add_ff <= y_add;
-         end 
-      end 
+        always_ff @(posedge clk_i or posedge reset_i) 
+        begin
+            if (reset_i) 
+            begin
+                x_add_ff <= 'b0;          
+                y_add_ff <= 'b0;
+            end 
+            else 
+            begin
+                x_add_ff <= x_add;          
+                y_add_ff <= y_add;
+            end 
+        end 
 
-    always_ff @(posedge clk_i or posedge reset_i) 
-	  begin
-        if (reset_i) 
-		   begin
-               active_ff <= 'b0;
+        always_ff @(posedge clk_i or posedge reset_i) 
+        begin
+            if (reset_i) 
+            begin
+                active_ff <= 'b0;
 
             end 
-        else 
-		   begin
-               active_ff <= |y_gnt_o;
-         end 
-      end 
-	 
+            else 
+            begin
+                active_ff <= |y_gnt_o;
+            end 
+        end 
+        
 
 
     // Assign the current column requests from the active row based on row index
@@ -221,15 +229,15 @@ module top_single_pixel
     );
 
     // Instantiate RoundRobin module for row arbitration (x-direction)
-    row_arbiter   RRA_X 
-    (
-        .clk_i     (clk_i)      ,                  // Clock input
-        .reset_i   (reset_i)    ,                  // Reset input
-        .enable_i  (row_enable) ,                  // Enable signal for row arbitration
-        .req_i     (row_req)    ,                  // Row requests (active rows)
-        .gnt_o     (x_gnt_o)    ,                  // Row grant outputs
-        .x_add_o      (x_add)                        // Index for selected row 
-    );
+            row_arbiter   RRA_X 
+            (
+                .clk_i     (clk_i)      ,                  // Clock input
+                .reset_i   (reset_i)    ,                  // Reset input
+                .enable_i  (row_enable) ,                  // Enable signal for row arbitration
+                .req_i     (row_req)    ,                  // Row requests (active rows)
+                .gnt_o     (x_gnt_o)    ,                  // Row grant outputs
+                .x_add_o   (x_add)                         // Index for selected row 
+            );
 
     // Instantiate Polarity Selecter module outputs polarity 
     polarity_selector polarity_sel

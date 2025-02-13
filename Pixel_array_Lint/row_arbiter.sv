@@ -16,8 +16,6 @@ module row_arbiter
     output logic [ROW_ADD-1:0] x_add_o          // Encoded output representing the granted row index
  );
 
-  
-
     // Internal signals for mask and grant handling
     logic [ROWS-1:0] mask_ff ;                // Current mask (the active request set)
     logic [ROWS-1:0] nxt_mask;                // Next mask value after evaluating grants
@@ -25,16 +23,14 @@ module row_arbiter
     logic [ROWS-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
     logic [ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
     logic [ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
-    logic next_done;
-    logic [ROW_ADD-1:0] add_incr;
-    logic add_done;
+    
 	 
 
     // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign mask_req = req_i & mask_ff;
 
 	 
-    // Update mask and grant signals on the clock edge
+// Update mask and grant signals on the clock edge
     always_ff @(posedge clk_i or posedge reset_i) 
 	   begin
         if (reset_i) 
@@ -50,68 +46,71 @@ module row_arbiter
       end
 	 
 
-    // Determine the final grant output: either masked grants or raw grants depending on the mask
+// Determine the final grant output: either masked grants or raw grants depending on the mask
     assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt); 
 
-    // Generate the next mask based on the current grant outputs
-//    always_comb 
-//	   begin
-//        nxt_mask = mask_ff;                   // Default: next mask is the current mask
-//        next_done = 1'b0;
-//
-//        // Iterate through the gnt_temp bits to calculate the next mask
-//        for (int i = 0; i < ROWS ; i = i + 1)
-//		   begin
-//            if (gnt_temp[i] && (!next_done)) 
-//			      begin
-//                 nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-//                 next_done = 1'b1;
-//               end
-//         end
-//      end
+// Generate the next mask based on the current grant outputs
+   	assign nxt_mask= ~((gnt_temp << 1)-({{(ROWS-1){1'b0}}, 1'b1})); 
 
-   	 assign nxt_mask= ~((gnt_temp << 1)-({{(ROWS-1){1'b0}}, 1'b1})); 
+/*Lint issue for Multiple Assignmets of nxt_mask 
+   always_comb 
+	   begin
+       nxt_mask = mask_ff;                   // Default: next mask is the current mask
+       next_done = 1'b0;
 
-
-    // Compute xadd_o based on the current grants
-//   always_ff@(posedge clk_i or posedge reset_i)
-//      begin
-//       if(reset_i)
-//		  begin
-//		    x_add_o  <= {ROW_ADD{1'b0}};
-//			 add_incr <= {ROW_ADD{1'b0}};
-//        end
-//		  else
-//		  begin
-//        for (int i = 0; i < ROWS; i = i + 1) 
-//		   begin
-//            if (gnt_temp[i])
-//                  x_add_o <= add_incr;      // Assign the index of the granted cloumn index to yadd_o
-//            else
-//                 add_incr <= add_incr + 1'b1;
-//         end
-//      end
-//     end
-
-  function logic [ROW_ADD-1:0] address (input logic [ROWS-1:0] data);
-      for(int i=0 ;i<ROWS ;i++)
-      begin
-       if(data[i])
-	      return i[ROW_ADD-1:0];
-	   end
-	      return '0;
-	  endfunction
+       // Iterate through the gnt_temp bits to calculate the next mask
+       for (int i = 0; i < ROWS ; i = i + 1)
+		   begin
+           if (gnt_temp[i] && (!next_done)) 
+			      begin
+                nxt_mask = ({ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+                next_done = 1'b1;
+              end
+        end
+     end */
 
 
-     always_comb
-     begin
-     if (gnt_o !=0)
-      begin
-       x_add_o =address(gnt_o);
+// Compute yadd_o based on the current grants
+    function logic [ROW_ADD-1:0] address (input logic [ROWS-1:0] data);
+        for(int i=0 ;i<ROWS ;i++)
+        begin
+        if(data[i])
+          return i[ROW_ADD-1:0];
       end
-     else
-       x_add_o ='0;
+          return '0;
+      endfunction
+
+      always_comb
+      begin
+      if (gnt_o !=0)
+        begin
+        x_add_o =address(gnt_o);
+        end
+      else
+        x_add_o ='0;
+      end
+
+/*Lint issue for Multiple Assignmets of x_add_o 
+  always_ff@(posedge clk_i or posedge reset_i)
+     begin
+      if(reset_i)
+		  begin
+		    x_add_o  <= {ROW_ADD{1'b0}};
+			 add_incr <= {ROW_ADD{1'b0}};
+       end
+		  else
+		  begin
+       for (int i = 0; i < ROWS; i = i + 1) 
+		   begin
+           if (gnt_temp[i])
+                 x_add_o <= add_incr;      // Assign the index of the granted cloumn index to yadd_o
+           else
+                add_incr <= add_incr + 1'b1;
+        end
      end
+    end */
+
+
 
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     priority_arb  maskedGnt 
