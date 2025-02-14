@@ -23,62 +23,72 @@ logic [ROW_ADD-1:0]x_add;
 logic [COL_ADD-1:0]y_add;
 
 logic [ROWS[NO_levels-1]-1:0][COLS[NO_levels-1]-1:0] req [NO_levels-1:0];
-//logic [ROWS[NO_levels-1]-1:0][COLS[NO_levels-1]-1:0] req2 [NO_levels-1:0];
+logic [Lvl_ROWS[NO_levels-1]-1:0][Lvl_COLS[NO_levels-1]-1:0] gnt_out [NO_levels-1:0]; // Grant output for all levels Groups
+logic [ROWS[NO_levels-1]-1:0][COLS[NO_levels-1]-1:0] grant_enb [NO_levels-1:0];       // Overall Grant signals for all levels,acts as enable to higher levels
+logic [Lvl_ADD[NO_levels-1]-1:0] x_add_out [NO_levels-1:0];       // Row address output for all levels
+logic [Lvl_ADD[NO_levels-1]-1:0] y_add_out [NO_levels-1:0];      // Column address output for all levels
+logic grp_release [NO_levels-1:0];  // Group release signals for all levels
+logic active_out [NO_levels-1:0];   // Arbitration active status output for all levels
 
-logic [Lvl_ROWS[NO_levels-1]-1:0][Lvl_COLS[NO_levels-1]-1:0] gnt_out [NO_levels-1:0];
-logic [ROWS[NO_levels-1]-1:0][COLS[NO_levels-1]-1:0] grant_enb [NO_levels-1:0];
-logic [Lvl_ADD[NO_levels-1]-1:0] x_add_out [NO_levels-1:0];
-logic [Lvl_ADD[NO_levels-1]-1:0] y_add_out [NO_levels-1:0];
-logic grp_release [NO_levels-1:0];
-logic active_out [NO_levels-1:0];
-assign gnt_out_o=grant_enb[0];
+assign gnt_out_o = grant_enb[0];
 
- // Correct for single-bit signals.
+
 //logic grp_release [NO_levels-1:0]; //previous declaration
+// Generate block to create hierarchy for each level
 genvar i;
 generate
-   // always_comb 
-   // begin 
-        for (i = 0; i < NO_levels-1; i++) 
-        begin : level_hierarchy
-            // Declarations should be at the start
-            logic [ROWS[i]-1:0][COLS[i]-1:0] grant_enb [NO_levels-1:0];  // Use ROWS[i] and COLS[i]
-            logic [ROWS[i]-1:0][COLS[i]-1:0] req [NO_levels-1:0];      // Use ROWS[i] and COLS[i]
-            logic [Lvl_ROWS[i]-1:0][Lvl_COLS[i]-1:0] gnt_out [NO_levels-1:0]; // Use Lvl_ROWS[i] and Lvl_COLS[i]
-            logic [Lvl_ADD[i]-1:0] x_add_out [NO_levels-1:0];        // Use Lvl_ADD[i]
-            logic [Lvl_ADD[i]-1:0] y_add_out [NO_levels-1:0];        // Use Lvl_ADD[i]
-            logic grp_release [NO_levels-1:0];
-            logic active_out [NO_levels-1:0];	
-
-            // Use $warning directly
-          //  $warning("------------Loop Passed------------------");
+    // Loop through all levels except the last one
+    for (i = 0; i < NO_levels-1; i++) 
+    begin : level_hierarchy
+        // Level-specific signals
         
-            pixel_groups
-            #(
-                .LEVEL(i),
-                .ROWS(ROWS[i]),
-                .COLS(COLS[i]),
-                .Lvl_ROWS(Lvl_ROWS[i]),
-                .Lvl_COLS(Lvl_COLS[i]),
-                .Lvl_ADD(Lvl_ADD[i])
-            ) 
-            level_inst
-            (
-                .clk_i          (clk_i),
-                .reset_i        (reset_i),
-                .enable_i       (grant_enb[i+1]),  
-                .grp_enable_i   (i > 0 ? grp_release[i-1] : 1'b1),           
-                .req_i          (req[i]),
-                .gnt_o          (gnt_out[i]),
-                .gnt_out_o      (grant_enb[i]),       
-                .x_add_o        (x_add_out[i]),  
-                .y_add_o        (y_add_out[i]),  
-                .active_o       (active_out[i]),
-                .req_o          (req[i+1]),  
-                .grp_release_o  (grp_release[i])
-            );
-        end
-   // end
+        // Grant enable signals for current level
+        logic [ROWS[i]-1:0][COLS[i]-1:0] grant_enb [NO_levels-1:0];  
+        
+        // Request signals for current level
+        logic [ROWS[i]-1:0][COLS[i]-1:0] req [NO_levels-1:0];      
+        
+        // Grant output signals for current level
+        logic [Lvl_ROWS[i]-1:0][Lvl_COLS[i]-1:0] gnt_out [NO_levels-1:0];
+        
+        // X-coordinate address output for current level
+        logic [Lvl_ADD[i]-1:0] x_add_out [NO_levels-1:0];        
+        
+        // Y-coordinate address output for current level
+        logic [Lvl_ADD[i]-1:0] y_add_out [NO_levels-1:0];        
+        
+        // Group release signal for current level
+        logic grp_release [NO_levels-1:0];
+        
+        // Active status output for current level
+        logic active_out [NO_levels-1:0];	
+        
+        // Instantiation of the pixel_groups module for each level
+        pixel_groups
+        #(
+            .LEVEL(i),                 // Current level index
+            .ROWS(ROWS[i]),             // Row count for current level
+            .COLS(COLS[i]),             // Column count for current level
+            .Lvl_ROWS(Lvl_ROWS[i]),     // Selected Level number of rows 
+            .Lvl_COLS(Lvl_COLS[i]),     // Selected Level number of rows column 
+            .Lvl_ADD(Lvl_ADD[i])        // Address width for current level
+        ) 
+        level_inst
+        (
+            .clk_i          (clk_i),                    // System clock input
+            .reset_i        (reset_i),                  // System reset input
+            .enable_i       (grant_enb[i+1]),           // Enable signal from the higher level
+            .grp_enable_i   (i > 0 ? grp_release[i-1] : 1'b1), // Group enable signal from previous level 
+            .req_i          (req[i]),                   // Request input for current level
+            .gnt_o          (gnt_out[i]),               // Grant output for current level
+            .gnt_out_o      (grant_enb[i]),             // Grant enable output for current level
+            .x_add_o        (x_add_out[i]),             // Row address output for current level
+            .y_add_o        (y_add_out[i]),             // Column address output for current level
+            .active_o       (active_out[i]),            // Active status output for current level
+            .req_o          (req[i+1]),                 // Request output to the next level
+            .grp_release_o  (grp_release[i])            // Group release output for current level
+        );
+    end
 endgenerate
 
 // genvar i;
@@ -125,50 +135,70 @@ endgenerate
 //     end
 // endgenerate
 
+// Instantiation of pixel_level module for the highest level
 
 pixel_level 
-				#(  
-				    .Lvl_ROWS(ROWS[NO_levels-1]),
-					.Lvl_COLS(ROWS[NO_levels-1]),
-					.Lvl_ADD(Lvl_ADD[NO_levels-1])
-				 ) 
+    #(  
+        .Lvl_ROWS(ROWS[NO_levels-1]),   // Number of rows for the highest level
+        .Lvl_COLS(ROWS[NO_levels-1]),   // Number of columns for the highest level
+        .Lvl_ADD(Lvl_ADD[NO_levels-1])  // Address width for the highest level
+    ) 
 next_level 
-				(
-                .clk_i(clk_i),
-                .reset_i(reset_i),
-                .enable_i(enable1),
-                .grp_enable_i(grp_release[NO_levels-2]),
-                .req_i(req[NO_levels-1]),
-                .req_o(enable),
-                .gnt_o(gnt_out[NO_levels-1]),
-                .x_add_o(x_add_out[NO_levels-1]),
-                .y_add_o(y_add_out[NO_levels-1]),
-                .active_o(active_out[NO_levels-1]),
-                .grp_release_o(grp_release[NO_levels-1])
-            );
+    (
+        .clk_i(clk_i),                              // System clock input
+        .reset_i(reset_i),                           // System reset input
+        .enable_i(enable1),                          // Enable signal for the highest level
+        .grp_enable_i(grp_release[NO_levels-2]),      // Group enable from the previous level
+        .req_i(req[NO_levels-1]),                     // Request input for the highest level
+        .req_o(enable),                              // Request output for feedback or control
+        .gnt_o(gnt_out[NO_levels-1]),                 // Grant output for the highest level
+        .x_add_o(x_add_out[NO_levels-1]),             // row address output for the highest level
+        .y_add_o(y_add_out[NO_levels-1]),             // column address output for the highest level
+        .active_o(active_out[NO_levels-1]),           // Active status output for the highest level
+        .grp_release_o(grp_release[NO_levels-1])      // Group release output for the highest level
+    );
 
-
-// Declare array of structs for different levels
+// Combinational block for polarity reduction
 always_comb begin
-  for (int m = 0; m < ROWS1; m++) begin
-    for (int j = 0; j < COLS1; j++) begin
-      automatic int index = m * COLS1 + j;  // Explicitly declare as 'automatic'
-      req[0][index] = |req_i[m][j];
+    // Loop through all rows and columns
+    for (int m = 0; m < ROWS1; m++) begin
+        for (int j = 0; j < COLS1; j++) begin   
+            // If any bit is high, req[0][m][j] becomes high
+            req[0][m][j] = |req_i[m][j];
+        end
     end
-  end
 end
 
-// Generate block to instantiate hierarchical levels
-
 
 always_comb begin
+  $display("\n------------ req[0] Matrix (%0dx%0d) ------------", ROWS1, COLS1);
+  for (int m = 0; m < ROWS1; m++) begin
+    $write("[ ");  // Start of row
+    for (int j = 0; j < COLS1; j++) 
+    begin
+        $write("%b ", req[0][m][j]);  
+    end
+    $write("]\n"); // End of row and move to next line
+  end
+  $display("----------------------------------------\n");
+end
+
+
+// Combinational block to concatenate address outputs from all levels
+
+always_comb begin
+    // Initialize x_add and y_add to zero
     x_add = '0;
     y_add = '0;
-    for (int j = 0; j < NO_levels; j++) begin
-        x_add = {x_add,  x_add_out[j]};
-        y_add = {y_add,  y_add_out[j]};
+        for (int j = 0; j < NO_levels; j++) 
+    begin
+                                          // Combines x_add_out[j] with the accumulated x_add
+        x_add = {x_add, x_add_out[j]};
+                                          // Combines y_add_out[j] with the accumulated y_add
+        y_add = {y_add, y_add_out[j]};
     end
 end
+
 assign polarity_in=req_i[x_add][y_add];
 
 // Summing up the active signals dynamically
