@@ -1,13 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-`include "wall_clock.sv"
-`include "row_arbiter.sv"
-`include "polarity_selector.sv"
-`include "pixel_level.sv"
-`include "pixel_groups.sv"
-`include "column_arbiter.sv"
-`include "Priority_arb.sv"
-`include "AER.sv" 
-`include "lib_arbiter_pkg.sv"
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
 module top_pixel_hierarchy 

@@ -4,14 +4,11 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
-`include "lib_arbiter_pkg.sv"
+//`include "lib_arbiter_pkg.sv"
 
-import lib_arbiter_pkg::*;      // Importing arbiter package containing parameter constants
+//import lib_arbiter_pkg::*;      // Importing arbiter package containing parameter constants
 
-
-module 
-pixel_level #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD=1)
-
+module pixel_level #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD=1)
 (
     input  logic clk_i, reset_i                    ,             // Clock and reset signals
     input  logic enable_i                          ,             // Enable signal for the higher level
@@ -24,6 +21,7 @@ pixel_level #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD=1)
     output logic req_o                             ,             // Request signal from level acts as enable to this level if it has act requests
     output logic grp_release_o                                   // Group release output signal for higher level will high when it grants the all active requests
 );
+    //$warning("------------Loop Passed Lvl_ROWS=[%d],Lvl_COLS=[%d],Lvl_ADD=[%d]------------------",Lvl_ROWS,Lvl_COLS,Lvl_ADD); 
 
     logic [Lvl_ROWS-1:0] row_req   ;                             // Row-wise request signals
     logic [Lvl_COLS-1:0] col_req   ;                             // Column requests for the active row
