@@ -71,10 +71,10 @@ module pixel_groups #(parameter LEVEL = 0,parameter ROWS=16,parameter COLS=16,pa
    endgenerate
 
    always_comb begin
-       gnt_o = 0;
-       x_add_o = 0;
-       y_add_o = 0;
-       grp_release_o = 0;
+    //    gnt_o = 0;
+    //    x_add_o = 0;
+    //    y_add_o = 0;
+    //    grp_release_o = 0;
  
 
        for (int group = 0; group < NUM_GROUPS; group++) begin

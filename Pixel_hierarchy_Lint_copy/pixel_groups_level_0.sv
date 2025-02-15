@@ -4,6 +4,8 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
+`include "lib_func_pkg.sv"
+
 import lib_arbiter_pkg::*;                      // Importing arbiter package containing parameter constants
 import lib_func_pkg::*;
 module pixel_groups_level_0 

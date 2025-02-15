@@ -31,8 +31,6 @@ module pixel_level_1
     logic refresh_y                ;                         // Refresh signal for initialize row arbiter
     logic grp_release_x            ;                             // Group release signal for row arbitration
     logic grp_release_y            ;                             // Group release signal for column arbitration
-    logic grp_release_clk          ;                             // Clock signal for group release
-    logic toggle                   ;                             // Toggle signal for FSM transitions
 
     assign req_o =  |req_i;                                      // Indicates high if any active requests in req_i
    
@@ -62,7 +60,7 @@ module pixel_level_1
     state_t current_state, next_state;                          // FSM state variables
 //------------------------------------------------------------------------------------------------------------------------------
 
-	 
+//Lint warn grp_release_clk acts as non-clock in some cases	 
 /*    always_ff @(posedge clk_i or posedge reset_i) 
     begin
         if (reset_i) 
