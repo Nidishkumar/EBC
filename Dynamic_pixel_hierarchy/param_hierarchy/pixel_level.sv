@@ -6,7 +6,7 @@
 //------------------------------------------------------------------------------------------------------------------
 //`include "lib_arbiter_pkg.sv"
 
-//import lib_arbiter_pkg::*;      // Importing arbiter package containing parameter constants
+import lib_arbiter_pkg::*;      // Importing arbiter package containing parameter constants
 
 module pixel_level #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD=1)
 (

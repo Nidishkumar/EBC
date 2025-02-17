@@ -1,0 +1,187 @@
+# ERROR: No extended dataflow license exists
+# vsim -do "add wave -r *; run -all; quit" tb_level_1 
+# Start time: 20:51:47 on Feb 17,2025
+# Loading sv_std.std
+# Loading work.lib_arbiter_pkg
+# Loading work.tb_level_1_sv_unit
+# Loading work.tb_level_1
+# Loading work.top_pixel_hierarchy_sv_unit
+# Loading work.top_pixel_hierarchy
+# Loading work.pixel_level
+# Loading work.row_arbiter
+# Loading work.Priority_arb
+# Loading work.column_arbiter
+# Loading work.wall_clock
+# Loading work.polarity_selector
+# Loading work.pixel_groups
+# ** Warning: ----------NXT_ROWS[          0] = 4, NXT_COLS[          0] = 4 -----------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 31
+# ** Warning: ----------NXT_ROWS[          1] = 2, NXT_COLS[          1] = 2 -----------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 31
+# ** Warning: ----------POLARITY= 2-----------
+#    Time: 0 ps  Scope: tb_level_1.dut.polarity_sel File: polarity_selector.sv Line: 18
+# add wave -r *
+#  run -all
+# 
+# ------------ req[0] Matrix (8x8) ------------
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# [ x x x x x x x x ]
+# ----------------------------------------
+# 
+# ** Warning: ------------Loop Passed groups=[          0] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          1] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          2] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          3] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          0] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          1] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          2] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          3] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          4] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          5] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          6] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          7] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          8] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          9] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         10] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         11] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         12] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         13] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         14] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         15] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          0] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          1] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          2] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          3] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[1].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          0] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          1] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          2] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          3] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          4] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          5] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          6] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          7] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          8] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          9] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         10] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         11] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         12] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         13] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         14] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         15] ------------------
+#    Time: 0 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          0] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          1] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          2] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          3] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          4] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          5] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          6] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          7] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          8] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          9] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         10] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         11] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         12] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         13] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         14] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         15] ------------------
+#    Time: 40 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          0] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          1] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          2] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          3] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          4] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          5] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          6] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          7] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          8] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[          9] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         10] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         11] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         12] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         13] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         14] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Warning: ------------Loop Passed groups=[         15] ------------------
+#    Time: 120 ps  Scope: tb_level_1.dut.level_hierarchy[0].level_inst File: pixel_groups.sv Line: 35
+# ** Note: $finish    : tb_level_1.sv(134)
+#    Time: 1120 ps  Iteration: 0  Instance: /tb_level_1
+# 1
+# Break in Module tb_level_1 at tb_level_1.sv line 134
+#  quit
+# End time: 21:06:16 on Feb 17,2025, Elapsed time: 0:14:29
+# Errors: 0, Warnings: 75

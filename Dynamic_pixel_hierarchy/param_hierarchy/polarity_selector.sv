@@ -15,6 +15,8 @@ module polarity_selector
     output logic polarity_out                 // Output signal (polarity_out) representing the selected polarity
 );
 
+        $warning("----------POLARITY= %0d-----------", POLARITY);
+
 always_ff @(posedge clk_i or posedge reset_i) 
 begin
     if (reset_i) 
