@@ -3,7 +3,7 @@
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
-//--------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------
 import lib_arbiter_pkg::*;         // Importing arbiter package containing parameter constants
 
 module pixel_level_0 
@@ -26,8 +26,8 @@ module pixel_level_0
 	logic [Lvl0_ROWS-1:0] x_gnt_o     ;                            // Row arbiter grant signals
     logic [Lvl0_COLS-1:0] y_gnt_o     ;                            // Column arbiter grant signals
     logic x_enable, y_enable          ;                            // Enables for row and column arbitration control through FSM
-	logic refresh_x                     ;                            // Refresh signal for row arbiter to reset
-	logic refresh_y                     ;                            // Refresh signal for row arbiter to reset   
+	logic refresh_x                   ;                            // Refresh signal for row arbiter to reset
+	logic refresh_y                   ;                            // Refresh signal for row arbiter to reset   
 	logic grp_release_x               ;                            // Group release signal for row arbiter
     logic grp_release_y               ;                            // Group release signal for column arbiter
 
@@ -59,9 +59,9 @@ module pixel_level_0
                 grp_release_o <= 1'b0;                          // Default: group release is 0
          end
       end
-//-------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------
     
-//-----------------Generate Active row signals Logic-----------------------------------------------------------------------
+//-----------------Generate Active row signals Logic-------------------------------------------------------------------------------------------
     always_comb 
     begin
         for (int i = 0; i < Lvl0_ROWS; i++) 
@@ -69,7 +69,7 @@ module pixel_level_0
             row_req[i] = |(req_i[i]);                      // Logical OR of each row to detect active row requests
          end
     end
-//-------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------
 
 //------------------Active_o Logic--------------------------------------------------------------------------------------------
     always_ff @(posedge clk_i or posedge reset_i) 
@@ -187,11 +187,11 @@ module pixel_level_0
                      y_enable = 1'b0;                   // Disable column arbitration,if enable is low
 					 next_state = IDLE;                      // Transition to IDLE,if enable is low
                      refresh_x = 1'b1;                    // Refresh the row arbiter,if enable is low
-				      refresh_y=1'b1;
+				     refresh_y=1'b1;
 
 				 end    
 			end
-//--------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------
             default:
 			 begin
                     next_state = IDLE;                      // Default state transition to IDLE
@@ -200,7 +200,7 @@ module pixel_level_0
       end
 
 	 
-//-------------------Grant logic--------------------------------------------------------------------------------------------
+//-------------------Grant logic----------------------------------------------------------------------------------------------------------------
     always_comb
        begin
         for (int i = 0; i < Lvl0_ROWS; i++)
@@ -212,7 +212,7 @@ module pixel_level_0
                     gnt_o[i][j] = 1'b0;
              end
        end
-//--------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------
 		
 		
 		
@@ -236,7 +236,7 @@ module pixel_level_0
         .clk_i         (clk_i)   ,                // Clock input
         .reset_i       (reset_i) ,                // Reset input
         .enable_i      (y_enable),                // Enable signal for column arbitration
-		  .refresh_i     (refresh_y) ,               // Refresh signal
+		.refresh_i     (refresh_y) ,               // Refresh signal
         .req_i         (col_req) ,                // Column requests for the active row
         .gnt_o         (y_gnt_o) ,                // Column grant outputs
         .yadd_o        (y_add_o) ,                // Selected column index

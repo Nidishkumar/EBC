@@ -5,6 +5,17 @@
 // Date: []
 // Version: []
 //------------------------------------------------------------------------------------------------------------------
+`include "wall_clock.sv"
+`include "row_arbiter.sv"
+`include "polarity_selector.sv"
+`include "pixel_level_0.sv"
+`include "pixel_level_1.sv"
+`include "pixel_groups_level_0.sv"
+`include "column_arbiter.sv"
+`include "Priority_arb.sv"
+`include "event_encoder.sv" 
+`include "lib_arbiter_pkg.sv"
+`include "lib_func_pkg.sv"
 
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
@@ -53,7 +64,7 @@ assign x_add = {x_add_1, x_add_0};      // Combine all levels Row addresses
 assign y_add = {y_add_1, y_add_0};      // Combine all levels column address 
 assign polarity_in = req_i[x_add][y_add]; // Sends the active row's ,column's request polarity to the polarity module.
 assign active_in = &active;               // overall arbitration will active, if all levels arbitration active 
-//-------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------
 
 //-------------------Granted Pixel Row and Column address logic--------------------------------------------------------------------------------------------
 always_ff @(posedge clk_i or posedge reset_i) 
@@ -69,7 +80,7 @@ always_ff @(posedge clk_i or posedge reset_i)
         y_add_ff <= y_add;    // Store column address
     end 
  end 
-//-------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------
 
 // Instantiating submodules to handle different pixel levels
 pixel_level_1 level_1 

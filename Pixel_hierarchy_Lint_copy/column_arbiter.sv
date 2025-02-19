@@ -3,7 +3,8 @@
 // Author: [Your Name]
 // Date: [Current Date]
 // Version: [Version Number]
-//------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 import lib_arbiter_pkg::*;                          // Importing arbiter package containing parameter constants
 
@@ -19,7 +20,7 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     output logic grp_release_o
 );
   
-//------------------Arbiter Internal Signals------------------------------------------------------------------------
+//------------------Arbiter Internal Signals-------------------------------------------------------------------------------------------------------
 
     logic [Lvl_COLS-1:0] mask_ff     ;              // Current mask 
     logic [Lvl_COLS-1:0] nxt_mask    ;              // Next mask based on grants
@@ -27,18 +28,20 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     logic [Lvl_COLS-1:0] mask_gnt    ;              // Masked grants (output from priority arbiter)
     logic [Lvl_COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
 	
-//--------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//-----------------Column Arbiter Assignments-------------------------------------------------------------------------
+
+//-----------------Column Arbiter Assignments--------------------------------------------------------------------------------------------------------
    
     assign mask_req = req_i & mask_ff ;              // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign grp_release_o =  ~(|mask_req) ;           //Grp_release will be high if mask_req is zero
     assign gnt_temp = mask_gnt ;                     // Register the combinational grant from masked arbiter
     assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_COLS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
   
-//----------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
 
-//-----------------Mask and Grant logic------------------------------------------------------------------------------------
+
+//-----------------Mask and Grant logic-------------------------------------------------------------------------------------------------------------------
 
     always_ff @(posedge clk_i or posedge reset_i) 
 	  begin
@@ -64,8 +67,6 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
           end
     end
 //---------------------------------------------------------------------------------------------------------------------------------------
-
-
 	 
     // Lint Warning for Multiple Assignmets of next_mask 
     /*always_comb 
@@ -122,6 +123,7 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
          end
       end  */
 		
+//----------------------------------------------------------------------------------------------------------------------------
 
     // Priority arbiter for masked requests (maskedGnt)
    Priority_arb #(.Lvl_ROWS(Lvl_COLS))
