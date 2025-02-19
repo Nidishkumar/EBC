@@ -7,7 +7,7 @@
 //----------------------------------------------------------------------------------------------------------------------------
 
 //------------------------ PACKAGE DEFINITION [ HIGHER LEVEL-4X4,LOWER LEVEL-2X2 ] ---------------------------------------------------------------------------------
-/*
+
 package lib_arbiter_pkg;
 
   parameter ROWS =8;        //Total number of pixels rows from EBC sensor
@@ -37,7 +37,7 @@ package lib_arbiter_pkg;
   parameter WIDTH             = SIZE + COL_ADD + ROW_ADD + 1; // Total width combining timestamp, row address, column address, and polarity
 
 endpackage
-*/
+
 
 
 
@@ -74,7 +74,7 @@ package lib_arbiter_pkg;
 endpackage
 */
 
-
+/*
 //------------------------ PACKAGE DEFINITION [ HIGHER LEVEL-8X8,LOWER LEVEL-4X4 ] ---------------------------------------------------------------------------------
 package lib_arbiter_pkg;
 
@@ -104,4 +104,4 @@ package lib_arbiter_pkg;
   parameter SIZE              = 32;                   // Width of the timestamp 
   parameter WIDTH             = SIZE + COL_ADD + ROW_ADD + 1; // Total width combining timestamp, row address, column address, and polarity
 
-endpackage
+endpackage*/
