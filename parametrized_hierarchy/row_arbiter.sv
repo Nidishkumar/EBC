@@ -1,0 +1,116 @@
+// Module name: Row Arbiter Module
+// Module Description: This module provides grants to active row requests for the pixel block
+// Author: [Your Name]
+// Date: [Current Date]
+// Version: [Version Number]
+//-----------------------------------------------------------------------------------------------------------------
+
+import lib_arbiter_pkg::*;                                      // Importing arbiter package containing parameter constants
+
+module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
+
+ (
+    input  logic clk_i                    ,        // Clock input for Synchronization
+    input  logic reset_i                  ,        // Active high Reset input
+    input  logic enable_i                 ,        // Enable signal to control Row arbiter
+    input  logic [Lvl_ROWS-1:0] req_i     ,        // Request for active row inputs
+    output logic [Lvl_ROWS-1:0] gnt_o     ,        // Grant outputs
+    output logic [Lvl_ROW_ADD-1:0] xadd_o ,        // Encoded output representing the granted row index
+	 output logic grp_release_o                     // Grp_release will high after completion all active requests
+ );
+
+    // Internal signals for mask and grant handling
+    logic [Lvl_ROWS-1:0] mask_ff ;                // Current mask (the active request set)
+    logic [Lvl_ROWS-1:0] nxt_mask;                // Next mask value after evaluating grants
+    logic [Lvl_ROWS-1:0] mask_req;                // Masked requests (and of req_i and mask_ff)
+    logic [Lvl_ROWS-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
+    logic [Lvl_ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
+    logic [Lvl_ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
+	 logic [Lvl_ROW_ADD-1:0] xadd_incr;            // Temporary address increament variable
+	 logic add_done;                               // Flag to indicate yadd_o is updated
+	 logic mask_done;                              // Flag to indicate nxt_mask is updated
+	 
+
+    // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
+    assign mask_req = req_i & mask_ff;
+
+    // Update mask and grant signals on the clock edge
+    always_ff @(posedge clk_i or posedge reset_i) 
+	   begin
+      if (reset_i) 
+		  begin
+            mask_ff <= {Lvl_ROWS{1'b1}};          // Reset mask to all ones (allow all requests)
+            gnt_o   <= {Lvl_ROWS{1'b0}};          // Reset grant output to zero (no grants)
+		 end 
+		else if (enable_i) 
+		 begin
+            mask_ff <= nxt_mask;                  // Update mask based on next mask calculation
+            gnt_o  <= gnt_temp;                   // Register the grant output
+       end
+
+		
+      end
+	   
+	always_comb //ff@(posedge clk_i or posedge reset_i)
+  
+		begin
+		// if(reset_i)
+		//   grp_release_o<=0;
+		// else
+		//  begin
+		 if(!gnt_temp )
+		   grp_release_o=1;
+		 else
+		 grp_release_o=0;
+		// end
+		end
+
+    // Determine the final grant output: either masked grants or raw grants depending on the mask_req
+    assign gnt_temp = mask_gnt; 
+
+    // // Generate the next mask based on the current grant outputs
+    // always_comb 
+	  //  begin
+    //     nxt_mask = {Lvl_ROWS{1'b1}};                    // Default: next mask is the current mask
+    //     mask_done=1'b0;
+    //     // Iterate through the gnt_temp bits to calculate the next mask
+    //     for (int i = 0; i < Lvl_ROWS && !mask_done; i = i + 1)
+		//    begin
+    //         if (gnt_temp[i]) 
+		// 	      begin
+    //              nxt_mask = ({Lvl_ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+		// 			  mask_done=1'b1;
+    //            end
+    //      end
+    //   end
+     assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
+
+     function logic [Lvl_ROW_ADD-1:0] address (input logic [Lvl_ROWS-1:0] data);
+      for(int i=0 ;i<Lvl_ROWS ;i++)
+      begin
+       if(data[i])
+	      return i;
+	   end
+	      return '0;
+	  endfunction
+
+
+      always_comb
+      begin
+      if (gnt_o !=0)
+      begin
+         xadd_o =address(gnt_o);
+      end
+      else
+         xadd_o ='0;
+      end
+    // Priority arbiter for masked requests (gives grants based on the masked requests)
+    Priority_arb #(.Lvl_ROWS(Lvl_ROWS))
+	 maskedGnt 
+    (
+        .req_i  (mask_req)  ,                   // Input masked requests
+        .gnt_o  (mask_gnt)                      // Output masked grants
+    );
+
+
+endmodule
