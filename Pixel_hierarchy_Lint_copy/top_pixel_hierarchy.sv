@@ -5,18 +5,6 @@
 // Date: []
 // Version: []
 //------------------------------------------------------------------------------------------------------------------
-`include "wall_clock.sv"
-`include "row_arbiter.sv"
-`include "polarity_selector.sv"
-`include "pixel_level_0.sv"
-`include "pixel_level_1.sv"
-`include "pixel_groups_level_0.sv"
-`include "column_arbiter.sv"
-`include "Priority_arb.sv"
-`include "event_encoder.sv" 
-`include "lib_arbiter_pkg.sv"
-`include "lib_func_pkg.sv"
-
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
 
