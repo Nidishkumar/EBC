@@ -1,5 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+`include "wall_clock.sv"
+`include "row_arbiter.sv"
+`include "polarity_selector.sv"
+`include "pixel_level.sv"
+`include "pixel_groups.sv"
+`include "column_arbiter.sv"
+`include "Priority_arb.sv"
+`include "event_encoder.sv" 
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
 module top_pixel_hierarchy 
@@ -53,13 +61,11 @@ generate
         if(i==0)
         begin
  //----------------------------------------------------------------------------------------------------------
-            if (i == 0) begin
         for (j = 0; j < ROWS[i]; j = j + 1) begin 
             for (k = 0; k < COLS[i]; k = k + 1) begin 
                 assign req_out[j][k] = |req_i[j][k];
             end
         end
-       end
  //----------------------------------------------------------------------------------------------------------
               assign grp_out=1'b1;
 
@@ -80,7 +86,7 @@ generate
               end
             
  //----------------------------------------------------------------------------------------------------------
-        end
+            end
         else
         begin
  //----------------------------------------------------------------------------------------------------------
