@@ -1,23 +1,23 @@
 package lib_arbiter_pkg;
   
   // Define constants
-  parameter NO_levels = 3;
-  parameter ROWS1=8;
-  parameter COLS1=8;
-  parameter int ROWS[NO_levels] = '{ROWS1, 4, 2};
-  parameter int COLS[NO_levels] = '{COLS1, 4, 2};
+  parameter NO_levels = 5;
+  parameter ROWS1=32;
+  parameter COLS1=32;
+  parameter int ROWS[NO_levels] = '{ROWS1,16, 8, 4 ,2};
+  parameter int COLS[NO_levels] = '{COLS1,16, 8, 4, 2};
 
   // Declare parameter arrays
-  parameter int BASE_ROWS[NO_levels] = '{2, 2, 2};
-  parameter int BASE_COLS[NO_levels] = '{2, 2, 2};
+  parameter int BASE_ROWS[NO_levels] = '{2, 2, 2, 2,2};
+  parameter int BASE_COLS[NO_levels] = '{2, 2, 2, 2, 2};
   
   parameter int Lvl_ROWS[NO_levels]=BASE_ROWS;
   parameter int Lvl_COLS[NO_levels]=BASE_COLS;
-  parameter int NUM_GROUP[NO_levels]='{16, 4, 1};
-  parameter int Lvl_ADD[NO_levels]='{1, 1, 1};
+  parameter int NUM_GROUP[NO_levels]='{256,64,16, 4, 1};
+  parameter int Lvl_ADD[NO_levels]='{1,1, 1, 1,1};
 
-  parameter ROW_ADD=Lvl_ADD[0]+Lvl_ADD[1]+Lvl_ADD[2];
-  parameter COL_ADD=Lvl_ADD[0]+Lvl_ADD[1]+Lvl_ADD[2];
+  parameter ROW_ADD=Lvl_ADD[0]+Lvl_ADD[1]+Lvl_ADD[2]+Lvl_ADD[3]+Lvl_ADD[4];
+  parameter COL_ADD=Lvl_ADD[0]+Lvl_ADD[1]+Lvl_ADD[2]+Lvl_ADD[3]+Lvl_ADD[4];
 
   // // Declare other parameters that will be updated by the function
   // parameter int Lvl_ROWS[NO_levels] ='{default: 0}; // Default values to 0

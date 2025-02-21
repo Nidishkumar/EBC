@@ -15,7 +15,7 @@ module pixel_groups #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COL
    output logic [Lvl_ADD-1:0] y_add_o,  
    output logic active_o,  
    output logic grp_release_o  
-);
+ );
 // always_comb begin
 //             $display("LEVEL[%d]===",LEVEL);
 //             for (int j = 0; j < NXT_ROWS; j++) begin
@@ -66,26 +66,6 @@ module pixel_groups #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COL
        end
    end
 
-//    always_comb begin
-//             $display("=== ====");
-//             for ( int j = 0; j < ROWS; j++) begin
-//                 for (int m = 0; m < COLS; m++) begin
-//                     $display("req_i[%0d][%0d] = %0b", j, m, req_i[j][m]);
-//                 end
-//             end
-//         end
-// always_comb
-// begin
-//     $display("=== set_group Array ===");
-//     for (int group = 0; group < NUM_GROUP; group++) begin
-//         for (int row = 0; row < Lvl_ROWS; row++) begin
-//             for (int col = 0; col < Lvl_COLS; col++) begin
-//                 $display("set_group[%0d][%0d][%0d] = %0b", group, row, col, set_group[group][row][col]);
-//             end
-//         end
-//     end
-//     $display("=======================");
-// end
    // Instantiate lower-level pixel groups dynamically
    genvar group;
    generate
