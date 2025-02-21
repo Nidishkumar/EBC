@@ -51,39 +51,24 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 		
       end
 	   
-	always_comb //ff@(posedge clk_i or posedge reset_i)
-  
+	 always_ff@(posedge clk_i or posedge reset_i)
 		begin
-		// if(reset_i)
-		//   grp_release_o<=0;
-		// else
-		//  begin
+		if(reset_i)
+		  grp_release_o<=0;
+		else
+		 begin
 		 if(!gnt_temp )
-		   grp_release_o=1;
+		   grp_release_o<=1;
 		 else
-		 grp_release_o=0;
-		// end
+		 grp_release_o<=0;
+		 end
 		end
 
     // Determine the final grant output: either masked grants or raw grants depending on the mask_req
     assign gnt_temp = mask_gnt; 
 
-    // // Generate the next mask based on the current grant outputs
-    // always_comb 
-	  //  begin
-    //     nxt_mask = {Lvl_ROWS{1'b1}};                    // Default: next mask is the current mask
-    //     mask_done=1'b0;
-    //     // Iterate through the gnt_temp bits to calculate the next mask
-    //     for (int i = 0; i < Lvl_ROWS && !mask_done; i = i + 1)
-		//    begin
-    //         if (gnt_temp[i]) 
-		// 	      begin
-    //              nxt_mask = ({Lvl_ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-		// 			  mask_done=1'b1;
-    //            end
-    //      end
-    //   end
      assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
+    
 
      function logic [Lvl_ROW_ADD-1:0] address (input logic [Lvl_ROWS-1:0] data);
       for(int i=0 ;i<Lvl_ROWS ;i++)
@@ -93,7 +78,6 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 	   end
 	      return '0;
 	  endfunction
-
 
       always_comb
       begin

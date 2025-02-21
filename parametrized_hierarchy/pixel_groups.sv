@@ -16,22 +16,31 @@ module pixel_groups #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COL
    output logic active_o,  
    output logic grp_release_o  
 );
-always_comb begin
-            $display("LEVEL[%d]===",LEVEL);
-            for (int j = 0; j < NXT_ROWS; j++) begin
-                for (int m = 0; m < NXT_COLS; m++) begin
-                    $display($time,"req_o[%0d][%0d][%0d] = %0b",LEVEL, j, m, req_o[j][m]);
-                end
-            end
-        end
-  always_comb begin
-            $display("===LEVEL [%0d] ====",LEVEL);
-            for ( int j = 0; j < ROWS; j++) begin
-                for (int m = 0; m < COLS; m++) begin
-                    $display("req_i[%0d][%0d][%0d] = %0b",LEVEL, j, m, req_i[j][m]);
-                end
-            end
-        end
+// always_comb begin
+//             $display("LEVEL[%d]===",LEVEL);
+//             for (int j = 0; j < NXT_ROWS; j++) begin
+//                 for (int m = 0; m < NXT_COLS; m++) begin
+//                     $display($time,"req_o[%0d][%0d][%0d] = %0b",LEVEL, j, m, req_o[j][m]);
+//                 end
+//             end
+//         end
+//   always_comb begin
+//             $display("===LEVEL [%0d] ====",LEVEL);
+//             for ( int j = 0; j < ROWS; j++) begin
+//                 for (int m = 0; m < COLS; m++) begin
+//                     $display("req_i[%0d][%0d][%0d] = %0b",LEVEL, j, m, req_i[j][m]);
+//                 end
+//             end
+//         end
+
+//    always_comb begin
+//             $display("===LEVEL [%0d] ====",LEVEL);
+//             for ( int j = 0; j < ROWS; j++) begin
+//                 for (int m = 0; m < COLS; m++) begin
+//                     $display("grant_o[%0d][%0d][%0d] = %0b",LEVEL, j, m, gnt_out_o[j][m]);
+//                 end
+//             end
+//         end
 
 
    //Dynamic group arrays
