@@ -76,8 +76,18 @@ module column_arbiter  #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
 
     // // Next mask generation based on current grant outputs
 
-      assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_COLS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
-
+always_comb 
+	   begin
+        nxt_mask = mask_ff;                   // Default: next mask is the current mask
+        // Iterate through the gnt_temp bits to calculate the next mask
+        for (int i = 0; i < Lvl_COLS ; i = i + 1)
+		   begin
+            if (gnt_temp[i]) 
+			      begin
+                 nxt_mask = ({Lvl_COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+               end
+         end
+      end
     // Compute yadd_o based on the current grants
   
 		function logic [Lvl_COL_ADD-1:0] address (input logic [Lvl_COLS-1:0] data);

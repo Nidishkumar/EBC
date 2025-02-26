@@ -67,8 +67,19 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
     // Determine the final grant output: either masked grants or raw grants depending on the mask_req
     assign gnt_temp = mask_gnt; 
 
-     assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
-    
+always_comb 
+	   begin
+        nxt_mask = mask_ff;                   // Default: next mask is the current mask
+
+        // Iterate through the gnt_temp bits to calculate the next mask
+        for (int i = 0; i < Lvl_ROWS ; i = i + 1)
+		   begin
+            if (gnt_temp[i]) 
+			      begin
+                 nxt_mask = ({Lvl_ROWS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+               end
+         end
+      end    
 
      function logic [Lvl_ROW_ADD-1:0] address (input logic [Lvl_ROWS-1:0] data);
       for(int i=0 ;i<Lvl_ROWS ;i++)

@@ -36,7 +36,6 @@ module pixel_level #(parameter Lvl_ROWS=2,parameter Lvl_COLS=2,parameter Lvl_ADD
     logic [Lvl_ROWS-1:0] x_gnt_o   ;                             // Row arbitration grant signals
 
     logic x_enable, y_enable       ;                             // Enable signals for row and column arbitration
-   // logic refresh                  ;                             // Refresh signal for initialize row arbiter
     logic grp_release_x            ;                             // Group release signal for row arbitration
     logic grp_release_y            ;                             // Group release signal for column arbitration
     logic grp_release_clk          ;                             // Clock signal for group release

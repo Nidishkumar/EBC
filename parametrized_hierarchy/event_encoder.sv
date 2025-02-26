@@ -4,7 +4,7 @@
 // Date: [Current Date]
 // Version: [Version Number]
 //------------------------------------------------------------------------------------------------------------------
-`include "lib_arbiter_pkg.sv"
+//`include "lib_arbiter_pkg.sv"
 
 import lib_arbiter_pkg::*;                             // Importing arbiter package containing parameter constants
 

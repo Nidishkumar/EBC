@@ -1,4 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+`include "wall_clock.sv"
+`include "row_arbiter.sv"
+`include "polarity_selector.sv"
+`include "pixel_level.sv"
+`include "pixel_groups.sv"
+`include "column_arbiter.sv"
+`include "Priority_arb.sv"
+`include "event_encoder.sv" 
+`include "lib_arbiter_pkg.sv"
 
 import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
 module top_pixel_hierarchy 
@@ -37,6 +46,7 @@ assign grp_release_out_o=grp_release_out[NO_levels-1];
 
 genvar i, j, k;
 generate
+    calculate_address_width ();
     for (i = 0; i < NO_levels-1; i++) begin : level_hierarchy
 
         logic [ROWS[i]-1:0][COLS[i]-1:0] grant_enb ;   
@@ -44,15 +54,15 @@ generate
         logic [ROWS[i+1]-1:0][COLS[i+1]-1:0] req_out ;      
         logic [ROWS[i+1]-1:0][COLS[i+1]-1:0] enable_in ;      
         logic grp_out;
-
+       
         if(i==0)
         begin
  //---------------------------------Lower leveL requests-----------------------------------------------------------------------------------------------------------------------
  // Assign input requests to the Lower level from input req_i     
-        for (j = 0; j < ROWS[i]; j = j + 1) 
-        begin 
+        for (j = 0; j < ROWS[i]; j = j + 1)  
+        begin :loops1
             for (k = 0; k < COLS[i]; k = k + 1) 
-            begin 
+            begin: loops2 
                 assign req_in[j][k] = |req_i[j][k];
             end
         end
@@ -62,18 +72,18 @@ generate
 //----------------------------------Lower level Enable--------------------------------------------------------------------------------------------------------------------
     // Assign enable signals to the Lower level from the Higher level       
               for( j=0;j<ROWS[i+1];j++)
-              begin
+              begin :loops3
                 for( k=0;k<COLS[i+1];k++)
-                 begin
-                  assign enable_in[j][k]=level_hierarchy[i+1].grant_enb[j][k];
+                 begin :loops4
+                  assign enable_in[j][k]=level_hierarchy[i+1].grant_enb[j][k];   
                  end
               end
 //-----------------------------------Lower level Grant----------------------------------------------------------------------------------------------------------------------
 // Assign the grant signals as output grant from Lower Level
               for (j=0;j<ROWS[i];j++)
-              begin
+              begin :loops4
                 for( k=0;k<COLS[i];k++)
-                 begin
+                 begin :loops5
                   assign gnt_out_o[j][k] =grant_enb[j][k];
                  end
               end
@@ -84,11 +94,15 @@ generate
  //------------------------------Intermediate level requests--------------------------------------------------------------------------------------------------------------------------
 // Assign input requests to the Intermediate levels
              for( j=0;j<ROWS[i];j++)
-              begin
+              begin :loops6
                 for( k=0;k<COLS[i];k++)
-                 begin
-                   assign req_in[j][k] =level_hierarchy[i-1].req_out[j][k];
+                 begin :loops7
+                   assign req_in[j][k] =level_hierarchy[i-1].req_out[j][k];   
                  end
+              end
+              initial
+               begin
+                $warning("------------no_groups=[%p]----------------", NUM_GROUP);
               end                 
 //-------------------------------Intermediate level grp_enable-------------------------------------------------------------------------------------------------------------------------
   // Assign group release signals to the Intermediate levels
@@ -98,9 +112,9 @@ generate
               if(i<NO_levels-2)
                  begin
                  for( j=0;j<ROWS[i+1];j++)
-                  begin
+                  begin :loops8
                     for( k=0;k<COLS[i+1];k++)
-                     begin
+                     begin :loops9
                        assign enable_in[j][k] =level_hierarchy[i+1].grant_enb[j][k];   // Enable signal from the next level grant 
                      end
                   end
@@ -108,9 +122,9 @@ generate
                 else
                 begin
                     for( j=0;j<ROWS[i+1];j++)
-                  begin
+                  begin :loops10
                     for( k=0;k<COLS[i+1];k++)
-                     begin
+                     begin :loops11
                        assign enable_in[j][k] =grant_out[NO_levels-1][j][k];           // Enable signal from the higher level grant
                      end
                   end   
@@ -120,9 +134,9 @@ generate
             if(i==NO_levels-2)
             begin
             for( j=0;j<ROWS[i+1];j++)
-                        begin
+                        begin :loops12
                             for( k=0;k<COLS[i+1];k++)
-                            begin
+                            begin :loops13
                               assign req[j][k]=req_out[j][k];
                             end
                         end
@@ -188,9 +202,9 @@ always_comb begin
         for (int j = NO_levels-1; j >=0; j--) 
     begin
                                           // Combines x_add_out[j] with the accumulated x_add
-        x_add = {x_add, x_add_out[j]};
+        x_add = { x_add_out[j]};
                                           // Combines y_add_out[j] with the accumulated y_add
-        y_add = {y_add, y_add_out[j]};
+        y_add = {y_add_out[j]};
     end
 end
 
@@ -230,5 +244,4 @@ event_encoder address_event (
 );
 
 endmodule
-
 
