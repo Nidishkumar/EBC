@@ -28,8 +28,8 @@ package lib_arbiter_pkg;
   parameter Lvl_ADD       = 2;      // Address size for Higher Level groups 
 
 // Parameters for address width calculation
-  parameter COL_ADD           = Lvl_ADD + Lvl0_ADD;   // Total column address width (sum of all levels)
-  parameter ROW_ADD           = Lvl_ADD + Lvl0_ADD;   // Total row address width (sum of all levels)
+  parameter COL_ADD           = 11;   // Total column address width (sum of all levels)
+  parameter ROW_ADD           = 11;   // Total row address width (sum of all levels)
   
 // Parameters for timestamp, data width and polarity
   parameter POLARITY          = 2;                    // Polarity signal width 
