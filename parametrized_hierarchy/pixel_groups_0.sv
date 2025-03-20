@@ -1,7 +1,7 @@
 
 import lib_arbiter_pkg::*; // Importing package for constants
 
-module pixel_groups #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1,NUM_GROUP=16,NXT_ROWS=8,NXT_COLS=8)
+module pixel_groups_0 #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1,NUM_GROUP=16,NXT_ROWS=8,NXT_COLS=8)
 (
    input logic clk_i,  
    input logic reset_i,  
@@ -9,7 +9,7 @@ module pixel_groups #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COL
    input logic [NXT_ROWS-1:0][NXT_COLS-1:0] enable_i,
    output logic [NXT_ROWS-1:0][NXT_COLS-1:0] req_o, 
    output logic [ROWS-1:0][COLS-1:0] gnt_out_o,  
-   output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] gnt_o,  
+  // output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] gnt_o,  
    output logic [Lvl_ADD-1:0] x_add_o,  
    output logic [Lvl_ADD-1:0] y_add_o,  
    output logic active_o,  
@@ -67,7 +67,6 @@ module pixel_groups #(parameter LEVEL = 0, ROWS=16, COLS=16, Lvl_ROWS=2, Lvl_COL
 
 
 generate
-    if (LEVEL == 0) begin
         genvar no_group;
         for (no_group = 0; no_group < NUM_GROUP; no_group++) begin : groups
             pixel_level_0 #(
@@ -87,33 +86,11 @@ generate
                 .grp_release_o(grp_release_temp[no_group])
             );
         end
-    end else begin
-        genvar no_group;
-        for (no_group = 0; no_group < NUM_GROUP; no_group++) begin : groups
-            pixel_level_1 #(
-                .Lvl_ROWS(Lvl_ROWS),
-                .Lvl_COLS(Lvl_COLS),
-                .Lvl_ADD(Lvl_ADD)
-            ) next_level (
-                .clk_i(clk_i),
-                .reset_i(reset_i),
-                .enable_i(enable_i[no_group / (ROWS/Lvl_ROWS)][no_group % (ROWS/Lvl_ROWS)]),
-                .grp_enable_i(grp_enable_i),
-                .req_i(set_group[no_group]),
-                .req_o(req_o[no_group / (ROWS/Lvl_ROWS)][no_group % (ROWS/Lvl_ROWS)]),
-                .gnt_o(gnt_temp[no_group]),
-                .x_add_o(x_add_temp[no_group]),
-                .y_add_o(y_add_temp[no_group]),
-                .active_o(active_temp[no_group]),
-                .grp_release_o(grp_release_temp[no_group])
-            );
-        end
-    end
 endgenerate
 
   
    always_comb begin
-       gnt_o = 0;
+      // gnt_o = 0;
        x_add_o = 0;
        y_add_o = 0;
        grp_release_o = 0;
@@ -123,7 +100,7 @@ endgenerate
 
            if (enable_i[group / (ROWS/Lvl_ROWS)][group % (ROWS/Lvl_ROWS)]) 
            begin
-               gnt_o = gnt_temp[group];
+         //      gnt_o = gnt_temp[group];
                x_add_o = x_add_temp[group];
                y_add_o = y_add_temp[group];
                grp_release_o = grp_release_temp[group];

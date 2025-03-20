@@ -25,11 +25,11 @@ module pixel_level_0  #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
     logic [Lvl_COLS-1:0] col_req     ;                            // Column-wise requests for the selected active row
 	logic [Lvl_ROWS-1:0] x_gnt_o     ;                            // Row arbiter grant signals
     logic [Lvl_COLS-1:0] y_gnt_o     ;                            // Column arbiter grant signals
-    logic x_enable, y_enable          ;                            // Enables for row and column arbitration control through FSM
-	logic refresh_x                     ;                            // Refresh signal for row arbiter to reset
-	logic refresh_y                     ;                            // Refresh signal for row arbiter to reset   
-	logic grp_release_x               ;                            // Group release signal for row arbiter
-    logic grp_release_y               ;                            // Group release signal for column arbiter
+    logic x_enable, y_enable         ;                            // Enables for row and column arbitration control through FSM
+	logic refresh_x                  ;                            // Refresh signal for row arbiter to reset
+	logic refresh_y                  ;                            // Refresh signal for row arbiter to reset   
+	logic grp_release_x              ;                            // Group release signal for row arbiter
+    logic grp_release_y              ;                            // Group release signal for column arbiter
 
     assign req_o =  |req_i;                                        // Logical OR of all input requests to detect active requests
 
@@ -116,8 +116,7 @@ module pixel_level_0  #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
         next_state = current_state;                       // Maintain current state by default
         x_enable = 1'b0;                                  // Disable row arbitration by default
         y_enable = 1'b0;                                  // Disable column arbitration by default
-        refresh_x = 1'b0;                                   // Default refresh is 0
-        refresh_y=1'b0;
+       
 
         case (current_state)
  //------------------IDLE State-----------------------------------------------------------------------------------------------------    
@@ -129,10 +128,13 @@ module pixel_level_0  #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
                     next_state = ROW_GRANT;               // Transition to row grant state
                     refresh_x = 1'b0;
                     refresh_y = 1'b0; 
+
                  end 
 				else 
 				 begin			       
                     next_state = IDLE;                    // Stay in IDLE state if enable_i is low
+                    refresh_x = 1'b1;                                   // Default refresh is 0
+                    refresh_y=1'b1;
                  end 
              end
 //--------------------------------------------------------------------------------------------------------------------------------- 
@@ -236,7 +238,7 @@ module pixel_level_0  #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
         .clk_i         (clk_i)   ,                // Clock input
         .reset_i       (reset_i) ,                // Reset input
         .enable_i      (y_enable),                // Enable signal for column arbitration
-		  .refresh_i     (refresh_y) ,               // Refresh signal
+		.refresh_i     (refresh_y) ,               // Refresh signal
         .req_i         (col_req) ,                // Column requests for the active row
         .gnt_o         (y_gnt_o) ,                // Column grant outputs
         .yadd_o        (y_add_o) ,                // Selected column index

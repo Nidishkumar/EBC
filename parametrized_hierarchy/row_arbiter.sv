@@ -28,26 +28,18 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
     logic [Lvl_ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
     logic [Lvl_ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
     logic [Lvl_ROW_ADD-1:0] xadd_incr;
-	 logic add_done;
+	logic add_done;
+    logic mask_done;
+
 //--------------------------------------------------------------------------------------------------------------------------------------- 
 
- 
-//-----------------Row Arbiter Assignments-------------------------------------------------------------------------
-   
-	 assign mask_req = req_i & mask_ff;                   // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
-    assign grp_release_o =  ~(|mask_req);                //Grp_release will be high if mask_req is zero
-	 assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt);  // Determine the final grant output: either masked grants or raw grants depending on the mask_req
-    assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
-
-//---------------------------------------------------------------------------------------------------------------------------------------
-
-//-----------------Mask and Grant logic----------------------------------------------------------------------
+ //-----------------Mask and Grant logic----------------------------------------------------------------------
     always_ff @(posedge clk_i or posedge reset_i) 
 	   begin
       if (reset_i) 
 		  begin
-            mask_ff <= {Lvl_ROWS{1'b1}};          // Reset mask to all ones (allow all requests)
-            gnt_o   <= {Lvl_ROWS{1'b0}};          // Reset grant output to zero (no grants)
+            mask_ff <= (Lvl_ROWS > 0) ? {Lvl_ROWS{1'b1}} : 1'b1;
+            gnt_o   <= (Lvl_ROWS > 0) ? {Lvl_ROWS{1'b0}} : 1'b0;        // Reset grant output to zero (no grants)
 		 end 
 		else if (enable_i) 
 		 begin
@@ -56,8 +48,8 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
        end
       else if(refresh_i)
 		 begin
-			   mask_ff <= {Lvl_ROWS{1'b1}};          // Initialize mask to all ones (allow all requests)
-            gnt_o   <= {Lvl_ROWS{1'b0}};
+			mask_ff <= (Lvl_ROWS > 0) ? {Lvl_ROWS{1'b1}} : 1'b1;
+            gnt_o   <= (Lvl_ROWS > 0) ? {Lvl_ROWS{1'b0}} : 1'b0;
        end
       else
          begin
@@ -68,8 +60,19 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
       end   
 //-----------------------------------------------------------------------------------------
 
+//-----------------Row Arbiter Assignments-------------------------------------------------------------------------
+   
+	 assign mask_req = req_i & mask_ff;                   // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
+    assign grp_release_o =  ~(|mask_req);                //Grp_release will be high if mask_req is zero
+	 assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt);  // Determine the final grant output: either masked grants or raw grants depending on the mask_req
+    // assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
+// assign nxt_mask = ~((gnt_temp << 1) - ({(Lvl_ROWS-1) ' (1'b0), 1'b1}));
+
+//---------------------------------------------------------------------------------------------------------------------------------------
+
+
     //     // Lint Warning for Multiple Assignmets of next_mask 
-   /* always_comb 
+    always_comb 
 	   begin
         nxt_mask = mask_ff;                   // Default: next mask is the current mask
         mask_done=1'b0;
@@ -82,7 +85,7 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
 					  mask_done=1'b1;
                end
          end
-      end */
+      end 
 		
 //--------------------Encoding Granted Row Index Logic-----------------------------------------------------
     always_comb 

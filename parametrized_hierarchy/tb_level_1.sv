@@ -23,7 +23,7 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
             .reset_i           (reset_i)            ,               // Active high Reset input
             .req_i             (req_i)              ,               // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_out_o         (gnt_out_o)          ,               // grant outputs
-			   .grp_release_out_o (grp_release_out_o)  ,               //Grouplease output
+		    	  .grp_release_out_o (grp_release_out_o)  ,               //Grouplease output
             .data_out_o        (data_out_o)                         //dataout of events
 
   );
@@ -115,11 +115,11 @@ initialize;           //initializing inputs
 #10;
 apply_reset;          //apply reset
 #10;
-apply_requests;       //applying random requests for dynamic pixel sizes
-#80;       
+//apply_requests;       //applying random requests for dynamic pixel sizes
+//#80;       
+//apply_requests;       //applying random requests for dynamic pixel sizes
 apply_requests;       //applying random requests for dynamic pixel sizes
 #1000;
-apply_requests;       //applying random requests for dynamic pixel sizes
 //#100; 
 //apply_requests;       //applying random requests for dynamic pixel sizes
 //#35; 
