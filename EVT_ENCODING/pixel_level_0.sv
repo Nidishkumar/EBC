@@ -133,6 +133,8 @@ module pixel_level_0
 				else 
 				 begin			       
                     next_state = IDLE;                    // Stay in IDLE state if enable_i is low
+                    refresh_x = 1'b1;                                   // Default refresh is 0
+                    refresh_y=1'b1;
                  end 
              end
 //--------------------------------------------------------------------------------------------------------------------------------- 
@@ -236,7 +238,7 @@ module pixel_level_0
         .clk_i         (clk_i)   ,                // Clock input
         .reset_i       (reset_i) ,                // Reset input
         .enable_i      (y_enable),                // Enable signal for column arbitration
-		  .refresh_i     (refresh_y) ,               // Refresh signal
+		.refresh_i     (refresh_y) ,               // Refresh signal
         .req_i         (col_req) ,                // Column requests for the active row
         .gnt_o         (y_gnt_o) ,                // Column grant outputs
         .yadd_o        (y_add_o) ,                // Selected column index

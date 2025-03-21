@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------------------------------------------
 
 import lib_arbiter_pkg::*;                          // Importing arbiter package containing parameter constants
-
 module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
 (
     input  logic clk_i                    ,         // Clock input for Synchronization
@@ -26,8 +25,7 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     logic [Lvl_COLS-1:0] mask_req    ;              // Masked requests (and of req_i and mask_ff)
     logic [Lvl_COLS-1:0] mask_gnt    ;              // Masked grants (output from priority arbiter)
     logic [Lvl_COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
-    logic [Lvl_COL_ADD-1:0]yadd_incr ;
-	 logic add_done;
+    
 //--------------------------------------------------------------------------------------------------------------------
 
 //-----------------Column Arbiter Assignments-------------------------------------------------------------------------
@@ -65,24 +63,6 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
           end
     end
 //---------------------------------------------------------------------------------------------------------------------------------------
-
-
-	 
-    // Lint Warning for Multiple Assignmets of next_mask 
-    /*always_comb 
-     begin
-        nxt_mask = mask_ff;                    // Default: next mask is the current mask
-        mask_done=1'b0;
-        // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < Lvl_COLS ; i = i + 1) 
-		   begin
-            if (gnt_temp[i] && !mask_done) 
-			      begin
-                   nxt_mask = ({Lvl_COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-						 mask_done=1'b1;
-               end
-         end
-     end */
 
 //--------------------Encoding Granted Column Index Logic---------------------------------------------------------------------------------------------------
 	

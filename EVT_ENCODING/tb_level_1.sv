@@ -16,7 +16,7 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
   logic [ROWS-1:0][COLS-1:0] gnt_out_o                       ; //grant output
   logic grp_release_out_o                                    ; //Grouplease output
   logic [WIDTH-1:0] data_out_o                               ; //dataout of events
-  
+  logic valid_data_o                                         ; //valid data output
   top_pixel_hierarchy dut 
   (
             .clk_i             (clk_i)              ,               // Clock input
@@ -24,8 +24,8 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
             .req_i             (req_i)              ,               // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_out_o         (gnt_out_o)          ,               // grant outputs
 			      .grp_release_out_o (grp_release_out_o)  ,               //Grouplease output
-            .data_out_o        (data_out_o)                         //dataout of events
-
+            .data_out_o        (data_out_o)         ,                    //dataout of events
+            .valid_data_o      (valid_data_o)                       //valid data output
   );
 
  //-------------------------------------------Clock generation-------------------------------------------------------//
@@ -116,20 +116,24 @@ initialize;           //initializing inputs
 apply_reset;          //apply reset
 #10;
 apply_requests;       //applying random requests for dynamic pixel sizes
-// #20;       
-// apply_requests;       //applying random requests for dynamic pixel sizes
-// #25;
-// apply_requests;       //applying random requests for dynamic pixel sizes
-// #100; 
-// apply_requests;       //applying random requests for dynamic pixel sizes
-// #35; 
-// apply_requests;       //applying random requests for dynamic pixel sizes
-// #55; 
-// apply_requests;       //applying random requests for dynamic pixel sizes
-// #80; 
-// apply_requests;       //applying random requests for dynamic pixel sizes
-// #10; 
-// apply_requests;       //applying random requests for dynamic pixel sizes
+#20;       
+apply_requests;       //applying random requests for dynamic pixel sizes
+#25;
+apply_requests;       //applying random requests for dynamic pixel sizes
+#100; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#35; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#55; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#80; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#10; 
+apply_requests;       //applying random requests for dynamic pixel sizes
+#40
+apply_requests;       //applying random requests for dynamic pixel sizes
+#105; 
+apply_requests;       //applying random requests for dynamic pixel sizes
 #500; 
 $stop;                //stop simulation
 end

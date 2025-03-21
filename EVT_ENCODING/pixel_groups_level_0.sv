@@ -13,12 +13,12 @@ module pixel_groups_level_0
     input logic [ROWS-1:0][COLS-1:0][POLARITY-1:0] req_i ,   // EBC Sensors input pixel data with polarity
     input logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] enable_i    ,   // Enable from the higher level hierarchy grant
     output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0] req_o      ,   // Request signals from each group to the higher level
-  	 output logic [ROWS-1:0][COLS-1:0] gnt_out_o          ,   //Overall grant for the all active requests
+  	output logic [ROWS-1:0][COLS-1:0] gnt_out_o          ,   //Overall grant for the all active requests
     output logic [Lvl0_ROWS-1:0][Lvl0_COLS-1:0] gnt_o    ,   // Grant for lower pixel groups 
     output logic [Lvl0_ADD-1:0] x_add_o                  ,   // Row address of the lower level group
     output logic [Lvl0_ADD-1:0] y_add_o                  ,   // Column address of the lower level group
     output logic active_o                                ,   // active_o indicates if any group arbitration is active
-	 output logic grp_release_o                               // Group release signal indicates completion of lower level group arbitration
+	output logic grp_release_o                               // Group release signal indicates completion of lower level group arbitration
 
 );
 
@@ -48,7 +48,7 @@ module pixel_groups_level_0
                     for (int col = 0; col < Lvl0_COLS; col++) 
 					      begin
                            set_group[no_group][row][col] = (|req_i[(no_group / CONST0) * Lvl0_GROUP_SIZE + row][(no_group % CONST0) * Lvl0_GROUP_SIZE + col]);  // Mapping pixels to the individual groups
-					            gnt_out_o[(no_group / CONST0) * Lvl0_GROUP_SIZE + row][(no_group % CONST0) * Lvl0_GROUP_SIZE + col] = gnt_temp[no_group][row][col]; // Mapping lower group grants to overall grant  
+					       gnt_out_o[(no_group / CONST0) * Lvl0_GROUP_SIZE + row][(no_group % CONST0) * Lvl0_GROUP_SIZE + col] = gnt_temp[no_group][row][col]; // Mapping lower group grants to overall grant  
                      end 
                  end
            end

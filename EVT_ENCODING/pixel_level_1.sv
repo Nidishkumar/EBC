@@ -142,12 +142,16 @@ module pixel_level_1
                     begin
                         x_enable = 1'b1;                            // Enable row arbitration
                         next_state = ROW_GRANT;                     // Transition to ROW_GRANT state
+                        refresh_x=1'b0;                                    //Initialize the row arbiter
+                        refresh_y=1'b0;                                    //Initialize the row arbiter
                     end
                     else                                            //If enable is low,
                     begin
                         x_enable = 1'b0;                             //row enable will low  
                         y_enable = 1'b0;                             //column enable will low  
                         next_state = IDLE;                           //next_state to IDLE
+                        refresh_x = 1'b1;                                    //Initialize the row arbiter
+                        refresh_y=1'b1;                                    //Initialize the row arbiter
                     end  
             end
 //-------------------------------------------------------------------------------------------------------------------------
@@ -163,6 +167,8 @@ module pixel_level_1
                         y_enable = 1'b1;                            // Enable column arbitration
                         x_enable = 1'b0;                            // Disable row arbitration
                         next_state = COL_GRANT;                     // Transition to COL_GRANT state
+                        refresh_x=1'b0;                                    //Initialize the row arbiter
+                        refresh_y=1'b0;                                    //Initialize the row arbiter
                     end
 				end
                 else                                            //If enable is low,
@@ -187,7 +193,8 @@ module pixel_level_1
                         x_enable = 1'b1;                            // Re-enable row arbitration
                         y_enable = 1'b0;                            // Disable column arbitration
                         next_state = ROW_GRANT;                     // Transition back to ROW_GRANT                                    //Initialize the row arbiter
-                        refresh_y=1'b1;                                    //Initialize the row arbiter
+                        refresh_y=1'b1;     
+                        refresh_x=1'b0;                               //Initialize the row arbiter
                      end
 				end
 				else                                               //If enable is low,

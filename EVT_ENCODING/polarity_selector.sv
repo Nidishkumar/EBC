@@ -16,26 +16,21 @@ module polarity_selector
 );
 
 //-------------------Polarity_out logic--------------------------------------------------------------------------------------------
-always_comb //ff@(posedge clk_i or posedge reset_i) 
+always_ff@(posedge clk_i or posedge reset_i) 
  begin
-    // if (reset_i) 
-    // begin
-    //     polarity_out <= 1'b0;                 // Reset the output polarity to 0 when reset is triggered
-    // end
-    // else 
-    //  begin
+    if (reset_i) 
+    begin
+        polarity_out <= 1'b0;                 // Reset the output polarity to 0 when reset is triggered
+    end
+    else 
+     begin
         case(req_i)
             2'b10   : polarity_out = 1'b1;   // If req_i is 2'b10, set polarity_out to 1,indicates intensity higher than threshold
             2'b01   : polarity_out = 1'b0;   // If req_i is 2'b01, set polarity_out to 0,indicates intensity lower than threshold
             default : polarity_out = 1'b0;   // Default case:set polarity_out to 0
         endcase
-     end
-    // if(req_i==2'b10)
-    //     polarity_out=1'b1;
-    // else
-    //     polarity_out=1'b0;
-    
-//  end
+     end    
+  end
 //-------------------------------------------------------------------------------------------------------------------------
 endmodule
 

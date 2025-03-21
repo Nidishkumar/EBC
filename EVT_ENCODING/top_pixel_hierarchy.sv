@@ -5,18 +5,8 @@
 // Date: []
 // Version: []
 //------------------------------------------------------------------------------------------------------------------
-`include "pixel_groups_level_0.sv"
-`include "pixel_level_0.sv"
-`include "pixel_level_1.sv"
-`include "column_arbiter.sv"
-`include "row_arbiter.sv"
-`include "event_encoder.sv"
-`include "polarity_selector.sv"
-`include "wall_clock.sv"
-`include "priority_arb.sv"
 
-import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constants
-
+import lib_arbiter_pkg::*;  // Importing arbiter package containing parameter constant
 module top_pixel_hierarchy 
 (
     input logic clk_i                                    ,  // Input clock for Synchronization
@@ -65,42 +55,43 @@ assign grp_release_out_o=grp_release[1];//grp_release as a indication of all act
 assign x_add = {x_add_1, x_add_0};      // Combine all levels Row addresses 
 assign y_add = {y_add_1, y_add_0};      // Combine all levels column address 
 assign polarity_in = req_i[x_add][y_add]; // Sends the active row's ,column's request polarity to the polarity module.
-assign active_in = &active;               // overall arbitration will active, if all levels arbitration active 
-//-------------------------------------------------------------------------------------------------------------------------
-always_comb
+//assign
+always_ff@(posedge clk_i or posedge reset_i)
 begin
-    $write("\nreq[%0b][%0b]= %d",x_add,y_add,polarity_in);  
+if(reset_i)
+  begin
+    active_in =0;
+	 active_req <=0;
+
+  end
+else
+  begin
+    active_in =&active;
+	 active_req <= |req_i;
+
+  end
 end
+//---------------------------------------------------------------------------------------------------------------------------------------------
+
 //-------------------Granted Pixel Row and Column address logic--------------------------------------------------------------------------------------------
 always_ff @(posedge clk_i or posedge reset_i) 
- begin
+begin
     if (reset_i) 
     begin
-        x_add_ff <= 'b0;      // Reset row address
-        y_add_ff <= 'b0;      // Reset column address
+        x_add_f  <= 'b0;
+        y_add_f  <= 'b0;
+        x_add_ff <= 'b0;
+        y_add_ff <= 'b0;
     end 
     else 
     begin
-        x_add_ff <= x_add;    // Store row address
-        y_add_ff <= y_add;    // Store column address
+        x_add_f  <= x_add;     // Stage 1
+        y_add_f  <= y_add;
+        x_add_ff <= x_add_f;   // Stage 2
+        y_add_ff <= y_add_f;
     end 
- end 
-
-// always_ff @(posedge clk_i or posedge reset_i) 
-//  begin
-//     if (reset_i) 
-//     begin
-//         x_add_ff <= 'b0;      // Reset row address
-//         y_add_ff <= 'b0;      // Reset column address
-//     end 
-//     else 
-//     begin
-//         x_add_ff <= x_add_f;    // Store row address
-//         y_add_ff <= y_add_f;    // Store column address
-//     end 
-//  end 
-//-------------------------------------------------------------------------------------------------------------------------
-assign active_req=|req_i; 
+end
+//----------------------------------------------------------------------------------------------------------------------------------------------
 
 // Instantiating submodules to handle different pixel levels
 pixel_level_1 level_1 

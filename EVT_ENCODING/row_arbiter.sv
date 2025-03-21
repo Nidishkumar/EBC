@@ -27,16 +27,14 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
     logic [Lvl_ROWS-1:0] mask_gnt;                // Masked grants (output from masked priority arbiter)
     logic [Lvl_ROWS-1:0] raw_gnt ;                // Raw grants (output from raw priority arbiter)
     logic [Lvl_ROWS-1:0] gnt_temp;                // Temporary grant value before updating the output
-    logic [Lvl_ROW_ADD-1:0] xadd_incr;
-	 logic add_done;
 //--------------------------------------------------------------------------------------------------------------------------------------- 
 
  
 //-----------------Row Arbiter Assignments-------------------------------------------------------------------------
    
-	 assign mask_req = req_i & mask_ff;                   // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
+	assign mask_req = req_i & mask_ff;                   // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign grp_release_o =  ~(|mask_req);                //Grp_release will be high if mask_req is zero
-	 assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt);  // Determine the final grant output: either masked grants or raw grants depending on the mask_req
+	assign gnt_temp = (|mask_req ? mask_gnt : raw_gnt);  // Determine the final grant output: either masked grants or raw grants depending on the mask_req
     assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_ROWS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
 
 //---------------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +82,7 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
          end
       end */
 		
-//--------------------Encoding Granted Row Index Logic-----------------------------------------------------
+//--------------------Encoding Granted Row Index Logic---------------------------------------------------------------------------------------------------
     always_comb begin
         xadd_o = {Lvl_ROW_ADD{1'b0}};                        // Initialize xadd_o to 0
         for (int i = 0; i < Lvl_ROWS ; i = i + 1) begin
@@ -93,6 +91,8 @@ module row_arbiter #(parameter Lvl_ROWS=2 , parameter Lvl_ROW_ADD=1)
             end
         end
     end  
+
+//---------------------------------------------------------------------------------------------------------------------------------------
     // Priority arbiter for masked requests (gives grants based on the masked requests)
     Priority_arb #(.Lvl_ROWS(Lvl_ROWS))
 	 maskedGnt 
