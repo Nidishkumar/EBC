@@ -11,13 +11,13 @@ module pixel_level_0  #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
 (
     input  logic clk_i, reset_i                                   ,  // Clock and Reset inputs
     input  logic enable_i                                         ,  // Enable signal to activate arbitration
-    input  logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]req_i              ,  // Input request with polarity from lower level groups
-    output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]gnt_o              ,  // Grant for the corresponding loer level group requests
-    output logic [Lvl_ADD-1:0] x_add_o                           ,  // Selected row index for lower level group
-    output logic [Lvl_ADD-1:0] y_add_o                           ,  // Selected column index for lower level group
+    input  logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]req_i                ,  // Input request with polarity from lower level groups
+    output logic [Lvl_ROWS-1:0][Lvl_COLS-1:0]gnt_o                ,  // Grant for the corresponding loer level group requests
+    output logic [Lvl_ADD-1:0] x_add_o                            ,  // Selected row index for lower level group
+    output logic [Lvl_ADD-1:0] y_add_o                            ,  // Selected column index for lower level group
     output logic active_o                                         ,  // Indicates the arbitration is active or not
     output logic req_o                                            ,  // Indicates any active requests in each lower level group to give as input request to higher level
-	 output logic grp_release_o                                       // Indicates group release for lower level group(all operations done)
+	output logic grp_release_o                                       // Indicates group release for lower level group(all operations done)
 );
 
     // Internal signals

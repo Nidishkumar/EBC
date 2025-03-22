@@ -26,9 +26,7 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     logic [Lvl_COLS-1:0] mask_req    ;              // Masked requests (and of req_i and mask_ff)
     logic [Lvl_COLS-1:0] mask_gnt    ;              // Masked grants (output from priority arbiter)
     logic [Lvl_COLS-1:0] gnt_temp    ;              // Temporary grant value before registering output
-    logic [Lvl_COL_ADD-1:0]yadd_incr ;
-	 logic add_done;
-   logic mask_done;
+	  logic mask_done;
 //--------------------------------------------------------------------------------------------------------------------
 //-----------------Mask and Grant logic------------------------------------------------------------------------------------
 
@@ -52,7 +50,7 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
         else
           begin
             mask_ff <= mask_ff;              // Update mask based on next mask 
-            gnt_o   <= gnt_o;              // Register the grant temp to output
+            gnt_o   <= gnt_o;               // Register the grant temp to output
           end
     end
 //---------------------------------------------------------------------------------------------------------------------------------------
@@ -62,32 +60,27 @@ module column_arbiter #(parameter Lvl_COLS=2 , parameter Lvl_COL_ADD=1)
     assign mask_req = req_i & mask_ff ;              // Masking the input request signals (req_i) using the current mask (mask_ff) to filter active requests
     assign grp_release_o =  ~(|mask_req) ;           //Grp_release will be high if mask_req is zero
     assign gnt_temp = mask_gnt ;                     // Register the combinational grant from masked arbiter
-    // assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_COLS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
+    assign nxt_mask= ~((gnt_temp << 1)-({{(Lvl_COLS-1){1'b0}}, 1'b1})); //Next mask updation based on grant
     // assign nxt_mask = ~((gnt_temp << 1) - ({(Lvl_COLS-1) ' (1'b0), 1'b1}));
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-
-	 
+//----------------------------------------------------------------------------------------------------------------------	 
     // Lint Warning for Multiple Assignmets of next_mask 
-    always_comb 
-     begin
-        nxt_mask = mask_ff;                    // Default: next mask is the current mask
-        mask_done=1'b0;
-        // Iterate through the gnt_temp bits to calculate the next mask
-        for (int i = 0; i < Lvl_COLS ; i = i + 1) 
-		   begin
-            if (gnt_temp[i] && !mask_done) 
-			      begin
-                   nxt_mask = ({Lvl_COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
-						 mask_done=1'b1;
-               end
-         end
-     end 
+    // always_comb 
+    //  begin
+    //     nxt_mask = mask_ff;                    // Default: next mask is the current mask
+    //     mask_done=1'b0;
+    //     // Iterate through the gnt_temp bits to calculate the next mask
+    //     for (int i = 0; i < Lvl_COLS ; i = i + 1) 
+		//    begin
+    //         if (gnt_temp[i] && !mask_done) 
+		// 	      begin
+    //                nxt_mask = ({Lvl_COLS{1'b1}} << (i + 1)); // Next mask update based on current grant 
+		// 			      	 mask_done=1'b1;
+    //            end
+    //      end
+    //  end 
 
 //--------------------Encoding Granted Column Index Logic---------------------------------------------------------------------------------------------------
-	
     // Lint Warning for Multiple Assignmets of yadd_o
    // Lint Warning for Multiple Assignmets of yadd_o
       always_comb begin

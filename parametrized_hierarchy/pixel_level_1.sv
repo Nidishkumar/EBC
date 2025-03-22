@@ -28,7 +28,7 @@ module pixel_level_1 #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
 
     logic x_enable, y_enable       ;                             // Enable signals for row and column arbitration
     logic refresh_x                ;                             // Refresh signal for initialize row arbiter
-    logic refresh_y                ;                         // Refresh signal for initialize row arbiter
+    logic refresh_y                ;                             // Refresh signal for initialize row arbiter
     logic grp_release_x            ;                             // Group release signal for row arbitration
     logic grp_release_y            ;                             // Group release signal for column arbitration
 
@@ -60,35 +60,6 @@ module pixel_level_1 #(parameter Lvl_ROWS=2, Lvl_COLS=2, Lvl_ADD=1)
     state_t current_state, next_state;                          // FSM state variables
 //------------------------------------------------------------------------------------------------------------------------------
 
-//Lint warn grp_release_clk acts as non-clock in some cases	 
-/*    always_ff @(posedge clk_i or posedge reset_i) 
-    begin
-        if (reset_i) 
-            grp_release_clk <= 1'b0;                            // Reset group release clock
-				
-        else if (enable_i) 
-        begin
-            case (current_state) 
-				
-                IDLE: grp_release_clk <= !grp_release_clk;       // Toggle clock in IDLE state
-					 
-                ROW_GRANT: grp_release_clk <= !grp_release_clk;  // Toggle clock in ROW_GRANT state
-					 
-                default: 
-					  begin 
-					  
-					    if (toggle)  
-                            grp_release_clk <= !grp_release_clk;
-                   else
-                            grp_release_clk <= |grp_enable_i;     //grp_free_i getting from lower level indicates the group reaches to final request
-					  end
-            endcase
-        end
-        else
-            grp_release_clk <= 1'b0;                            // Disable group release clock when not enabled
-    end 
-	 
-*/
 
 //------------------FSM Current state logic--------------------------------------------------------------------------------- 
     always_ff @(posedge clk_i or posedge reset_i) 

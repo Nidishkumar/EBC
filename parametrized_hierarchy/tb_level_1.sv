@@ -16,7 +16,7 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
   logic [ROWS1-1:0][COLS1-1:0] gnt_out_o                    ; //grant output
   logic grp_release_out_o                                    ; //Grouplease output
   logic [WIDTH-1:0] data_out_o                               ; //dataout of events
-  
+  logic valid_data_o                                         ; //valid data output
   top_pixel_hierarchy dut 
   (
             .clk_i             (clk_i)              ,               // Clock input
@@ -24,8 +24,8 @@ import lib_arbiter_pkg::*;                                     // Importing arbi
             .req_i             (req_i)              ,               // Request signals for each row and column, with POLARITY bits determining the signal's polarity 
             .gnt_out_o         (gnt_out_o)          ,               // grant outputs
 		    	  .grp_release_out_o (grp_release_out_o)  ,               //Grouplease output
-            .data_out_o        (data_out_o)                         //dataout of events
-
+            .data_out_o        (data_out_o)        ,                    //dataout of events
+            .valid_data_o      (valid_data_o)                       //valid data output
   );
 
  //-------------------------------------------Clock generation-------------------------------------------------------//
